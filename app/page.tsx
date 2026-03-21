@@ -457,7 +457,7 @@ export default function Home() {
 							<button
 								disabled={selectedServices.length === 0}
 								onClick={() => handleNext(3)}
-								className="flex-[2] font-['Bebas_Neue'] text-[20px] tracking-[2px] bg-[#e63946] text-white px-9 py-4 rounded-md transition-all hover:bg-[#c1121f] hover:-translate-y-[1px] flex items-center justify-center gap-2.5 w-full disabled:bg-[#e0e0e0] disabled:text-[#c4c4c4] disabled:cursor-not-allowed disabled:transform-none"
+								className="flex-2 font-['Bebas_Neue'] text-[20px] tracking-[2px] bg-[#e63946] text-white px-9 py-4 rounded-md transition-all hover:bg-[#c1121f] hover:-translate-y-1 flex items-center justify-center gap-2.5 w-full disabled:bg-[#e0e0e0] disabled:text-[#c4c4c4] disabled:cursor-not-allowed disabled:transform-none"
 							>
 								Próximo: Escolher Horário →
 							</button>
@@ -590,7 +590,7 @@ export default function Home() {
 
 						<div className="flex gap-3 mt-6">
 							<button
-								className="flex-[2] font-['Bebas_Neue'] text-[20px] tracking-[2px] bg-[#e63946] text-white px-9 py-4 rounded-md transition-all hover:bg-[#c1121f] hover:-translate-y-[1px] flex items-center justify-center gap-2.5 w-full disabled:bg-[#e0e0e0] disabled:text-[#c4c4c4] disabled:cursor-not-allowed disabled:transform-none"
+								className="flex-2 font-['Bebas_Neue'] text-[20px] tracking-[2px] bg-[#e63946] text-white px-9 py-4 rounded-md transition-all hover:bg-[#c1121f] hover:-translate-y-1 flex items-center justify-center gap-2.5 w-full disabled:bg-[#e0e0e0] disabled:text-[#c4c4c4] disabled:cursor-not-allowed disabled:transform-none"
 								disabled={!selectedDate || !selectedTime}
 								onClick={() => handleNext(4)}
 							>
@@ -667,7 +667,7 @@ export default function Home() {
 							</div>
 						</div>
 
-						<div className="bg-[#fffbea] border-[1.5px] border-[#d4a017] rounded-md px-4 py-3 text-[13px] text-[#444] mt-4 flex gap-2 items-start leading-[1.5]">
+						<div className="bg-[#fffbea] border-[1.5px] border-[#d4a017] rounded-md px-4 py-3 text-[13px] text-[#444] mt-4 flex gap-2 items-start leading-1.5">
 							<span>📱</span>
 							<span>
 								Você vai receber a confirmação no seu WhatsApp. Guarda o número do barbeiro por
@@ -677,7 +677,7 @@ export default function Home() {
 
 						<div className="flex gap-3 mt-6">
 							<button
-								className="flex-[2] font-['Bebas_Neue'] text-[20px] tracking-[2px] bg-[#e63946] text-white px-9 py-4 rounded-md transition-all hover:bg-[#c1121f] hover:-translate-y-[1px] flex items-center justify-center gap-2.5 w-full disabled:bg-[#e0e0e0] disabled:text-[#c4c4c4] disabled:cursor-not-allowed disabled:transform-none"
+								className="flex-2 font-['Bebas_Neue'] text-[20px] tracking-[2px] bg-[#e63946] text-white px-9 py-4 rounded-md transition-all hover:bg-[#c1121f] hover:-translate-y-1 flex items-center justify-center gap-2.5 w-full disabled:bg-[#e0e0e0] disabled:text-[#c4c4c4] disabled:cursor-not-allowed disabled:transform-none"
 								disabled={!clientName || !clientPhone}
 								onClick={() => handleNext(5)}
 							>
@@ -747,7 +747,7 @@ export default function Home() {
 						</div>
 
 						<button
-							className="w-[100%] font-['Bebas_Neue'] text-[20px] tracking-[2px] bg-[#e63946] text-white px-9 py-4 rounded-md transition-all hover:bg-[#c1121f] hover:-translate-y-[1px] flex items-center justify-center gap-2.5 disabled:bg-[#e0e0e0] disabled:text-[#c4c4c4] disabled:cursor-not-allowed disabled:transform-none"
+							className="w-full font-['Bebas_Neue'] text-[20px] tracking-[2px] bg-[#e63946] text-white px-9 py-4 rounded-md transition-all hover:bg-[#c1121f] hover:-translate-y-1 flex items-center justify-center gap-2.5 disabled:bg-[#e0e0e0] disabled:text-[#c4c4c4] disabled:cursor-not-allowed disabled:transform-none"
 							disabled={isSubmitting}
 							onClick={handleConfirm}
 						>
@@ -783,7 +783,7 @@ export default function Home() {
 							brother!
 						</p>
 
-						<button className="bg-[#25D366] text-white font-['Barlow_Condensed'] text-[18px] font-bold tracking-[1px] px-8 py-3.5 rounded-full uppercase cursor-pointer transition-all hover:bg-[#1EBE5A] hover:-translate-y-0.5 shadow-[0_10px_20px_rgba(37,211,102,0.3)] w-[100%] max-w-[280px] mx-auto flex items-center justify-center gap-2.5">
+						<button className="bg-[#25D366] text-white font-['Barlow_Condensed'] text-[18px] font-bold tracking-[1px] px-8 py-3.5 rounded-full uppercase cursor-pointer transition-all hover:bg-[#1EBE5A] hover:-translate-y-0.5 shadow-[0_10px_20px_rgba(37,211,102,0.3)] w-full max-w-[280px] mx-auto flex items-center justify-center gap-2.5">
 							<svg className="w-7 h-7" viewBox="0 0 32 32" fill="none">
 								<circle cx="16" cy="16" r="16" fill="#fff" />
 								<path
