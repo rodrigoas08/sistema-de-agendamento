@@ -1,9 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { X } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
@@ -13,9 +13,7 @@ const loginSchema = z.object({
 		.string()
 		.min(1, "Campo obrigatório")
 		.email("Usuário deve ser um e-mail válido"),
-	senha: z
-		.string()
-		.min(1, "Campo obrigatório"),
+	senha: z.string().min(1, "Campo obrigatório"),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -64,6 +62,14 @@ export default function LoginButton() {
 			},
 		});
 	};
+
+	useEffect(() => {
+		if (isOpen) {
+			document.body.style.overflow = "hidden";
+		} else {
+			document.body.style.overflow = "auto";
+		}
+	}, [isOpen]);
 
 	return (
 		<>
@@ -153,50 +159,56 @@ export default function LoginButton() {
 							</div>
 
 							<div>
-					<label className="block text-sm font-bold text-gray-700 mb-1">Senha</label>
-					<div className="relative">
-						<input
-							type="password"
-							{...register("senha")}
-							className={cn(
-								"w-full pl-4 pr-10 py-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black",
-								errors.senha && "border-red-500",
+								<label className="block text-sm font-bold text-gray-700 mb-1">Senha</label>
+								<div className="relative">
+									<input
+										type="password"
+										{...register("senha")}
+										className={cn(
+											"w-full pl-4 pr-10 py-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black",
+											errors.senha && "border-red-500",
+										)}
+										placeholder="Sua senha"
+									/>
+									{senhaValue && (
+										<button
+											type="button"
+											onClick={() => setValue("senha", "", { shouldValidate: true })}
+											className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+										>
+											<X size={18} />
+										</button>
+									)}
+								</div>
+								{errors.senha && (
+									<p className="text-red-500 text-xs mt-1 font-semibold">
+										{errors.senha.message}
+									</p>
+								)}
+							</div>
+
+							{loginError && (
+								<p className="text-red-500 text-sm font-bold text-center bg-red-50 border border-red-200 rounded px-3 py-2">
+									{loginError}
+								</p>
 							)}
-							placeholder="Sua senha"
-						/>
-						{senhaValue && (
-							<button
-								type="button"
-								onClick={() => setValue("senha", "", { shouldValidate: true })}
-								className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-							>
-								<X size={18} />
-							</button>
-						)}
+
+							<div className="w-full flex flex-col items-end">
+								<button
+									type="submit"
+									disabled={isLoading}
+									className="flex items-center justify-center w-full mt-4 py-4 text-white font-bold bg-red-500 hover:bg-red-600 disabled:bg-red-300 rounded transition-colors tracking-wide"
+								>
+									{isLoading ? (
+										<Loader2 className="animate-spin" />
+									) : (
+										"ENTRAR NA ÁREA ADMINISTRATIVA"
+									)}
+								</button>
+							</div>
+						</form>
 					</div>
-					{errors.senha && (
-						<p className="text-red-500 text-xs mt-1 font-semibold">{errors.senha.message}</p>
-					)}
 				</div>
-
-				{loginError && (
-					<p className="text-red-500 text-sm font-bold text-center bg-red-50 border border-red-200 rounded px-3 py-2">
-						{loginError}
-					</p>
-				)}
-
-				<div className="w-full flex flex-col items-end">
-					<button
-						type="submit"
-						disabled={isLoading}
-						className="w-full bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white font-bold py-4 rounded transition-colors tracking-wide mt-4"
-					>
-						{isLoading ? "Entrando..." : "ENTRAR NA ÁREA ADMINISTRATIVA"}
-					</button>
-				</div>
-			</form>
-			</div>
-			</div>
 			)}
 		</>
 	);
