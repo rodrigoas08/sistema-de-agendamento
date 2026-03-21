@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import LoginButton from "@/components/ui/LoginButton";
 import { createClient } from "@/utils/supabase/client";
-import { clientCss } from "@/components/ClientStyle";
+import { cn } from "@/lib/utils";
 
 type Barber = {
 	id: string;
@@ -53,6 +53,9 @@ const ALL_SLOTS = [
 	"16:30",
 	"17:00",
 	"17:30",
+	"18:00",
+	"18:30",
+	"19:00",
 ];
 
 export default function Home() {
@@ -179,470 +182,627 @@ export default function Home() {
 	const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
 	return (
-		<>
-			<style dangerouslySetInnerHTML={{ __html: clientCss }} />
+		<div className="font-['Barlow'] bg-white text-[#0a0a0a] min-h-dvh overflow-x-hidden">
+			<header className="bg-[#0a0a0a] h-16 flex items-center justify-between px-4 sticky top-0 z-[200] border-b-2 border-b-[#e63946]">
+				<a
+					href="#"
+					className="font-['Bebas_Neue'] text-[26px] text-white tracking-[3px] flex items-center gap-2.5 no-underline"
+				>
+					<span className="w-2.5 h-2.5 bg-[#e63946] rounded-full inline-block"></span>
+					Seu<em className="text-[#e63946] italic">Negócio</em>
+				</a>
+				<nav className="flex gap-2 items-center">
+					<LoginButton />
+				</nav>
+			</header>
 
-			{/* We use original DOM and class names */}
-			<div className="client-page">
-				<header className="client-header">
-					<a className="logo" href="#">
-						<span className="logo-dot"></span>Seu
-						<em style={{ color: "var(--red)" }}>Negócio</em>
-					</a>
-					<nav>
-						<LoginButton />
-					</nav>
-				</header>
+			<section className="bg-[#0a0a0a] pt-16 px-4 pb-14 text-center relative overflow-hidden before:content-[''] before:absolute before:inset-0 before:bg-[url('data:image/svg+xml,%3Csvg%20width=%2760%27%20height=%2760%27%20xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cpath%20d=%27M0%2060L60%200M-10%2010L10-10M50%2070L70%2050%27%20stroke=%27%23E63946%27%20stroke-width=%270.3%27%20opacity=%270.12%27/%3E%3C/svg%3E')] before:opacity-60">
+				<p className="font-['Barlow_Condensed'] text-xs font-bold tracking-[4px] uppercase text-[#e63946] mb-3.5 relative inline-block px-3 py-1.5 bg-[#e63946]/10 rounded-md">
+					✂ Agendamento Online
+				</p>
+				<h1 className="font-['Bebas_Neue'] text-[clamp(56px,11vw,100px)] text-white leading-[0.9] tracking-[3px] relative mb-5">
+					BARBEARIA
+					<br />
+					<em className="text-[#e63946] not-italic">DO SEU JEITO</em>
+				</h1>
+				<p className="text-[15px] text-[#c4c4c4] mt-4 relative font-medium max-w-[400px] mx-auto leading-relaxed">
+					Escolha seu barbeiro, seu horário e apareça na hora — sem fila, sem papo.
+				</p>
+				<div className="mt-9 relative">
+					<button
+						onClick={() =>
+							document.getElementById("booking")?.scrollIntoView({ behavior: "smooth" })
+						}
+						className="font-['Bebas_Neue'] text-[22px] tracking-[2px] bg-[#e63946] text-white px-12 py-4 rounded-md cursor-pointer transition-all hover:bg-[#c1121f] hover:-translate-y-0.5 inline-flex items-center gap-3"
+					>
+						✂ Agendar Agora
+					</button>
+				</div>
+				<div className="flex justify-center mt-12 relative border-t border-white/10 pt-8 text-3xl">
+					<div className="text-center px-4 border-r border-white/10">
+						<b className="text-[#d4a017] block leading-none">{barbers.length || 0}</b>
+						<span className="text-[11px] text-[#888] uppercase tracking-[2px] font-semibold">
+							Barbeiros
+						</span>
+					</div>
+					<div className="text-center px-5 border-r border-white/10">
+						<b className="text-[#d4a017] block leading-none">{services.length || 0}</b>
+						<span className="text-[11px] text-[#888] uppercase tracking-[2px] font-semibold">
+							Serviços
+						</span>
+					</div>
+					<div className="text-center px-5 border-r border-white/10">
+						<b className="text-[#d4a017] block leading-none">100%</b>
+						<span className="text-[11px] text-[#888] uppercase tracking-[2px] font-semibold">
+							Online
+						</span>
+					</div>
+					<div className="text-center px-5">
+						<b className="text-[#d4a017] block leading-none">0</b>
+						<span className="text-[11px] text-[#888] uppercase tracking-[2px] font-semibold">
+							Fila
+						</span>
+					</div>
+				</div>
+			</section>
 
-				<section className="hero">
-					<p className="hero-tag">✂ Agendamento Online</p>
-					<h1>
-						BARBEARIA
-						<br />
-						<em>DO SEU JEITO</em>
-					</h1>
-					<p className="hero-sub">
-						Escolha seu barbeiro, seu horário e apareça na hora — sem fila, sem papo.
-					</p>
-					<div className="hero-cta">
-						<button
-							className="btn-hero"
-							onClick={() =>
-								document.getElementById("booking")?.scrollIntoView({ behavior: "smooth" })
-							}
+			<main id="booking" className="relative max-w-[700px] mx-auto mt-4 px-4 pb-24">
+				{step <= 5 && (
+					<>
+						<div className="mb-8 text-center" id="booking-head">
+							<h2 className="font-['Bebas_Neue'] text-[34px] tracking-[2px] text-[#0a0a0a] mb-2">
+								FAÇA SEU AGENDAMENTO
+							</h2>
+							<p className="text-[13px] text-[#888] font-medium mt-1">
+								Rápido, fácil e sem complicação — do jeito que tem que ser.
+							</p>
+						</div>
+						<div
+							className="flex mb-11 border-[1.5px] border-[#e0e0e0] rounded-xl overflow-hidden"
+							id="progress"
 						>
-							✂ Agendar Agora
-						</button>
-					</div>
-					<div className="hero-strip">
-						<div className="hero-stat">
-							<b>{barbers.length || 0}</b>
-							<span>Barbeiros</span>
-						</div>
-						<div className="hero-stat">
-							<b>{services.length || 0}</b>
-							<span>Serviços</span>
-						</div>
-						<div className="hero-stat">
-							<b>100%</b>
-							<span>Online</span>
-						</div>
-						<div className="hero-stat">
-							<b>0</b>
-							<span>Fila</span>
-						</div>
-					</div>
-				</section>
-
-				<main id="booking" className="booking-wrap">
-					{step <= 5 && (
-						<>
-							<div className="section-head" id="booking-head">
-								<h2>FAÇA SEU AGENDAMENTO</h2>
-								<p>Rápido, fácil e sem complicação — do jeito que tem que ser.</p>
-							</div>
-							<div className="progress" id="progress">
-								{[1, 2, 3, 4, 5].map((s, idx) => (
-									<div
-										key={s}
-										className={`prog-step ${step === s ? "active" : ""} ${step > s ? "done" : ""}`}
+							{[1, 2, 3, 4, 5].map((s, idx) => (
+								<div
+									key={s}
+									className={cn(
+										"relative flex flex-1 flex-col shrink items-center px-2 py-3.5 gap-[3px] transition-colors border-r-[1.5px] border-[#e0e0e0] last:border-r-0 bg-white",
+										step === s && "bg-[#0a0a0a]",
+										step > s && "bg-[#f9f9f9]",
+									)}
+								>
+									<span
+										className={cn(
+											"font-['Bebas_Neue'] text-2xl leading-none transition-colors",
+											step === s ? "text-[#e63946]" : "text-[#c4c4c4]",
+										)}
 									>
-										<span className="prog-n">0{s}</span>
-										<span className="prog-lbl">
-											{["Barbeiro", "Serviço", "Horário", "Dados", "Confirmar"][idx]}
-										</span>
-										<span className="prog-tick" style={{ display: step > s ? "flex" : "none" }}>
+										0{s}
+									</span>
+									<span
+										className={cn(
+											"font-['Barlow_Condensed'] text-[10px] font-bold tracking-[1.5px] uppercase transition-colors",
+											step === s ? "text-white/70" : "text-[#c4c4c4]",
+										)}
+									>
+										{["Barbeiro", "Serviço", "Horário", "Dados", "Confirmar"][idx]}
+									</span>
+									{step > s && (
+										<span className="absolute top-2 right-2 w-4 h-4 bg-[#e63946] rounded-full text-[9px] text-white flex items-center justify-center font-bold">
 											✓
 										</span>
-									</div>
-								))}
-							</div>
-						</>
-					)}
-
-					{step === 1 && (
-						<div className="step-panel active">
-							<div className="section-head">
-								<h2>ESCOLHE O CARA</h2>
-								<p>Seleciona o barbeiro que vai te deixar na régua.</p>
-							</div>
-							<div className="barbers-grid">
-								{barbers.length === 0 ? (
-									<div className="skeleton"></div>
-								) : (
-									barbers.map((b) => (
-										<div
-											key={b.id}
-											className={`barber-card ${selectedBarber?.id === b.id ? "selected" : ""}`}
-											onClick={() => setSelectedBarber(b)}
-										>
-											{b.badge && <div className="bc-badge">{b.badge}</div>}
-											<div className="bc-top">
-												<div className="bc-avatar" style={{ background: b.color || "#0a0a0a" }}>
-													{b.name
-														.split(" ")
-														.map((w) => w[0])
-														.join("")
-														.slice(0, 2)}
-												</div>
-												<div>
-													<div className="bc-name">{b.name}</div>
-													<div className="bc-role">{b.role}</div>
-													<div className="bc-stars">
-														{"★".repeat(Math.round(b.rating || 5))}{" "}
-														<em>
-															{b.rating || 5} ({b.total_cuts || 0} cortes)
-														</em>
-													</div>
-												</div>
-											</div>
-											<div className="bc-tags">
-												{(b.tags || []).map((t: string) => (
-													<span key={t} className="bc-tag">
-														{t}
-													</span>
-												))}
-											</div>
-										</div>
-									))
-								)}
-							</div>
-							<div className="btn-row">
-								<button
-									className="btn-primary"
-									disabled={!selectedBarber}
-									onClick={() => handleNext(2)}
-								>
-									Próximo: Escolher Serviço →
-								</button>
-							</div>
-						</div>
-					)}
-
-					{step === 2 && (
-						<div className="step-panel active">
-							<div className="section-head">
-								<h2>QUE PARADA VAI SER?</h2>
-								<p>Pode escolher mais de um serviço na mesma sessão.</p>
-							</div>
-							<div className="services-grid">
-								{services.map((s) => {
-									const isSec = selectedServices.some((svc) => svc.id === s.id);
-									return (
-										<div
-											key={s.id}
-											className={`svc-card ${isSec ? "selected" : ""}`}
-											onClick={() => toggleService(s)}
-										>
-											<div className="svc-ico">{s.icon || "✂"}</div>
-											<div className="svc-info">
-												<div className="svc-name">{s.name}</div>
-												<div className="svc-dur">⏱ {s.duration}</div>
-											</div>
-											<div className="svc-price">R${Number(s.price).toFixed(0)}</div>
-										</div>
-									);
-								})}
-							</div>
-							<div
-								style={{
-									marginTop: 16,
-									fontFamily: "'Barlow Condensed', sans-serif",
-									fontSize: 14,
-									color: "var(--gray-500)",
-									fontWeight: 600,
-									letterSpacing: 1,
-								}}
-							>
-								{selectedServices.length > 0 && (
-									<span
-										style={{
-											color: "var(--red)",
-											fontSize: 18,
-											fontFamily: "'Bebas Neue', cursive",
-											letterSpacing: 1,
-										}}
-									>
-										Total: R${totalServiceCost.toFixed(0)}
-									</span>
-								)}
-							</div>
-							<div className="btn-row">
-								<button
-									className="btn-primary"
-									disabled={selectedServices.length === 0}
-									onClick={() => handleNext(3)}
-								>
-									Próximo: Escolher Horário →
-								</button>
-								<button className="btn-sec" onClick={() => handleNext(1)}>
-									← Voltar
-								</button>
-							</div>
-						</div>
-					)}
-
-					{step === 3 && (
-						<div className="step-panel active">
-							<div className="section-head">
-								<h2>QUANDO VOCÊ VEM?</h2>
-								<p>Escolhe a data e o horário que mandar bem pra você.</p>
-							</div>
-							<div className="cal-wrap">
-								<div className="cal-box">
-									<div className="cal-nav-row">
-										<button className="cal-arr" onClick={() => changeMonth(-1)}>
-											←
-										</button>
-										<span className="cal-month-lbl">
-											{MONTHS[calMonth]} {calYear}
-										</span>
-										<button className="cal-arr" onClick={() => changeMonth(1)}>
-											→
-										</button>
-									</div>
-									<div className="cal-grid">
-										{DAYS.map((d, i) => (
-											<div key={`dlbl-${i}`} className="cal-dlbl">
-												{d}
-											</div>
-										))}
-										{blanks.map((b) => (
-											<div key={`b-${b}`} className="cal-d empty"></div>
-										))}
-										{days.map((d) => {
-											const dt = new Date(calYear, calMonth, d);
-											const isPast = dt < today;
-											const isToday = dt.getTime() === today.getTime();
-											const monthStr = String(calMonth + 1).padStart(2, "0");
-											const dayStr = String(d).padStart(2, "0");
-											const dateStr = `${calYear}-${monthStr}-${dayStr}`;
-											const isSelected = selectedDate === dateStr;
-
-											let cls = "cal-d";
-											if (isPast) cls += " past";
-											if (isToday) cls += " today";
-											if (isSelected) cls += " selected";
-
-											return (
-												<div
-													key={`d-${d}`}
-													className={cls}
-													onClick={() => {
-														if (!isPast) {
-															setSelectedDate(dateStr);
-															setSelectedTime("");
-														}
-													}}
-												>
-													{d}
-												</div>
-											);
-										})}
-									</div>
+									)}
 								</div>
-								<div className="slots-box">
-									<p className="slots-title">Horários Disponíveis</p>
-									<div>
-										{!selectedDate ? (
-											<div className="slots-empty">👈 Seleciona uma data primeiro</div>
-										) : (
-											<div className="slots-grid">
-												{ALL_SLOTS.map((time) => {
-													const busy = busySlots.includes(time);
-													let cls = "slot";
-													if (busy) cls += " busy";
-													else if (selectedTime === time) cls += " selected";
+							))}
+						</div>
+					</>
+				)}
 
-													return (
-														<div
-															key={time}
-															className={cls}
-															onClick={() => {
-																if (!busy) setSelectedTime(time);
-															}}
-														>
-															{time}
-														</div>
-													);
-												})}
+				{step === 1 && (
+					<div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+						<div className="mb-8 text-center">
+							<h2 className="font-['Bebas_Neue'] text-[34px] tracking-[2px] text-[#0a0a0a] mb-2">
+								ESCOLHE O CARA
+							</h2>
+							<p className="text-[13px] text-[#888] font-medium mt-1">
+								Seleciona o barbeiro que vai te deixar na régua.
+							</p>
+						</div>
+						<div className="grid grid-cols-[repeat(auto-fit,minmax(270px,1fr))] gap-3.5">
+							{barbers.length === 0 ? (
+								<div className="h-[120px] rounded-xl mb-3.5 bg-[linear-gradient(90deg,#f2f2f2_25%,#e0e0e0_50%,#f2f2f2_75%)] bg-[length:200%_100%] animate-pulse"></div>
+							) : (
+								barbers.map((b) => (
+									<div
+										key={b.id}
+										onClick={() => setSelectedBarber(b)}
+										className={cn(
+											"border-[1.5px] rounded-xl p-5 cursor-pointer transition-all bg-white relative overflow-hidden group hover:-translate-y-0.5",
+											selectedBarber?.id === b.id
+												? "border-[#e63946]"
+												: "border-[#e0e0e0] hover:border-[#0a0a0a]",
+										)}
+									>
+										<div
+											className={cn(
+												"absolute top-0 left-0 right-0 h-[3px] transition-colors",
+												selectedBarber?.id === b.id
+													? "bg-[#e63946]"
+													: "bg-[#e0e0e0] group-hover:bg-[#0a0a0a]",
+											)}
+										></div>
+										{b.badge && (
+											<div className="absolute top-3 right-3 bg-[#d4a017] text-[#0a0a0a] font-['Barlow_Condensed'] text-[10px] font-bold tracking-[1px] uppercase px-2 py-0.5 rounded-full z-10">
+												{b.badge}
 											</div>
 										)}
+
+										<div className="flex items-center gap-3.5 mb-3.5">
+											<div
+												className={cn(
+													"w-[60px] h-[60px] rounded-full flex items-center justify-center font-['Bebas_Neue'] text-[22px] text-white shrink-0 border-[2.5px] transition-colors",
+													selectedBarber?.id === b.id ? "border-[#e63946]" : "border-[#e0e0e0]",
+												)}
+												style={{ background: b.color || "#0a0a0a" }}
+											>
+												{b.name
+													.split(" ")
+													.map((w) => w[0])
+													.join("")
+													.slice(0, 2)}
+											</div>
+											<div>
+												<div className="font-['Barlow_Condensed'] text-[20px] font-bold">{b.name}</div>
+												<div className="text-[12px] text-[#888] font-medium mt-0.5">{b.role}</div>
+												<div className="flex items-center gap-1 text-[12px] font-semibold text-[#d4a017]">
+													{"★".repeat(Math.round(b.rating || 5))}{" "}
+													<em className="text-[#888] not-italic font-normal">
+														{b.rating || 5} ({b.total_cuts || 0} cortes)
+													</em>
+												</div>
+											</div>
+										</div>
+
+										<div className="flex flex-wrap gap-1.5 mt-2.5">
+											{(b.tags || []).map((t: string) => (
+												<span
+													key={t}
+													className={cn(
+														"text-[11px] font-semibold font-['Barlow_Condensed'] tracking-[0.5px] px-2.5 py-[3px] rounded-full",
+														selectedBarber?.id === b.id
+															? "bg-[#ffe5e7] text-[#e63946]"
+															: "bg-[#f2f2f2] text-[#444]",
+													)}
+												>
+													{t}
+												</span>
+											))}
+										</div>
 									</div>
+								))
+							)}
+						</div>
+						<div className="flex gap-3 mt-6">
+							<button
+								disabled={!selectedBarber}
+								onClick={() => handleNext(2)}
+								className="flex-2 font-['Bebas_Neue'] text-[20px] tracking-[2px] bg-[#e63946] text-white px-9 py-4 rounded-md transition-all hover:bg-[#c1121f] hover:-translate-y-[1px] flex items-center justify-center gap-2.5 w-full disabled:bg-[#e0e0e0] disabled:text-[#c4c4c4] disabled:cursor-not-allowed disabled:transform-none"
+							>
+								Próximo: Escolher Serviço →
+							</button>
+						</div>
+					</div>
+				)}
+
+				{step === 2 && (
+					<div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+						<div className="mb-8 text-center">
+							<h2 className="font-['Bebas_Neue'] text-[34px] tracking-[2px] text-[#0a0a0a] mb-2">
+								QUE PARADA VAI SER?
+							</h2>
+							<p className="text-[13px] text-[#888] font-medium mt-1">
+								Pode escolher mais de um serviço na mesma sessão.
+							</p>
+						</div>
+
+						<div className="grid grid-cols-[repeat(auto-fit,minmax(210px,1fr))] gap-3">
+							{services.map((s) => {
+								const isSec = selectedServices.some((svc) => svc.id === s.id);
+								return (
+									<div
+										key={s.id}
+										onClick={() => toggleService(s)}
+										className={cn(
+											"border-[1.5px] rounded-xl px-4 py-4 cursor-pointer transition-all flex items-center gap-3.5",
+											isSec
+												? "border-[#e63946] bg-[#fff7f7]"
+												: "border-[#e0e0e0] bg-white hover:border-[#0a0a0a]",
+										)}
+									>
+										<div
+											className={cn(
+												"w-[46px] h-[46px] rounded-md flex items-center justify-center text-[22px] shrink-0 transition-colors",
+												isSec ? "bg-[#e63946] text-white" : "bg-[#f2f2f2] text-[#0a0a0a]",
+											)}
+										>
+											{s.icon || "✂"}
+										</div>
+										<div className="flex-1">
+											<div className="font-['Barlow_Condensed'] text-[16px] font-bold">{s.name}</div>
+											<div className="text-[11px] text-[#888] font-medium mt-0.5">⏱ {s.duration}</div>
+										</div>
+										<div
+											className={cn(
+												"font-['Bebas_Neue'] text-[24px] shrink-0 transition-colors",
+												isSec ? "text-[#e63946]" : "text-[#0a0a0a]",
+											)}
+										>
+											R${Number(s.price).toFixed(0)}
+										</div>
+									</div>
+								);
+							})}
+						</div>
+
+						<div className="mt-4 font-['Barlow_Condensed'] text-[14px] text-[#888] font-semibold tracking-[1px]">
+							{selectedServices.length > 0 && (
+								<span className="text-[#e63946] text-[18px] font-['Bebas_Neue'] tracking-[1px]">
+									Total: R${totalServiceCost.toFixed(0)}
+								</span>
+							)}
+						</div>
+
+						<div className="flex gap-3 mt-6">
+							<button
+								disabled={selectedServices.length === 0}
+								onClick={() => handleNext(3)}
+								className="flex-[2] font-['Bebas_Neue'] text-[20px] tracking-[2px] bg-[#e63946] text-white px-9 py-4 rounded-md transition-all hover:bg-[#c1121f] hover:-translate-y-[1px] flex items-center justify-center gap-2.5 w-full disabled:bg-[#e0e0e0] disabled:text-[#c4c4c4] disabled:cursor-not-allowed disabled:transform-none"
+							>
+								Próximo: Escolher Horário →
+							</button>
+							<button
+								onClick={() => handleNext(1)}
+								className="flex-1 font-['Barlow_Condensed'] text-[13px] font-bold tracking-[1.5px] uppercase bg-transparent text-[#888] border-[1.5px] border-[#e0e0e0] py-3 px-5 rounded-md cursor-pointer transition-all flex items-center justify-center gap-2 hover:border-[#0a0a0a] hover:text-[#0a0a0a]"
+							>
+								← Voltar
+							</button>
+						</div>
+					</div>
+				)}
+
+				{step === 3 && (
+					<div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+						<div className="mb-8 text-center">
+							<h2 className="font-['Bebas_Neue'] text-[34px] tracking-[2px] text-[#0a0a0a] mb-2">
+								QUANDO VOCÊ VEM?
+							</h2>
+							<p className="text-[13px] text-[#888] font-medium mt-1">
+								Escolhe a data e o horário que mandar bem pra você.
+							</p>
+						</div>
+
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+							<div className="border-[1.5px] border-[#e0e0e0] rounded-xl p-5 bg-white">
+								<div className="flex items-center justify-between mb-4">
+									<button
+										className="w-8 h-8 border-[1.5px] border-[#e0e0e0] rounded-md bg-transparent cursor-pointer text-[14px] flex items-center justify-center transition-all hover:bg-[#0a0a0a] hover:border-[#0a0a0a] hover:text-white"
+										onClick={() => changeMonth(-1)}
+									>
+										←
+									</button>
+									<span className="font-['Barlow_Condensed'] text-[17px] font-bold tracking-[1px] uppercase">
+										{MONTHS[calMonth]} {calYear}
+									</span>
+									<button
+										className="w-8 h-8 border-[1.5px] border-[#e0e0e0] rounded-md bg-transparent cursor-pointer text-[14px] flex items-center justify-center transition-all hover:bg-[#0a0a0a] hover:border-[#0a0a0a] hover:text-white"
+										onClick={() => changeMonth(1)}
+									>
+										→
+									</button>
+								</div>
+								<div className="grid grid-cols-7 gap-1">
+									{DAYS.map((d, i) => (
+										<div
+											key={`dlbl-${i}`}
+											className="text-center text-[10px] font-bold tracking-[1px] uppercase text-[#888] pt-1 pb-2"
+										>
+											{d}
+										</div>
+									))}
+									{blanks.map((b) => (
+										<div key={`b-${b}`} className="aspect-square"></div>
+									))}
+									{days.map((d) => {
+										const dt = new Date(calYear, calMonth, d);
+										const isPast = dt < today;
+										const isToday = dt.getTime() === today.getTime();
+										const monthStr = String(calMonth + 1).padStart(2, "0");
+										const dayStr = String(d).padStart(2, "0");
+										const dateStr = `${calYear}-${monthStr}-${dayStr}`;
+										const isSelected = selectedDate === dateStr;
+
+										return (
+											<div
+												key={`d-${d}`}
+												className={cn(
+													"aspect-square flex items-center justify-center text-[13px] font-medium rounded-md cursor-pointer border-[1.5px] border-transparent transition-all relative",
+													isPast
+														? "text-[#c4c4c4] cursor-not-allowed"
+														: "hover:bg-[#f2f2f2] hover:border-[#c4c4c4]",
+													isToday && !isSelected ? "border-[#e63946] text-[#e63946] font-bold" : "",
+													isSelected ? "bg-[#0a0a0a] text-white border-[#0a0a0a]" : "",
+													isToday && isSelected ? "bg-[#e63946] border-[#e63946]" : "",
+												)}
+												onClick={() => {
+													if (!isPast) {
+														setSelectedDate(dateStr);
+														setSelectedTime("");
+													}
+												}}
+											>
+												{d}
+											</div>
+										);
+									})}
 								</div>
 							</div>
-							<div className="btn-row">
-								<button
-									className="btn-primary"
-									disabled={!selectedDate || !selectedTime}
-									onClick={() => handleNext(4)}
-								>
-									Próximo: Seus Dados →
-								</button>
-								<button className="btn-sec" onClick={() => handleNext(2)}>
-									← Voltar
-								</button>
+
+							<div className="border-[1.5px] border-[#e0e0e0] rounded-xl p-5 bg-white">
+								<p className="font-['Barlow_Condensed'] text-[14px] font-bold tracking-[1.5px] uppercase text-[#888] mb-3.5">
+									Horários Disponíveis
+								</p>
+								<div>
+									{!selectedDate ? (
+										<div className="text-center py-8 text-[#888] text-[13px]">
+											👈 Seleciona uma data primeiro
+										</div>
+									) : (
+										<div className="grid grid-cols-3 gap-2">
+											{ALL_SLOTS.map((time) => {
+												const busy = busySlots.includes(time);
+
+												return (
+													<div
+														key={time}
+														className={cn(
+															"py-2.5 px-1.5 text-center border-[1.5px] border-[#e0e0e0] rounded-md text-[13px] font-semibold transition-all bg-white",
+															busy
+																? "bg-[#f9f9f9] text-[#c4c4c4] cursor-not-allowed line-through border-transparent"
+																: "cursor-pointer hover:border-[#0a0a0a] hover:bg-[#f9f9f9]",
+															selectedTime === time && !busy
+																? "bg-[#0a0a0a] text-white border-[#0a0a0a]"
+																: "",
+														)}
+														onClick={() => {
+															if (!busy) setSelectedTime(time);
+														}}
+													>
+														{time}
+													</div>
+												);
+											})}
+										</div>
+									)}
+								</div>
 							</div>
 						</div>
-					)}
 
-					{step === 4 && (
-						<div className="step-panel active">
-							<div className="section-head">
-								<h2>QUEM É VOCÊ, PARCEIRO?</h2>
-								<p>Sem login, sem burocracia — só o essencial.</p>
+						<div className="flex gap-3 mt-6">
+							<button
+								className="flex-[2] font-['Bebas_Neue'] text-[20px] tracking-[2px] bg-[#e63946] text-white px-9 py-4 rounded-md transition-all hover:bg-[#c1121f] hover:-translate-y-[1px] flex items-center justify-center gap-2.5 w-full disabled:bg-[#e0e0e0] disabled:text-[#c4c4c4] disabled:cursor-not-allowed disabled:transform-none"
+								disabled={!selectedDate || !selectedTime}
+								onClick={() => handleNext(4)}
+							>
+								Próximo: Seus Dados →
+							</button>
+							<button
+								className="flex-1 font-['Barlow_Condensed'] text-[13px] font-bold tracking-[1.5px] uppercase bg-transparent text-[#888] border-[1.5px] border-[#e0e0e0] py-3 px-5 rounded-md cursor-pointer transition-all flex items-center justify-center gap-2 hover:border-[#0a0a0a] hover:text-[#0a0a0a]"
+								onClick={() => handleNext(2)}
+							>
+								← Voltar
+							</button>
+						</div>
+					</div>
+				)}
+
+				{step === 4 && (
+					<div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+						<div className="mb-8 text-center">
+							<h2 className="font-['Bebas_Neue'] text-[34px] tracking-[2px] text-[#0a0a0a] mb-2">
+								QUEM É VOCÊ, PARCEIRO?
+							</h2>
+							<p className="text-[13px] text-[#888] font-medium mt-1">
+								Sem login, sem burocracia — só o essencial.
+							</p>
+						</div>
+
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+							<div className="flex flex-col gap-2">
+								<label className="font-['Barlow_Condensed'] text-[11px] font-bold tracking-[1.5px] uppercase text-[#444]">
+									Seu Nome *
+								</label>
+								<input
+									type="text"
+									placeholder="Ex: Rafael Silva"
+									className="px-3.5 py-3 border-[1.5px] border-[#e0e0e0] rounded-md font-['Barlow'] text-[15px] text-[#0a0a0a] bg-white transition-colors w-full focus:outline-none focus:border-[#0a0a0a]"
+									value={clientName}
+									onChange={(e) => setClientName(e.target.value)}
+								/>
 							</div>
-							<div className="form-grid">
-								<div className="fg">
-									<label>Seu Nome *</label>
-									<input
-										type="text"
-										placeholder="Ex: Rafael Silva"
-										value={clientName}
-										onChange={(e) => setClientName(e.target.value)}
-									/>
-								</div>
-								<div className="fg">
-									<label>WhatsApp *</label>
-									<input
-										type="tel"
-										placeholder="(11) 99999-9999"
-										value={clientPhone}
-										onChange={(e) => setClientPhone(e.target.value)}
-									/>
-								</div>
-								<div className="fg full">
-									<label>E-mail (opcional)</label>
-									<input
-										type="email"
-										placeholder="seu@email.com"
-										value={clientEmail}
-										onChange={(e) => setClientEmail(e.target.value)}
-									/>
-								</div>
-								<div className="fg full">
-									<label>Observações</label>
-									<textarea
-										placeholder="Ex: quero degradê alto..."
-										value={clientObs}
-										onChange={(e) => setClientObs(e.target.value)}
-									></textarea>
-								</div>
+							<div className="flex flex-col gap-2">
+								<label className="font-['Barlow_Condensed'] text-[11px] font-bold tracking-[1.5px] uppercase text-[#444]">
+									WhatsApp *
+								</label>
+								<input
+									type="tel"
+									className="px-3.5 py-3 border-[1.5px] border-[#e0e0e0] rounded-md font-['Barlow'] text-[15px] text-[#0a0a0a] bg-white transition-colors w-full focus:outline-none focus:border-[#0a0a0a]"
+									placeholder="(11) 99999-9999"
+									value={clientPhone}
+									onChange={(e) => setClientPhone(e.target.value)}
+								/>
 							</div>
-							<div className="form-alert" style={{ marginTop: 16 }}>
-								<span>📱</span>
-								<span>
-									Você vai receber a confirmação no seu WhatsApp. Guarda o número do barbeiro por
-									lá caso precise cancelar ou remarcar!
+							<div className="flex flex-col gap-2 sm:col-span-2">
+								<label className="font-['Barlow_Condensed'] text-[11px] font-bold tracking-[1.5px] uppercase text-[#444]">
+									E-mail (opcional)
+								</label>
+								<input
+									type="email"
+									className="px-3.5 py-3 border-[1.5px] border-[#e0e0e0] rounded-md font-['Barlow'] text-[15px] text-[#0a0a0a] bg-white transition-colors w-full focus:outline-none focus:border-[#0a0a0a]"
+									placeholder="seu@email.com"
+									value={clientEmail}
+									onChange={(e) => setClientEmail(e.target.value)}
+								/>
+							</div>
+							<div className="flex flex-col gap-2 sm:col-span-2">
+								<label className="font-['Barlow_Condensed'] text-[11px] font-bold tracking-[1.5px] uppercase text-[#444]">
+									Observações
+								</label>
+								<textarea
+									className="px-3.5 py-3 border-[1.5px] border-[#e0e0e0] rounded-md font-['Barlow'] text-[15px] text-[#0a0a0a] bg-white transition-colors w-full focus:outline-none focus:border-[#0a0a0a] min-h-[75px] resize-y"
+									placeholder="Ex: quero degradê alto..."
+									value={clientObs}
+									onChange={(e) => setClientObs(e.target.value)}
+								></textarea>
+							</div>
+						</div>
+
+						<div className="bg-[#fffbea] border-[1.5px] border-[#d4a017] rounded-md px-4 py-3 text-[13px] text-[#444] mt-4 flex gap-2 items-start leading-[1.5]">
+							<span>📱</span>
+							<span>
+								Você vai receber a confirmação no seu WhatsApp. Guarda o número do barbeiro por
+								lá caso precise cancelar ou remarcar!
+							</span>
+						</div>
+
+						<div className="flex gap-3 mt-6">
+							<button
+								className="flex-[2] font-['Bebas_Neue'] text-[20px] tracking-[2px] bg-[#e63946] text-white px-9 py-4 rounded-md transition-all hover:bg-[#c1121f] hover:-translate-y-[1px] flex items-center justify-center gap-2.5 w-full disabled:bg-[#e0e0e0] disabled:text-[#c4c4c4] disabled:cursor-not-allowed disabled:transform-none"
+								disabled={!clientName || !clientPhone}
+								onClick={() => handleNext(5)}
+							>
+								Próximo: Revisar Agendamento →
+							</button>
+							<button
+								className="flex-1 font-['Barlow_Condensed'] text-[13px] font-bold tracking-[1.5px] uppercase bg-transparent text-[#888] border-[1.5px] border-[#e0e0e0] py-3 px-5 rounded-md cursor-pointer transition-all flex items-center justify-center gap-2 hover:border-[#0a0a0a] hover:text-[#0a0a0a]"
+								onClick={() => handleNext(3)}
+							>
+								← Voltar
+							</button>
+						</div>
+					</div>
+				)}
+
+				{step === 5 && (
+					<div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+						<div className="mb-8 text-center">
+							<h2 className="font-['Bebas_Neue'] text-[34px] tracking-[2px] text-[#0a0a0a] mb-2">
+								CONFERE E CONFIRMA
+							</h2>
+							<p className="text-[13px] text-[#888] font-medium mt-1">
+								Tá tudo certo? Bora garantir sua vaga!
+							</p>
+						</div>
+
+						<div className="bg-[#f9f9f9] border-[1.5px] border-[#e0e0e0] rounded-xl p-6 mb-6">
+							<div className="font-['Bebas_Neue'] text-[20px] tracking-[1.5px] mb-4">
+								✅ RESUMO DO AGENDAMENTO
+							</div>
+							<div className="flex justify-between items-center py-2.5 border-b border-[#e0e0e0] text-[14px]">
+								<span className="text-[#888] font-medium">Barbeiro</span>
+								<span className="font-bold">{selectedBarber?.name}</span>
+							</div>
+							<div className="flex justify-between items-center py-2.5 border-b border-[#e0e0e0] text-[14px]">
+								<span className="text-[#888] font-medium">Serviços</span>
+								<span className="font-bold text-right">
+									{selectedServices.map((s) => s.name).join(", ")}
 								</span>
 							</div>
-							<div className="btn-row">
-								<button
-									className="btn-primary"
-									disabled={!clientName || !clientPhone}
-									onClick={() => handleNext(5)}
-								>
-									Próximo: Revisar Agendamento →
-								</button>
-								<button className="btn-sec" onClick={() => handleNext(3)}>
-									← Voltar
-								</button>
+							<div className="flex justify-between items-center py-2.5 border-b border-[#e0e0e0] text-[14px]">
+								<span className="text-[#888] font-medium">Data</span>
+								<span className="font-bold">
+									{selectedDate.split("-").reverse().join("/")} às {selectedTime}
+								</span>
+							</div>
+							<div className="flex justify-between items-center py-2.5 border-b border-[#e0e0e0] text-[14px]">
+								<span className="text-[#888] font-medium">Cliente</span>
+								<span className="font-bold">{clientName}</span>
+							</div>
+							<div className="flex justify-between items-center py-2.5 border-b border-[#e0e0e0] text-[14px] last:border-b-0">
+								<span className="text-[#888] font-medium">WhatsApp</span>
+								<span className="font-bold">{clientPhone}</span>
+							</div>
+							{clientObs && (
+								<div className="flex justify-between items-center py-2.5 border-b border-[#e0e0e0] text-[14px] last:border-b-0">
+									<span className="text-[#888] font-medium">Obs</span>
+									<span className="font-bold text-right max-w-[60%]">{clientObs}</span>
+								</div>
+							)}
+							<div className="flex justify-between items-center py-2.5 border-b-0 text-[14px] mt-3.5">
+								<span className="text-[#888] font-medium">Total</span>
+								<span className="font-['Bebas_Neue'] text-[30px] text-[#e63946]">
+									R${totalServiceCost.toFixed(0)}
+								</span>
 							</div>
 						</div>
-					)}
 
-					{step === 5 && (
-						<div className="step-panel active">
-							<div className="section-head">
-								<h2>CONFERE E CONFIRMA</h2>
-								<p>Tá tudo certo? Bora garantir sua vaga!</p>
-							</div>
-							<div className="summ-card">
-								<div className="summ-title">✅ RESUMO DO AGENDAMENTO</div>
-								<div className="summ-row">
-									<span className="summ-key">Barbeiro</span>
-									<span className="summ-val">{selectedBarber?.name}</span>
-								</div>
-								<div className="summ-row">
-									<span className="summ-key">Serviços</span>
-									<span className="summ-val">
-										{selectedServices.map((s) => s.name).join(", ")}
-									</span>
-								</div>
-								<div className="summ-row">
-									<span className="summ-key">Data</span>
-									<span className="summ-val">
-										{selectedDate.split("-").reverse().join("/")} às {selectedTime}
-									</span>
-								</div>
-								<div className="summ-row">
-									<span className="summ-key">Cliente</span>
-									<span className="summ-val">{clientName}</span>
-								</div>
-								<div className="summ-row">
-									<span className="summ-key">WhatsApp</span>
-									<span className="summ-val">{clientPhone}</span>
-								</div>
-								{clientObs && (
-									<div className="summ-row">
-										<span className="summ-key">Obs</span>
-										<span className="summ-val">{clientObs}</span>
-									</div>
-								)}
-								<div className="summ-row" style={{ marginTop: 14 }}>
-									<span className="summ-key">Total</span>
-									<span className="summ-total">R${totalServiceCost.toFixed(0)}</span>
-								</div>
-							</div>
-							<button className="btn-primary" disabled={isSubmitting} onClick={handleConfirm}>
-								✅ Confirmar Agendamento
-							</button>
-							<div className="btn-row" style={{ justifyContent: "center", marginTop: 12 }}>
-								<button className="btn-sec" onClick={() => handleNext(4)}>
-									← Editar
-								</button>
-							</div>
-						</div>
-					)}
+						<button
+							className="w-[100%] font-['Bebas_Neue'] text-[20px] tracking-[2px] bg-[#e63946] text-white px-9 py-4 rounded-md transition-all hover:bg-[#c1121f] hover:-translate-y-[1px] flex items-center justify-center gap-2.5 disabled:bg-[#e0e0e0] disabled:text-[#c4c4c4] disabled:cursor-not-allowed disabled:transform-none"
+							disabled={isSubmitting}
+							onClick={handleConfirm}
+						>
+							{isSubmitting ? "Enviando..." : "✅ Confirmar Agendamento"}
+						</button>
 
-					{step === 6 && (
-						<div className="success-screen" style={{ display: "block" }}>
-							<div className="success-icon">✂</div>
-							<div className="success-h">
-								AGENDADO!
-								<br />
-								<em>SEU HORÁRIO</em>
-								<br />
-								TÁ GARANTIDO
-							</div>
-							<p className="success-p">
-								Você vai receber a confirmação no WhatsApp em instantes. Cola no horário,
-								brother!
-							</p>
-							<button className="btn-wa">
-								<svg style={{ width: 28, height: 28 }} viewBox="0 0 32 32" fill="none">
-									<circle cx="16" cy="16" r="16" fill="#fff" />
-									<path
-										d="M16 5C9.925 5 5 9.925 5 16c0 1.965.514 3.812 1.41 5.413L5 27l5.72-1.392A10.94 10.94 0 0016 27c6.075 0 11-4.925 11-11S22.075 5 16 5zm5.585 15.45c-.235.66-1.375 1.26-1.89 1.31-.515.055-1.005.245-3.39-.71-2.855-1.14-4.675-4.015-4.815-4.205-.14-.19-1.13-1.51-1.13-2.88s.715-2.045.97-2.325c.255-.28.555-.35.74-.35l.53.01c.17.005.4-.065.625.475.235.555.795 1.93.865 2.07.07.14.115.305.025.49-.09.185-.135.3-.27.46-.135.16-.285.36-.405.485-.135.135-.275.28-.12.55.155.27.69 1.14 1.48 1.845 1.015.905 1.87 1.185 2.14 1.32.27.135.43.115.585-.07.155-.185.665-.775.84-1.04.175-.265.35-.22.59-.135.24.085 1.52.715 1.78.845.26.13.435.195.5.305.065.11.065.64-.17 1.3z"
-										fill="#25D366"
-									/>
-								</svg>
-								Ver no WhatsApp
+						<div className="flex justify-center mt-3">
+							<button
+								className="font-['Barlow_Condensed'] text-[13px] font-bold tracking-[1.5px] uppercase bg-transparent text-[#888] border-[1.5px] border-[#e0e0e0] py-3 px-5 rounded-md cursor-pointer transition-all flex items-center justify-center gap-2 hover:border-[#0a0a0a] hover:text-[#0a0a0a]"
+								onClick={() => handleNext(4)}
+							>
+								← Editar
 							</button>
 						</div>
-					)}
-				</main>
-				{/* Footer */}
-				<footer className="bg-black text-center py-6 text-gray-500 text-xs border-t border-gray-800">
-					<p>
-						Desenvolvido por <span className="text-red-500">Rodrigo</span>
-						<span className="text-white font-italic">as</span>
-						<span className="text-red-500">Dev</span>.
-						<br />
-						Sistema de Agendamento
-					</p>
-				</footer>
-			</div>
-		</>
+					</div>
+				)}
+
+				{step === 6 && (
+					<div className="animate-in zoom-in-95 duration-500 bg-white border-2 border-[#e63946] rounded-xl p-10 text-center max-w-[400px] mx-auto mt-12 mb-12 shadow-[0_20px_40px_rgba(230,57,70,0.15)] relative overflow-hidden">
+						<div className="absolute top-0 left-0 right-0 h-1.5 bg-[#e63946]"></div>
+						<div className="w-[80px] h-[80px] bg-[#e63946] text-white rounded-full flex items-center justify-center text-[36px] mx-auto mb-6 shadow-[0_10px_20px_rgba(230,57,70,0.3)] rotate-0 hover:rotate-180 transition-transform duration-500">
+							✂
+						</div>
+						<div className="font-['Bebas_Neue'] text-[42px] leading-[0.9] text-[#0a0a0a] mb-4 tracking-[1.5px]">
+							AGENDADO!
+							<br />
+							<em className="text-[#e63946] not-italic">SEU HORÁRIO</em>
+							<br />
+							TÁ GARANTIDO
+						</div>
+						<p className="text-[15px] text-[#888] leading-relaxed mb-8 font-medium">
+							Você vai receber a confirmação no WhatsApp em instantes. Cola no horário,
+							brother!
+						</p>
+
+						<button className="bg-[#25D366] text-white font-['Barlow_Condensed'] text-[18px] font-bold tracking-[1px] px-8 py-3.5 rounded-full uppercase cursor-pointer transition-all hover:bg-[#1EBE5A] hover:-translate-y-0.5 shadow-[0_10px_20px_rgba(37,211,102,0.3)] w-[100%] max-w-[280px] mx-auto flex items-center justify-center gap-2.5">
+							<svg className="w-7 h-7" viewBox="0 0 32 32" fill="none">
+								<circle cx="16" cy="16" r="16" fill="#fff" />
+								<path
+									d="M16 5C9.925 5 5 9.925 5 16c0 1.965.514 3.812 1.41 5.413L5 27l5.72-1.392A10.94 10.94 0 0016 27c6.075 0 11-4.925 11-11S22.075 5 16 5zm5.585 15.45c-.235.66-1.375 1.26-1.89 1.31-.515.055-1.005.245-3.39-.71-2.855-1.14-4.675-4.015-4.815-4.205-.14-.19-1.13-1.51-1.13-2.88s.715-2.045.97-2.325c.255-.28.555-.35.74-.35l.53.01c.17.005.4-.065.625.475.235.555.795 1.93.865 2.07.07.14.115.305.025.49-.09.185-.135.3-.27.46-.135.16-.285.36-.405.485-.135.135-.275.28-.12.55.155.27.69 1.14 1.48 1.845 1.015.905 1.87 1.185 2.14 1.32.27.135.43.115.585-.07.155-.185.665-.775.84-1.04.175-.265.35-.22.59-.135.24.085 1.52.715 1.78.845.26.13.435.195.5.305.065.11.065.64-.17 1.3z"
+									fill="#25D366"
+								/>
+							</svg>
+							Ver no WhatsApp
+						</button>
+					</div>
+				)}
+			</main>
+			<footer className="bg-black text-center py-6 text-gray-500 text-xs border-t border-gray-800">
+				<p>
+					Desenvolvido por <span className="text-red-500">Rodrigo</span>
+					<span className="text-white italic">as</span>
+					<span className="text-red-500">Dev</span>.
+					<br />
+					Sistema de Agendamento
+				</p>
+			</footer>
+		</div>
 	);
 }
