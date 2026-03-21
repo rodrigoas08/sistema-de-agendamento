@@ -183,7 +183,7 @@ export default function Home() {
 
 	return (
 		<div className="font-['Barlow'] bg-white text-[#0a0a0a] min-h-dvh overflow-x-hidden">
-			<header className="bg-[#0a0a0a] h-16 flex items-center justify-between px-4 sticky top-0 z-[200] border-b-2 border-b-[#e63946]">
+			<header className="flex items-center justify-between h-16 px-4 md:px-18 lg:px-58 bg-[#0a0a0a] border-b-2 border-b-[#e63946]">
 				<a
 					href="#"
 					className="font-['Bebas_Neue'] text-[26px] text-white tracking-[3px] flex items-center gap-2.5 no-underline"
@@ -205,7 +205,7 @@ export default function Home() {
 					<br />
 					<em className="text-[#e63946] not-italic">DO SEU JEITO</em>
 				</h1>
-				<p className="text-[15px] text-[#c4c4c4] mt-4 relative font-medium max-w-[400px] mx-auto leading-relaxed">
+				<p className="text-base text-[#c4c4c4] mt-4 relative font-medium max-w-[400px] mx-auto leading-relaxed">
 					Escolha seu barbeiro, seu horário e apareça na hora — sem fila, sem papo.
 				</p>
 				<div className="mt-9 relative">
@@ -218,8 +218,8 @@ export default function Home() {
 						✂ Agendar Agora
 					</button>
 				</div>
-				<div className="flex justify-center mt-12 relative border-t border-white/10 pt-8 text-3xl">
-					<div className="text-center px-4 border-r border-white/10">
+				<div className="relative flex flex-1 justify-center mt-12 pt-8 md:px-18 lg:px-55 border-t border-white/10 text-3xl">
+					<div className="text-center px-5 border-r border-white/10">
 						<b className="text-[#d4a017] block leading-none">{barbers.length || 0}</b>
 						<span className="text-[11px] text-[#888] uppercase tracking-[2px] font-semibold">
 							Barbeiros
@@ -246,10 +246,10 @@ export default function Home() {
 				</div>
 			</section>
 
-			<main id="booking" className="relative max-w-[700px] mx-auto mt-4 px-4 pb-24">
+			<main id="booking" className="relative mx-auto mt-4 px-4 pb-24">
 				{step <= 5 && (
 					<>
-						<div className="mb-8 text-center" id="booking-head">
+						<div id="booking-head" className="max-w-[700px] mx-auto mb-8 text-center">
 							<h2 className="font-['Bebas_Neue'] text-[34px] tracking-[2px] text-[#0a0a0a] mb-2">
 								FAÇA SEU AGENDAMENTO
 							</h2>
@@ -258,7 +258,7 @@ export default function Home() {
 							</p>
 						</div>
 						<div
-							className="flex mb-11 border-[1.5px] border-[#e0e0e0] rounded-xl overflow-hidden"
+							className="flex justify-center max-w-[700px] mx-auto mb-11 border-[1.5px] border-[#e0e0e0] rounded-xl overflow-hidden"
 							id="progress"
 						>
 							{[1, 2, 3, 4, 5].map((s, idx) => (
@@ -307,17 +307,17 @@ export default function Home() {
 								Seleciona o barbeiro que vai te deixar na régua.
 							</p>
 						</div>
-						<div className="grid grid-cols-[repeat(auto-fit,minmax(270px,1fr))] gap-3.5">
+						<div className="grid grid-cols-[repeat(auto-fit,minmax(270px,1fr))] w-full gap-3.5 lg:px-55">
 							{barbers.length === 0 ? (
-								<div className="h-[120px] rounded-xl mb-3.5 bg-[linear-gradient(90deg,#f2f2f2_25%,#e0e0e0_50%,#f2f2f2_75%)] bg-[length:200%_100%] animate-pulse"></div>
+								<div className="w-[100px] h-[120px] rounded-xl mb-3.5 bg-[linear-gradient(90deg,#f2f2f2_25%,#e0e0e0_50%,#f2f2f2_75%)] bg-size-[200%_100%] animate-pulse"></div>
 							) : (
-								barbers.map((b) => (
+								barbers.map((barber) => (
 									<div
-										key={b.id}
-										onClick={() => setSelectedBarber(b)}
+										key={barber.id}
+										onClick={() => setSelectedBarber(barber)}
 										className={cn(
-											"border-[1.5px] rounded-xl p-5 cursor-pointer transition-all bg-white relative overflow-hidden group hover:-translate-y-0.5",
-											selectedBarber?.id === b.id
+											"relative p-5 border-[1.5px] rounded-xl cursor-pointer transition-all bg-white overflow-hidden group hover:-translate-y-0.5",
+											selectedBarber?.id === barber.id
 												? "border-[#e63946]"
 												: "border-[#e0e0e0] hover:border-[#0a0a0a]",
 										)}
@@ -325,14 +325,14 @@ export default function Home() {
 										<div
 											className={cn(
 												"absolute top-0 left-0 right-0 h-[3px] transition-colors",
-												selectedBarber?.id === b.id
+												selectedBarber?.id === barber.id
 													? "bg-[#e63946]"
 													: "bg-[#e0e0e0] group-hover:bg-[#0a0a0a]",
 											)}
 										></div>
-										{b.badge && (
+										{barber.badge && (
 											<div className="absolute top-3 right-3 bg-[#d4a017] text-[#0a0a0a] font-['Barlow_Condensed'] text-[10px] font-bold tracking-[1px] uppercase px-2 py-0.5 rounded-full z-10">
-												{b.badge}
+												{barber.badge}
 											</div>
 										)}
 
@@ -340,35 +340,37 @@ export default function Home() {
 											<div
 												className={cn(
 													"w-[60px] h-[60px] rounded-full flex items-center justify-center font-['Bebas_Neue'] text-[22px] text-white shrink-0 border-[2.5px] transition-colors",
-													selectedBarber?.id === b.id ? "border-[#e63946]" : "border-[#e0e0e0]",
+													selectedBarber?.id === barber.id ? "border-[#e63946]" : "border-[#e0e0e0]",
 												)}
-												style={{ background: b.color || "#0a0a0a" }}
+												style={{ background: barber.color || "#0a0a0a" }}
 											>
-												{b.name
+												{barber.name
 													.split(" ")
 													.map((w) => w[0])
 													.join("")
 													.slice(0, 2)}
 											</div>
 											<div>
-												<div className="font-['Barlow_Condensed'] text-[20px] font-bold">{b.name}</div>
-												<div className="text-[12px] text-[#888] font-medium mt-0.5">{b.role}</div>
+												<div className="font-['Barlow_Condensed'] text-[20px] font-bold">
+													{barber.name}
+												</div>
+												<div className="text-[12px] text-[#888] font-medium mt-0.5">{barber.role}</div>
 												<div className="flex items-center gap-1 text-[12px] font-semibold text-[#d4a017]">
-													{"★".repeat(Math.round(b.rating || 5))}{" "}
+													{"★".repeat(Math.round(barber.rating || 5))}{" "}
 													<em className="text-[#888] not-italic font-normal">
-														{b.rating || 5} ({b.total_cuts || 0} cortes)
+														{barber.rating || 5} ({barber.total_cuts || 0} cortes)
 													</em>
 												</div>
 											</div>
 										</div>
 
 										<div className="flex flex-wrap gap-1.5 mt-2.5">
-											{(b.tags || []).map((t: string) => (
+											{(barber.tags || []).map((t: string) => (
 												<span
 													key={t}
 													className={cn(
 														"text-[11px] font-semibold font-['Barlow_Condensed'] tracking-[0.5px] px-2.5 py-[3px] rounded-full",
-														selectedBarber?.id === b.id
+														selectedBarber?.id === barber.id
 															? "bg-[#ffe5e7] text-[#e63946]"
 															: "bg-[#f2f2f2] text-[#444]",
 													)}
@@ -381,11 +383,11 @@ export default function Home() {
 								))
 							)}
 						</div>
-						<div className="flex gap-3 mt-6">
+						<div className="flex justify-center mx-auto gap-3 mt-6 lg:px-55">
 							<button
 								disabled={!selectedBarber}
 								onClick={() => handleNext(2)}
-								className="flex-2 font-['Bebas_Neue'] text-[20px] tracking-[2px] bg-[#e63946] text-white px-9 py-4 rounded-md transition-all hover:bg-[#c1121f] hover:-translate-y-[1px] flex items-center justify-center gap-2.5 w-full disabled:bg-[#e0e0e0] disabled:text-[#c4c4c4] disabled:cursor-not-allowed disabled:transform-none"
+								className="flex items-center justify-center gap-2.5 w-full px-9 py-4 rounded-md bg-[#e63946] font-['Bebas_Neue'] text-white text-[20px] tracking-[2px] transition-all hover:bg-[#c1121f] hover:-translate-y-px disabled:bg-[#e0e0e0] disabled:text-[#c4c4c4] disabled:cursor-not-allowed disabled:transform-none"
 							>
 								Próximo: Escolher Serviço →
 							</button>
