@@ -49,7 +49,7 @@ export default function AdminPage() {
 				(payload) => {
 					if (payload.eventType === "INSERT") {
 						const newAppt = payload.new as Appointment;
-						
+
 						const today = new Date().toISOString().split("T")[0];
 						if (newAppt.date === today) {
 							setAppointments((prev) => {
@@ -62,17 +62,20 @@ export default function AdminPage() {
 							{
 								id: newAppt.id,
 								message: `Novo agendamento: ${newAppt.client_name} (${newAppt.service_names})`,
-								time: new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
+								time: new Date().toLocaleTimeString("pt-BR", {
+									hour: "2-digit",
+									minute: "2-digit",
+								}),
 							},
 							...prev,
 						]);
 					} else if (payload.eventType === "UPDATE") {
 						const updatedAppt = payload.new as Appointment;
 						setAppointments((prev) =>
-							prev.map((appt) => (appt.id === updatedAppt.id ? updatedAppt : appt))
+							prev.map((appt) => (appt.id === updatedAppt.id ? updatedAppt : appt)),
 						);
 					}
-				}
+				},
 			)
 			.subscribe();
 
@@ -83,22 +86,53 @@ export default function AdminPage() {
 
 	const todayCount = appointments.length;
 	const pendingCount = appointments.filter((a) => a.status === "pending").length;
+	const confirmedCount = appointments.filter(
+		(a) => a.status === "confirmed",
+	).length;
+
+	// const revenue = appointments.reduce((total, appt) => {
+	// 	if (appt.status === "confirmed") {
+	// 		const servicePrice = parseFloat(appt.);
+	// 		return total + (isNaN(servicePrice) ? 0 : servicePrice);
+	// 	}
+	// 	return total;
+	// }, 0);
 
 	return (
 		<div>
 			{/* STATS */}
 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 				<div className="bg-white border-2 border-gray-200 rounded-xl p-5 relative overflow-hidden before:absolute before:top-0 before:left-0 before:right-0 before:h-1 before:bg-red-500">
-					<div className="font-['Barlow_Condensed'] text-[11px] font-bold tracking-[1.5px] uppercase text-gray-500 mb-2">AGENDAMENTOS HOJE</div>
-					<div className="font-['Bebas_Neue'] text-4xl leading-none text-red-500">{todayCount}</div>
+					<div className="font-['Barlow_Condensed'] text-[11px] font-bold tracking-[1.5px] uppercase text-gray-500 mb-2">
+						AGENDAMENTOS HOJE
+					</div>
+					<div className="font-['Bebas_Neue'] text-4xl leading-none text-red-500">
+						{todayCount}
+					</div>
 				</div>
 				<div className="bg-white border-2 border-gray-200 rounded-xl p-5 relative overflow-hidden before:absolute before:top-0 before:left-0 before:right-0 before:h-1 before:bg-yellow-500">
-					<div className="font-['Barlow_Condensed'] text-[11px] font-bold tracking-[1.5px] uppercase text-gray-500 mb-2">PENDENTES</div>
-					<div className="font-['Bebas_Neue'] text-4xl leading-none text-yellow-500">{pendingCount}</div>
+					<div className="font-['Barlow_Condensed'] text-[11px] font-bold tracking-[1.5px] uppercase text-gray-500 mb-2">
+						PENDENTES
+					</div>
+					<div className="font-['Bebas_Neue'] text-4xl leading-none text-yellow-500">
+						{pendingCount}
+					</div>
 				</div>
 				<div className="bg-white border-2 border-gray-200 rounded-xl p-5 relative overflow-hidden before:absolute before:top-0 before:left-0 before:right-0 before:h-1 before:bg-green-500">
-					<div className="font-['Barlow_Condensed'] text-[11px] font-bold tracking-[1.5px] uppercase text-gray-500 mb-2">TAXA CONVERSÃO</div>
-					<div className="font-['Bebas_Neue'] text-4xl leading-none text-green-500">100%</div>
+					<div className="font-['Barlow_Condensed'] text-[11px] font-bold tracking-[1.5px] uppercase text-gray-500 mb-2">
+						CONFIRMADOS
+					</div>
+					<div className="font-['Bebas_Neue'] text-4xl leading-none text-green-500">
+						{confirmedCount}
+					</div>
+				</div>
+				<div className="bg-white border-2 border-gray-200 rounded-xl p-5 relative overflow-hidden before:absolute before:top-0 before:left-0 before:right-0 before:h-1 before:bg-black">
+					<div className="font-['Barlow_Condensed'] text-[11px] font-bold tracking-[1.5px] uppercase text-gray-500 mb-2">
+						Faturamento
+					</div>
+					<div className="font-['Bebas_Neue'] text-4xl leading-none text-black">
+						R$ 1{revenue}
+					</div>
 				</div>
 			</div>
 
@@ -106,27 +140,47 @@ export default function AdminPage() {
 				{/* TABELA DE AGENDAMENTOS */}
 				<div className="xl:col-span-2 bg-white border-2 border-gray-200 rounded-xl overflow-hidden">
 					<div className="p-5 border-b border-gray-200 flex items-center justify-between">
-						<h2 className="font-['Bebas_Neue'] text-xl tracking-[1.5px]">PRÓXIMOS CORTES (HOJE)</h2>
+						<h2 className="font-['Bebas_Neue'] text-xl tracking-[1.5px]">
+							PRÓXIMOS CORTES (HOJE)
+						</h2>
 					</div>
-					
+
 					<div className="overflow-x-auto w-full">
 						<table className="w-full text-left border-collapse">
 							<thead>
 								<tr className="bg-gray-50">
-									<th className="font-['Barlow_Condensed'] text-[11px] font-bold tracking-[1.5px] uppercase text-gray-500 py-3 px-5 border-b border-gray-200">HORÁRIO</th>
-									<th className="font-['Barlow_Condensed'] text-[11px] font-bold tracking-[1.5px] uppercase text-gray-500 py-3 px-5 border-b border-gray-200">CLIENTE</th>
-									<th className="font-['Barlow_Condensed'] text-[11px] font-bold tracking-[1.5px] uppercase text-gray-500 py-3 px-5 border-b border-gray-200">PROFISSIONAL / SERVIÇO</th>
-									<th className="font-['Barlow_Condensed'] text-[11px] font-bold tracking-[1.5px] uppercase text-gray-500 py-3 px-5 border-b border-gray-200">STATUS</th>
+									<th className="font-['Barlow_Condensed'] text-[11px] font-bold tracking-[1.5px] uppercase text-gray-500 py-3 px-5 border-b border-gray-200">
+										HORÁRIO
+									</th>
+									<th className="font-['Barlow_Condensed'] text-[11px] font-bold tracking-[1.5px] uppercase text-gray-500 py-3 px-5 border-b border-gray-200">
+										CLIENTE
+									</th>
+									<th className="font-['Barlow_Condensed'] text-[11px] font-bold tracking-[1.5px] uppercase text-gray-500 py-3 px-5 border-b border-gray-200">
+										PROFISSIONAL / SERVIÇO
+									</th>
+									<th className="font-['Barlow_Condensed'] text-[11px] font-bold tracking-[1.5px] uppercase text-gray-500 py-3 px-5 border-b border-gray-200">
+										STATUS
+									</th>
 								</tr>
 							</thead>
 							<tbody>
 								{loading ? (
 									<tr className="hover:bg-gray-50 border-b border-gray-100">
-										<td className="py-5 px-5 text-center text-sm font-semibold text-gray-400" colSpan={4}>Carregando agendamentos...</td>
+										<td
+											className="py-5 px-5 text-center text-sm font-semibold text-gray-400"
+											colSpan={4}
+										>
+											Carregando agendamentos...
+										</td>
 									</tr>
 								) : appointments.length === 0 ? (
 									<tr className="hover:bg-gray-50 border-b border-gray-100">
-										<td className="py-5 px-5 text-center text-sm font-semibold text-gray-400" colSpan={4}>Nenhum agendamento para hoje.</td>
+										<td
+											className="py-5 px-5 text-center text-sm font-semibold text-gray-400"
+											colSpan={4}
+										>
+											Nenhum agendamento para hoje.
+										</td>
 									</tr>
 								) : (
 									appointments.map((appt) => (
@@ -134,14 +188,19 @@ export default function AdminPage() {
 											<td className="py-3 px-5 text-sm font-bold">{appt.time}</td>
 											<td className="py-3 px-5 text-sm font-semibold">{appt.client_name}</td>
 											<td className="py-3 px-5 text-sm">
-												<span className="font-bold text-red-500">{appt.barber_name}</span> - {appt.service_names}
+												<span className="font-bold text-red-500">{appt.barber_name}</span> -{" "}
+												{appt.service_names}
 											</td>
 											<td className="py-3 px-5 text-sm">
-												<span className={`px-2 py-1 rounded text-xs font-bold uppercase ${
-													appt.status === "pending" ? "bg-yellow-100 text-yellow-700" :
-													appt.status === "confirmed" ? "bg-green-100 text-green-700" :
-													"bg-gray-100 text-gray-700"
-												}`}>
+												<span
+													className={`px-2 py-1 rounded text-xs font-bold uppercase ${
+														appt.status === "pending"
+															? "bg-yellow-100 text-yellow-700"
+															: appt.status === "confirmed"
+																? "bg-green-100 text-green-700"
+																: "bg-gray-100 text-gray-700"
+													}`}
+												>
 													{appt.status}
 												</span>
 											</td>
@@ -157,7 +216,7 @@ export default function AdminPage() {
 				<div className="bg-white border-2 border-gray-200 rounded-xl overflow-hidden flex flex-col h-[500px]">
 					<div className="p-5 border-b border-gray-200 flex items-center justify-between">
 						<h2 className="font-['Bebas_Neue'] text-xl tracking-[1.5px] flex items-center gap-2">
-							<span className="w-2 h-2 bg-green-500 rounded-full animate-pulse inline-block" /> 
+							<span className="w-2 h-2 bg-green-500 rounded-full animate-pulse inline-block" />
 							FEED AO VIVO
 						</h2>
 					</div>
