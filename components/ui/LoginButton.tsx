@@ -1,11 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { X, Loader2, Eye, EyeOff } from "lucide-react";
-import Button from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
+import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import Button from "@/components/ui/Button";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { X, Loader2, Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 
 const loginSchema = z.object({

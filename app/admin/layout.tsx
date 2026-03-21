@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
+import LogoutButton from "@/components/ui/LogoutButton";
 
 export default async function AdminLayout({
 	children,
@@ -23,9 +24,12 @@ export default async function AdminLayout({
 		.single();
 
 	if (!admin) {
-		console.error("Usuário logado via Google não foi encontrado na tabela 'admins'. UID:", user.id);
+		console.error(
+			"Usuário logado via Google não foi encontrado na tabela 'admins'. UID:",
+			user.id,
+		);
 		if (adminError) console.error("Erro da query admins:", adminError.message);
-		
+
 		// Logado com o Google, mas não é admin!
 		redirect("/?error=unauthorized_admin");
 	}
@@ -43,7 +47,9 @@ export default async function AdminLayout({
 						ADM
 					</div>
 					<div>
-						<div className="text-sm font-semibold leading-tight">{user.email?.split("@")[0] || "Admin"}</div>
+						<div className="text-sm font-semibold leading-tight">
+							{user.email?.split("@")[0] || "Admin"}
+						</div>
 						<div className="text-xs text-gray-500">Super Admin</div>
 					</div>
 				</div>
@@ -59,11 +65,7 @@ export default async function AdminLayout({
 					</div>
 				</nav>
 				<div className="p-4 border-t border-white/10">
-					<form action="/auth/signout" method="post">
-						<button className="text-xs text-gray-500 hover:text-white transition-colors cursor-pointer text-left w-full">
-							Sair da conta
-						</button>
-					</form>
+					<LogoutButton />
 				</div>
 			</aside>
 
@@ -71,7 +73,9 @@ export default async function AdminLayout({
 			<div className="flex-1 flex flex-col min-w-0">
 				{/* TOPBAR */}
 				<header className="bg-white border-b border-gray-200 px-7 h-[60px] flex items-center justify-between sticky top-0 z-50">
-					<h1 className="font-['Bebas_Neue'] text-[22px] tracking-[1.5px] text-black">PAINEL GERAL</h1>
+					<h1 className="font-['Bebas_Neue'] text-[22px] tracking-[1.5px] text-black">
+						PAINEL GERAL
+					</h1>
 					<div className="flex items-center gap-3">
 						<button className="w-9 h-9 border-2 border-gray-200 rounded flex items-center justify-center relative hover:border-black transition-colors">
 							🔔
@@ -79,9 +83,7 @@ export default async function AdminLayout({
 						</button>
 					</div>
 				</header>
-				<main className="p-7">
-					{children}
-				</main>
+				<main className="p-7">{children}</main>
 			</div>
 		</div>
 	);
