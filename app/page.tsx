@@ -253,7 +253,7 @@ export default function Home() {
 							<h2 className="font-['Bebas_Neue'] text-[34px] tracking-[2px] text-[#0a0a0a] mb-2">
 								FAÇA SEU AGENDAMENTO
 							</h2>
-							<p className="text-[13px] text-[#888] font-medium mt-1">
+							<p className="text-sm text-[#888] font-medium mt-1">
 								Rápido, fácil e sem complicação — do jeito que tem que ser.
 							</p>
 						</div>
@@ -303,7 +303,7 @@ export default function Home() {
 							<h2 className="font-['Bebas_Neue'] text-[34px] tracking-[2px] text-[#0a0a0a] mb-2">
 								ESCOLHE O CARA
 							</h2>
-							<p className="text-[13px] text-[#888] font-medium mt-1">
+							<p className="text-sm text-[#888] font-medium mt-1">
 								Seleciona o barbeiro que vai te deixar na régua.
 							</p>
 						</div>
@@ -401,7 +401,7 @@ export default function Home() {
 							<h2 className="font-['Bebas_Neue'] text-[34px] tracking-[2px] text-[#0a0a0a] mb-2">
 								QUE PARADA VAI SER?
 							</h2>
-							<p className="text-[13px] text-[#888] font-medium mt-1">
+							<p className="text-sm text-[#888] font-medium mt-1">
 								Pode escolher mais de um serviço na mesma sessão.
 							</p>
 						</div>
@@ -463,7 +463,7 @@ export default function Home() {
 							</button>
 							<button
 								onClick={() => handleNext(1)}
-								className="flex-1 font-['Barlow_Condensed'] text-[13px] font-bold tracking-[1.5px] uppercase bg-transparent text-[#888] border-[1.5px] border-[#e0e0e0] py-3 px-5 rounded-md cursor-pointer transition-all flex items-center justify-center gap-2 hover:border-[#0a0a0a] hover:text-[#0a0a0a]"
+								className="flex-1 text-xs font-bold tracking-[1.5px] uppercase bg-transparent text-[#888] border-[1.5px] border-[#e0e0e0] py-3 px-5 rounded-md cursor-pointer transition-all flex items-center justify-center gap-2 hover:border-[#0a0a0a] hover:text-[#0a0a0a]"
 							>
 								← Voltar
 							</button>
@@ -477,7 +477,7 @@ export default function Home() {
 							<h2 className="font-['Bebas_Neue'] text-[34px] tracking-[2px] text-[#0a0a0a] mb-2">
 								QUANDO VOCÊ VEM?
 							</h2>
-							<p className="text-[13px] text-[#888] font-medium mt-1">
+							<p className="text-sm text-[#888] font-medium mt-1">
 								Escolhe a data e o horário que mandar bem pra você.
 							</p>
 						</div>
@@ -526,7 +526,7 @@ export default function Home() {
 											<div
 												key={`d-${d}`}
 												className={cn(
-													"aspect-square flex items-center justify-center text-[13px] font-medium rounded-md cursor-pointer border-[1.5px] border-transparent transition-all relative",
+													"aspect-square flex items-center justify-center text-xs font-medium rounded-md cursor-pointer border-[1.5px] border-transparent transition-all relative",
 													isPast
 														? "text-[#c4c4c4] cursor-not-allowed"
 														: "hover:bg-[#f2f2f2] hover:border-[#c4c4c4]",
@@ -554,7 +554,7 @@ export default function Home() {
 								</p>
 								<div>
 									{!selectedDate ? (
-										<div className="text-center py-8 text-[#888] text-[13px]">
+										<div className="text-center py-8 text-[#888] text-xs">
 											👈 Seleciona uma data primeiro
 										</div>
 									) : (
@@ -566,7 +566,7 @@ export default function Home() {
 													<div
 														key={time}
 														className={cn(
-															"py-2.5 px-1.5 text-center border-[1.5px] border-[#e0e0e0] rounded-md text-[13px] font-semibold transition-all bg-white",
+															"py-2.5 px-1.5 text-center border-[1.5px] border-[#e0e0e0] rounded-md text-xs font-semibold transition-all bg-white",
 															busy
 																? "bg-[#f9f9f9] text-[#c4c4c4] cursor-not-allowed line-through border-transparent"
 																: "cursor-pointer hover:border-[#0a0a0a] hover:bg-[#f9f9f9]",
@@ -597,7 +597,7 @@ export default function Home() {
 								Próximo: Seus Dados →
 							</button>
 							<button
-								className="flex-1 font-['Barlow_Condensed'] text-[13px] font-bold tracking-[1.5px] uppercase bg-transparent text-[#888] border-[1.5px] border-[#e0e0e0] py-3 px-5 rounded-md cursor-pointer transition-all flex items-center justify-center gap-2 hover:border-[#0a0a0a] hover:text-[#0a0a0a]"
+								className="flex-1 font-['Barlow_Condensed'] text-xs font-bold tracking-[1.5px] uppercase bg-transparent text-[#888] border-[1.5px] border-[#e0e0e0] py-3 px-5 rounded-md cursor-pointer transition-all flex items-center justify-center gap-2 hover:border-[#0a0a0a] hover:text-[#0a0a0a]"
 								onClick={() => handleNext(2)}
 							>
 								← Voltar
@@ -612,7 +612,7 @@ export default function Home() {
 							<h2 className="font-['Bebas_Neue'] text-[34px] tracking-[2px] text-[#0a0a0a] mb-2">
 								QUEM É VOCÊ, PARCEIRO?
 							</h2>
-							<p className="text-[13px] text-[#888] font-medium mt-1">
+							<p className="text-xs text-[#888] font-medium mt-1">
 								Sem login, sem burocracia — só o essencial.
 							</p>
 						</div>
@@ -667,9 +667,9 @@ export default function Home() {
 							</div>
 						</div>
 
-						<div className="bg-[#fffbea] border-[1.5px] border-[#d4a017] rounded-md px-4 py-3 text-[13px] text-[#444] mt-4 flex gap-2 items-start leading-1.5">
+						<div className="bg-[#fffbea] border-[1.5px] border-[#d4a017] rounded-md px-4 py-3 text-xs text-[#444] mt-4 flex gap-2 items-start leading-1.5">
 							<span>📱</span>
-							<span>
+							<span className="leading-[initial]">
 								Você vai receber a confirmação no seu WhatsApp. Guarda o número do barbeiro por
 								lá caso precise cancelar ou remarcar!
 							</span>
@@ -684,7 +684,7 @@ export default function Home() {
 								Próximo: Revisar Agendamento →
 							</button>
 							<button
-								className="flex-1 font-['Barlow_Condensed'] text-[13px] font-bold tracking-[1.5px] uppercase bg-transparent text-[#888] border-[1.5px] border-[#e0e0e0] py-3 px-5 rounded-md cursor-pointer transition-all flex items-center justify-center gap-2 hover:border-[#0a0a0a] hover:text-[#0a0a0a]"
+								className="flex-1 font-['Barlow_Condensed'] text-xs font-bold tracking-[1.5px] uppercase bg-transparent text-[#888] border-[1.5px] border-[#e0e0e0] py-3 px-5 rounded-md cursor-pointer transition-all flex items-center justify-center gap-2 hover:border-[#0a0a0a] hover:text-[#0a0a0a]"
 								onClick={() => handleNext(3)}
 							>
 								← Voltar
@@ -699,7 +699,7 @@ export default function Home() {
 							<h2 className="font-['Bebas_Neue'] text-[34px] tracking-[2px] text-[#0a0a0a] mb-2">
 								CONFERE E CONFIRMA
 							</h2>
-							<p className="text-[13px] text-[#888] font-medium mt-1">
+							<p className="text-xs text-[#888] font-medium mt-1">
 								Tá tudo certo? Bora garantir sua vaga!
 							</p>
 						</div>
@@ -756,7 +756,7 @@ export default function Home() {
 
 						<div className="flex justify-center mt-3">
 							<button
-								className="font-['Barlow_Condensed'] text-[13px] font-bold tracking-[1.5px] uppercase bg-transparent text-[#888] border-[1.5px] border-[#e0e0e0] py-3 px-5 rounded-md cursor-pointer transition-all flex items-center justify-center gap-2 hover:border-[#0a0a0a] hover:text-[#0a0a0a]"
+								className="font-['Barlow_Condensed'] text-xs font-bold tracking-[1.5px] uppercase bg-transparent text-[#888] border-[1.5px] border-[#e0e0e0] py-3 px-5 rounded-md cursor-pointer transition-all flex items-center justify-center gap-2 hover:border-[#0a0a0a] hover:text-[#0a0a0a]"
 								onClick={() => handleNext(4)}
 							>
 								← Editar
