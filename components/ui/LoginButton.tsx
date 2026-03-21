@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { X, Loader2 } from "lucide-react";
+import { X, Loader2, Eye, EyeOff } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
@@ -22,6 +22,7 @@ export default function LoginButton() {
 	const [isOpen, setIsOpen] = useState(false);
 	const [loginError, setLoginError] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
+	const [showPassword, setShowPassword] = useState(false);
 
 	const {
 		register,
@@ -36,6 +37,10 @@ export default function LoginButton() {
 
 	const usuarioValue = watch("usuario");
 	const senhaValue = watch("senha") || "";
+
+	const handleShowPassword = () => {
+		setShowPassword(!showPassword);
+	};
 
 	const onSubmit = async (data: LoginFormValues) => {
 		setLoginError("");
@@ -83,7 +88,7 @@ export default function LoginButton() {
 				<div className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center p-6 sm:p-12 overflow-y-auto">
 					<button
 						onClick={() => setIsOpen(false)}
-						className="absolute top-6 right-6 p-2 text-gray-800 hover:bg-gray-100 rounded-full"
+						className="absolute top-6 right-6 p-2 text-gray-800 hover:bg-gray-100 rounded-full cursor-pointer"
 					>
 						<X size={24} />
 					</button>
@@ -97,7 +102,7 @@ export default function LoginButton() {
 								<button
 									type="button"
 									onClick={handleGoogleLogin}
-									className="flex items-center justify-center gap-3 w-full border-2 border-gray-200 hover:border-black hover:bg-gray-50 text-black font-bold py-3.5 rounded transition-all tracking-wide"
+									className="flex items-center justify-center gap-3 w-full border-2 border-gray-200 hover:border-black hover:bg-gray-50 text-gray-500 font-bold py-3.5 rounded transition-all tracking-wide cursor-pointer"
 								>
 									<svg
 										viewBox="0 0 24 24"
@@ -130,7 +135,7 @@ export default function LoginButton() {
 							</div>
 
 							<div>
-								<label className="block text-sm font-bold text-gray-700 mb-1">Usuário</label>
+								<label className="block text-sm font-bold text-gray-700 mb-1">E-mail</label>
 								<div className="relative">
 									<input
 										type="text"
@@ -145,7 +150,7 @@ export default function LoginButton() {
 										<button
 											type="button"
 											onClick={() => setValue("usuario", "", { shouldValidate: true })}
-											className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+											className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
 										>
 											<X size={18} />
 										</button>
@@ -162,23 +167,21 @@ export default function LoginButton() {
 								<label className="block text-sm font-bold text-gray-700 mb-1">Senha</label>
 								<div className="relative">
 									<input
-										type="password"
+										type={showPassword ? "text" : "password"}
 										{...register("senha")}
 										className={cn(
-											"w-full pl-4 pr-10 py-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black",
+											"w-full pl-4 pr-10 py-3 rounded border border-gray-300 text-black focus:outline-none focus:ring-2 focus:ring-red-500",
 											errors.senha && "border-red-500",
 										)}
 										placeholder="Sua senha"
 									/>
-									{senhaValue && (
-										<button
-											type="button"
-											onClick={() => setValue("senha", "", { shouldValidate: true })}
-											className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-										>
-											<X size={18} />
-										</button>
-									)}
+									<button
+										type="button"
+										onClick={handleShowPassword}
+										className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+									>
+										{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+									</button>
 								</div>
 								{errors.senha && (
 									<p className="text-red-500 text-xs mt-1 font-semibold">
