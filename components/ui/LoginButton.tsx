@@ -9,51 +9,50 @@ import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
 
 const loginSchema = z.object({
-	loja: z.string().min(1, "Campo obrigatório").max(50, "Máximo de 50 caracteres"),
 	usuario: z
 		.string()
 		.min(1, "Campo obrigatório")
 		.email("Usuário deve ser um e-mail válido"),
 	senha: z
 		.string()
-		.min(8, "A senha deve ter no mínimo 8 caracteres")
-		.regex(/[A-Z]/, "A senha deve conter pelo menos uma letra maiúscula")
-		.regex(/[a-z]/, "A senha deve conter pelo menos uma letra minúscula")
-		.regex(/[0-9]/, "A senha deve conter pelo menos um número")
-		.regex(/[^A-Za-z0-9]/, "A senha deve conter pelo menos um caractere especial"),
+		.min(1, "Campo obrigatório"),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginButton() {
 	const [isOpen, setIsOpen] = useState(false);
+	const [loginError, setLoginError] = useState("");
+	const [isLoading, setIsLoading] = useState(false);
 
 	const {
 		register,
 		handleSubmit,
 		watch,
 		setValue,
-		formState: { errors, isValid, isSubmitted },
+		formState: { errors },
 	} = useForm<LoginFormValues>({
 		resolver: zodResolver(loginSchema),
 		mode: "onSubmit",
 	});
 
-	const lojaValue = watch("loja");
 	const usuarioValue = watch("usuario");
 	const senhaValue = watch("senha") || "";
 
-	const passRequirements = [
-		{ regex: /.{8,}/, text: "No mínimo 8 caracteres" },
-		{ regex: /[A-Z]/, text: "Uma letra maiúscula" },
-		{ regex: /[a-z]/, text: "Uma letra minúscula" },
-		{ regex: /[0-9]/, text: "Um número" },
-		{ regex: /[^A-Za-z0-9]/, text: "Um caractere especial" },
-	];
-
-	const onSubmit = (data: LoginFormValues) => {
-		console.log("Login validado com sucesso:", data);
-		setIsOpen(false);
+	const onSubmit = async (data: LoginFormValues) => {
+		setLoginError("");
+		setIsLoading(true);
+		const supabase = createClient();
+		const { error } = await supabase.auth.signInWithPassword({
+			email: data.usuario,
+			password: data.senha,
+		});
+		setIsLoading(false);
+		if (error) {
+			setLoginError("E-mail ou senha incorretos.");
+			return;
+		}
+		window.location.href = "/admin";
 	};
 
 	const handleGoogleLogin = async () => {
@@ -68,7 +67,11 @@ export default function LoginButton() {
 
 	return (
 		<>
-			<Button text="LOGIN" onClick={() => setIsOpen(true)} className="w-25" />
+			<Button
+				text="LOGIN"
+				onClick={() => setIsOpen(true)}
+				className="w-25 cursor-pointer"
+			/>
 
 			{isOpen && (
 				<div className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center p-6 sm:p-12 overflow-y-auto">
@@ -121,33 +124,6 @@ export default function LoginButton() {
 							</div>
 
 							<div>
-								<label className="block text-sm font-bold text-gray-700 mb-1">Sua loja</label>
-								<div className="relative">
-									<input
-										type="text"
-										{...register("loja")}
-										className={cn(
-											"w-full pl-4 pr-10 py-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black",
-											errors.loja && "border-red-500",
-										)}
-										placeholder="Nome ou ID da loja"
-									/>
-									{lojaValue && (
-										<button
-											type="button"
-											onClick={() => setValue("loja", "", { shouldValidate: true })}
-											className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-										>
-											<X size={18} />
-										</button>
-									)}
-								</div>
-								{errors.loja && (
-									<p className="text-red-500 text-xs mt-1 font-semibold">{errors.loja.message}</p>
-								)}
-							</div>
-
-							<div>
 								<label className="block text-sm font-bold text-gray-700 mb-1">Usuário</label>
 								<div className="relative">
 									<input
@@ -177,74 +153,50 @@ export default function LoginButton() {
 							</div>
 
 							<div>
-								<label className="block text-sm font-bold text-gray-700 mb-1">Senha</label>
-								<div className="relative">
-									<input
-										type="password"
-										{...register("senha")}
-										className={cn(
-											"w-full pl-4 pr-10 py-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black",
-											errors.senha && "border-red-500",
-										)}
-										placeholder="Sua senha"
-									/>
-									{senhaValue && (
-										<button
-											type="button"
-											onClick={() => setValue("senha", "", { shouldValidate: true })}
-											className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-										>
-											<X size={18} />
-										</button>
-									)}
-								</div>
-								<div className="mt-3 flex flex-col gap-1 text-xs font-semibold">
-									{passRequirements.map((req, i) => {
-										const isReqValid = req.regex.test(senhaValue);
-										return (
-											<span
-												key={i}
-												className={cn(
-													"flex items-center gap-1 transition-colors",
-													isReqValid ? "text-green-600" : "text-gray-400",
-												)}
-											>
-												<span className="w-4">{isReqValid ? "✓" : "○"}</span>
-												{req.text}
-											</span>
-										);
-									})}
-								</div>
-							</div>
-
-							{isSubmitted && !isValid && (
-								<p className="text-red-500 text-sm font-bold text-center">
-									É preciso preencher todos os campos corretamente.
-								</p>
+					<label className="block text-sm font-bold text-gray-700 mb-1">Senha</label>
+					<div className="relative">
+						<input
+							type="password"
+							{...register("senha")}
+							className={cn(
+								"w-full pl-4 pr-10 py-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black",
+								errors.senha && "border-red-500",
 							)}
-
-							<div className="w-full flex flex-col items-end">
-								<button
-									type="submit"
-									onClick={() => console.log("Botão de login acionado")}
-									className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded transition-colors tracking-wide mt-4"
-								>
-									ENTRAR NA ÁREA ADMINISTRATIVA
-								</button>
-								<a
-									href="#"
-									onClick={(e) => {
-										e.preventDefault();
-										console.log("Esqueci a senha");
-									}}
-									className="mt-2 text-sm text-gray-500 hover:text-red-500 transition-colors"
-								>
-									Esqueceu a senha?
-								</a>
-							</div>
-						</form>
+							placeholder="Sua senha"
+						/>
+						{senhaValue && (
+							<button
+								type="button"
+								onClick={() => setValue("senha", "", { shouldValidate: true })}
+								className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+							>
+								<X size={18} />
+							</button>
+						)}
 					</div>
+					{errors.senha && (
+						<p className="text-red-500 text-xs mt-1 font-semibold">{errors.senha.message}</p>
+					)}
 				</div>
+
+				{loginError && (
+					<p className="text-red-500 text-sm font-bold text-center bg-red-50 border border-red-200 rounded px-3 py-2">
+						{loginError}
+					</p>
+				)}
+
+				<div className="w-full flex flex-col items-end">
+					<button
+						type="submit"
+						disabled={isLoading}
+						className="w-full bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white font-bold py-4 rounded transition-colors tracking-wide mt-4"
+					>
+						{isLoading ? "Entrando..." : "ENTRAR NA ÁREA ADMINISTRATIVA"}
+					</button>
+				</div>
+			</form>
+			</div>
+			</div>
 			)}
 		</>
 	);
