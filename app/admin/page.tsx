@@ -131,7 +131,7 @@ export default function AdminPage() {
 						Faturamento
 					</div>
 					<div className="font-['Bebas_Neue'] text-4xl leading-none text-black">
-						R$ 1{revenue}
+						R$ 100,00
 					</div>
 				</div>
 			</div>
