@@ -1,0 +1,1614 @@
+<!doctype html>
+<html lang="pt-BR">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>BarberBook — Painel Admin</title>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@400;600;700;900&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			:root {
+				--black: #0a0a0a;
+				--white: #fff;
+				--red: #e63946;
+				--red-dark: #c1121f;
+				--gold: #d4a017;
+				--gray-50: #f9f9f9;
+				--gray-100: #f2f2f2;
+				--gray-200: #e0e0e0;
+				--gray-300: #c4c4c4;
+				--gray-400: #aaa;
+				--gray-500: #888;
+				--gray-700: #444;
+				--gray-900: #1a1a1a;
+				--green: #2ea84f;
+				--r: 6px;
+				--rlg: 12px;
+				--sidebar: 240px;
+			}
+			*,
+			*::before,
+			*::after {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
+			body {
+				font-family: "Barlow", sans-serif;
+				background: var(--gray-50);
+				color: var(--black);
+				min-height: 100vh;
+				display: flex;
+			}
+
+			/* AUTH SCREEN */
+			.auth-screen {
+				position: fixed;
+				inset: 0;
+				background: var(--black);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				z-index: 1000;
+				padding: 24px;
+			}
+			.auth-screen.hidden {
+				display: none;
+			}
+			.auth-box {
+				background: var(--white);
+				border-radius: var(--rlg);
+				width: 100%;
+				max-width: 420px;
+				overflow: hidden;
+			}
+			.auth-head {
+				background: var(--black);
+				padding: 28px 32px;
+				position: relative;
+				border-bottom: 2px solid var(--red);
+			}
+			.auth-head h1 {
+				font-family: "Bebas Neue", cursive;
+				font-size: 34px;
+				color: var(--white);
+				letter-spacing: 2px;
+				line-height: 1;
+			}
+			.auth-head p {
+				font-size: 13px;
+				color: var(--gray-500);
+				margin-top: 5px;
+			}
+			.auth-body {
+				padding: 28px 32px;
+			}
+			.social-btns {
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+				margin-bottom: 20px;
+			}
+			.social-btn {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				padding: 13px 18px;
+				border: 1.5px solid var(--gray-200);
+				border-radius: var(--r);
+				cursor: pointer;
+				background: var(--white);
+				font-size: 14px;
+				font-weight: 600;
+				color: var(--black);
+				transition: all 0.2s;
+				width: 100%;
+			}
+			.social-btn:hover {
+				border-color: var(--black);
+				background: var(--gray-50);
+			}
+			.social-btn svg {
+				width: 20px;
+				height: 20px;
+				flex-shrink: 0;
+			}
+			.divider {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				margin: 18px 0;
+				font-size: 12px;
+				color: var(--gray-400);
+				font-weight: 500;
+			}
+			.divider::before,
+			.divider::after {
+				content: "";
+				flex: 1;
+				height: 1px;
+				background: var(--gray-200);
+			}
+			.aig {
+				display: flex;
+				flex-direction: column;
+				gap: 7px;
+				margin-bottom: 14px;
+			}
+			.aig label {
+				font-family: "Barlow Condensed", sans-serif;
+				font-size: 11px;
+				font-weight: 700;
+				letter-spacing: 1.5px;
+				text-transform: uppercase;
+				color: var(--gray-700);
+			}
+			.aig input {
+				padding: 12px 14px;
+				border: 1.5px solid var(--gray-200);
+				border-radius: var(--r);
+				font-family: "Barlow", sans-serif;
+				font-size: 15px;
+				color: var(--black);
+				transition: border-color 0.2s;
+				width: 100%;
+			}
+			.aig input:focus {
+				outline: none;
+				border-color: var(--black);
+			}
+			.auth-error {
+				font-size: 12px;
+				color: var(--red);
+				margin-bottom: 10px;
+				display: none;
+			}
+			.btn-primary {
+				font-family: "Bebas Neue", cursive;
+				font-size: 20px;
+				letter-spacing: 2px;
+				background: var(--red);
+				color: var(--white);
+				border: none;
+				padding: 16px 36px;
+				border-radius: var(--r);
+				cursor: pointer;
+				transition: all 0.2s;
+				display: inline-flex;
+				align-items: center;
+				gap: 10px;
+				width: 100%;
+				justify-content: center;
+			}
+			.btn-primary:hover {
+				background: var(--red-dark);
+				transform: translateY(-1px);
+			}
+			.btn-primary:disabled {
+				background: var(--gray-200);
+				color: var(--gray-400);
+				cursor: not-allowed;
+				transform: none;
+			}
+
+			/* SIDEBAR */
+			.sidebar {
+				width: var(--sidebar);
+				background: var(--black);
+				display: flex;
+				flex-direction: column;
+				min-height: 100vh;
+				flex-shrink: 0;
+				position: sticky;
+				top: 0;
+				height: 100vh;
+			}
+			.sidebar-logo {
+				padding: 22px 20px;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
+			.sidebar-logo span {
+				font-family: "Bebas Neue", cursive;
+				font-size: 22px;
+				color: var(--white);
+				letter-spacing: 3px;
+			}
+			.logo-dot {
+				width: 8px;
+				height: 8px;
+				background: var(--red);
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+			.sidebar-user {
+				padding: 18px 20px;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+				display: flex;
+				align-items: center;
+				gap: 12px;
+			}
+			.sidebar-avatar {
+				width: 38px;
+				height: 38px;
+				border-radius: 50%;
+				background: var(--red);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-family: "Bebas Neue", cursive;
+				font-size: 15px;
+				color: var(--white);
+				flex-shrink: 0;
+			}
+			.sidebar-name {
+				font-size: 13px;
+				font-weight: 600;
+				color: var(--white);
+				line-height: 1.3;
+			}
+			.sidebar-role {
+				font-size: 11px;
+				color: var(--gray-500);
+			}
+			.sidebar-nav {
+				flex: 1;
+				padding: 14px 0;
+				overflow-y: auto;
+			}
+			.nav-item {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				padding: 11px 20px;
+				font-size: 13px;
+				font-weight: 600;
+				color: rgba(255, 255, 255, 0.45);
+				cursor: pointer;
+				transition: all 0.2s;
+				border-left: 3px solid transparent;
+			}
+			.nav-item:hover {
+				color: var(--white);
+				background: rgba(255, 255, 255, 0.05);
+			}
+			.nav-item.active {
+				color: var(--white);
+				border-left-color: var(--red);
+				background: rgba(230, 57, 70, 0.08);
+			}
+			.nav-icon {
+				width: 18px;
+				text-align: center;
+				font-size: 15px;
+			}
+			.nav-badge {
+				margin-left: auto;
+				background: var(--red);
+				color: var(--white);
+				font-size: 10px;
+				font-weight: 700;
+				padding: 2px 7px;
+				border-radius: 20px;
+				min-width: 20px;
+				text-align: center;
+			}
+			.sidebar-bottom {
+				padding: 16px 20px;
+				border-top: 1px solid rgba(255, 255, 255, 0.08);
+			}
+			.sidebar-bottom a {
+				display: block;
+				font-size: 12px;
+				color: var(--gray-500);
+				text-decoration: none;
+				transition: color 0.2s;
+				margin-bottom: 6px;
+				cursor: pointer;
+			}
+			.sidebar-bottom a:hover {
+				color: var(--white);
+			}
+
+			/* MAIN */
+			.main-area {
+				flex: 1;
+				overflow-x: hidden;
+				min-width: 0;
+			}
+			.topbar {
+				background: var(--white);
+				border-bottom: 1px solid var(--gray-200);
+				padding: 0 28px;
+				height: 60px;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				position: sticky;
+				top: 0;
+				z-index: 100;
+			}
+			.topbar-title {
+				font-family: "Bebas Neue", cursive;
+				font-size: 22px;
+				letter-spacing: 1.5px;
+			}
+			.topbar-right {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+			}
+			.notif-btn {
+				width: 36px;
+				height: 36px;
+				border: 1.5px solid var(--gray-200);
+				border-radius: var(--r);
+				background: none;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 16px;
+				position: relative;
+				transition: all 0.2s;
+			}
+			.notif-btn:hover {
+				border-color: var(--black);
+			}
+			.notif-dot {
+				position: absolute;
+				top: 6px;
+				right: 6px;
+				width: 8px;
+				height: 8px;
+				background: var(--red);
+				border-radius: 50%;
+				border: 2px solid var(--white);
+			}
+			.btn-xs {
+				font-family: "Barlow Condensed", sans-serif;
+				font-size: 11px;
+				font-weight: 700;
+				letter-spacing: 1px;
+				text-transform: uppercase;
+				padding: 7px 14px;
+				border-radius: var(--r);
+				cursor: pointer;
+				transition: all 0.2s;
+				border: 1.5px solid var(--gray-200);
+				background: none;
+				color: var(--gray-700);
+			}
+			.btn-xs:hover {
+				border-color: var(--black);
+				color: var(--black);
+			}
+			.btn-xs.red {
+				background: var(--red);
+				color: var(--white);
+				border-color: var(--red);
+			}
+			.btn-xs.red:hover {
+				background: var(--red-dark);
+			}
+			.content {
+				padding: 28px;
+			}
+			.page {
+				display: none;
+			}
+			.page.active {
+				display: block;
+			}
+
+			/* STATS */
+			.stats-row {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+				gap: 14px;
+				margin-bottom: 28px;
+			}
+			.stat-card {
+				background: var(--white);
+				border: 1.5px solid var(--gray-200);
+				border-radius: var(--rlg);
+				padding: 18px;
+				position: relative;
+				overflow: hidden;
+			}
+			.stat-card::after {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				height: 3px;
+				background: var(--gray-200);
+			}
+			.stat-card.red::after {
+				background: var(--red);
+			}
+			.stat-card.gold::after {
+				background: var(--gold);
+			}
+			.stat-card.green::after {
+				background: var(--green);
+			}
+			.stat-card.black::after {
+				background: var(--black);
+			}
+			.stat-lbl {
+				font-family: "Barlow Condensed", sans-serif;
+				font-size: 11px;
+				font-weight: 700;
+				letter-spacing: 1.5px;
+				text-transform: uppercase;
+				color: var(--gray-500);
+				margin-bottom: 8px;
+			}
+			.stat-num {
+				font-family: "Bebas Neue", cursive;
+				font-size: 38px;
+				line-height: 1;
+			}
+			.stat-num.red {
+				color: var(--red);
+			}
+			.stat-num.gold {
+				color: var(--gold);
+			}
+			.stat-num.green {
+				color: var(--green);
+			}
+			.stat-sub {
+				font-size: 11px;
+				color: var(--gray-500);
+				margin-top: 4px;
+				font-weight: 500;
+			}
+
+			/* SECTION CARD */
+			.section-card {
+				background: var(--white);
+				border: 1.5px solid var(--gray-200);
+				border-radius: var(--rlg);
+				margin-bottom: 24px;
+				overflow: hidden;
+			}
+			.card-header {
+				padding: 18px 22px;
+				border-bottom: 1px solid var(--gray-200);
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
+			.card-title {
+				font-family: "Bebas Neue", cursive;
+				font-size: 20px;
+				letter-spacing: 1.5px;
+			}
+			.card-actions {
+				display: flex;
+				gap: 8px;
+			}
+
+			/* TABLE */
+			table {
+				width: 100%;
+				border-collapse: collapse;
+			}
+			th {
+				font-family: "Barlow Condensed", sans-serif;
+				font-size: 11px;
+				font-weight: 700;
+				letter-spacing: 1.5px;
+				text-transform: uppercase;
+				color: var(--gray-500);
+				padding: 10px 22px;
+				text-align: left;
+				border-bottom: 1px solid var(--gray-200);
+				background: var(--gray-50);
+			}
+			td {
+				padding: 13px 22px;
+				border-bottom: 1px solid var(--gray-100);
+				font-size: 13px;
+				vertical-align: middle;
+			}
+			tr:last-child td {
+				border-bottom: none;
+			}
+			tr:hover td {
+				background: var(--gray-50);
+			}
+			.badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				font-family: "Barlow Condensed", sans-serif;
+				font-size: 11px;
+				font-weight: 700;
+				letter-spacing: 0.8px;
+				text-transform: uppercase;
+				padding: 4px 10px;
+				border-radius: 20px;
+			}
+			.badge.confirmed {
+				background: #e6f7ed;
+				color: #1a7a3a;
+			}
+			.badge.pending {
+				background: #fff8e0;
+				color: #a07000;
+			}
+			.badge.cancelled {
+				background: #fde8ea;
+				color: #c01020;
+			}
+			.badge.done {
+				background: var(--gray-100);
+				color: var(--gray-500);
+			}
+			.client-cell {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
+			.client-ava {
+				width: 34px;
+				height: 34px;
+				border-radius: 50%;
+				background: var(--black);
+				color: var(--white);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-family: "Bebas Neue", cursive;
+				font-size: 13px;
+				flex-shrink: 0;
+			}
+			.client-name {
+				font-weight: 600;
+				font-size: 14px;
+			}
+			.client-phone {
+				font-size: 11px;
+				color: var(--gray-500);
+			}
+			.action-btns {
+				display: flex;
+				gap: 6px;
+			}
+			.act-btn {
+				width: 30px;
+				height: 30px;
+				border: 1.5px solid var(--gray-200);
+				border-radius: var(--r);
+				background: none;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 14px;
+				transition: all 0.2s;
+			}
+			.act-btn:hover {
+				border-color: var(--black);
+				background: var(--gray-50);
+			}
+			.act-btn.wa:hover {
+				border-color: #25d366;
+				background: #e8fdf0;
+			}
+			.act-btn.del:hover {
+				border-color: var(--red);
+				background: #fde8ea;
+			}
+
+			/* FILTERS */
+			.filters-row {
+				display: flex;
+				gap: 8px;
+				flex-wrap: wrap;
+				padding: 14px 22px;
+				border-bottom: 1px solid var(--gray-200);
+				background: var(--gray-50);
+			}
+			.filter-btn {
+				font-family: "Barlow Condensed", sans-serif;
+				font-size: 12px;
+				font-weight: 700;
+				letter-spacing: 1px;
+				text-transform: uppercase;
+				padding: 7px 14px;
+				border: 1.5px solid var(--gray-200);
+				border-radius: var(--r);
+				background: var(--white);
+				cursor: pointer;
+				transition: all 0.2s;
+				color: var(--gray-700);
+			}
+			.filter-btn:hover {
+				border-color: var(--black);
+				color: var(--black);
+			}
+			.filter-btn.active {
+				background: var(--black);
+				color: var(--white);
+				border-color: var(--black);
+			}
+			.search-input {
+				padding: 7px 14px;
+				border: 1.5px solid var(--gray-200);
+				border-radius: var(--r);
+				font-family: "Barlow", sans-serif;
+				font-size: 13px;
+				background: var(--white);
+				color: var(--black);
+				margin-left: auto;
+				width: 200px;
+			}
+			.search-input:focus {
+				outline: none;
+				border-color: var(--black);
+			}
+
+			/* NOTIFICATIONS */
+			.notif-item {
+				display: flex;
+				gap: 14px;
+				padding: 16px 22px;
+				border-bottom: 1px solid var(--gray-100);
+				align-items: flex-start;
+				cursor: pointer;
+				transition: background 0.15s;
+			}
+			.notif-item:last-child {
+				border-bottom: none;
+			}
+			.notif-item:hover {
+				background: var(--gray-50);
+			}
+			.notif-item.unread {
+				background: #fff7f7;
+			}
+			.notif-ico {
+				width: 36px;
+				height: 36px;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 16px;
+				flex-shrink: 0;
+			}
+			.notif-ico.new {
+				background: #fde8ea;
+			}
+			.notif-ico.cancel {
+				background: #fff8e0;
+			}
+			.notif-ico.remind {
+				background: #e8fdf0;
+			}
+			.notif-body {
+				flex: 1;
+			}
+			.notif-title {
+				font-size: 13px;
+				font-weight: 700;
+				margin-bottom: 2px;
+			}
+			.notif-desc {
+				font-size: 12px;
+				color: var(--gray-500);
+			}
+			.notif-time {
+				font-size: 11px;
+				color: var(--gray-400);
+				margin-top: 3px;
+			}
+			.unread-dot {
+				width: 8px;
+				height: 8px;
+				background: var(--red);
+				border-radius: 50%;
+				flex-shrink: 0;
+				margin-top: 4px;
+			}
+
+			/* TEAM */
+			.barber-row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 14px 22px;
+				border-bottom: 1px solid var(--gray-100);
+			}
+			.barber-row:last-child {
+				border-bottom: none;
+			}
+			.toggle {
+				width: 40px;
+				height: 22px;
+				background: var(--gray-300);
+				border-radius: 20px;
+				position: relative;
+				cursor: pointer;
+				transition: background 0.2s;
+				flex-shrink: 0;
+			}
+			.toggle.on {
+				background: var(--green);
+			}
+			.toggle::after {
+				content: "";
+				position: absolute;
+				top: 3px;
+				left: 3px;
+				width: 16px;
+				height: 16px;
+				background: var(--white);
+				border-radius: 50%;
+				transition: transform 0.2s;
+			}
+			.toggle.on::after {
+				transform: translateX(18px);
+			}
+
+			/* REALTIME PULSE */
+			@keyframes pulse {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.4;
+				}
+			}
+			.live-dot {
+				width: 8px;
+				height: 8px;
+				background: var(--green);
+				border-radius: 50%;
+				animation: pulse 2s infinite;
+				display: inline-block;
+				margin-right: 6px;
+			}
+			.empty-state {
+				padding: 48px;
+				text-align: center;
+				color: var(--gray-400);
+				font-size: 14px;
+			}
+
+			/* TOAST */
+			.toast {
+				position: fixed;
+				bottom: 24px;
+				left: 50%;
+				transform: translateX(-50%) translateY(100px);
+				background: var(--black);
+				color: var(--white);
+				padding: 12px 24px;
+				border-radius: var(--r);
+				font-size: 14px;
+				font-weight: 600;
+				z-index: 9999;
+				transition: transform 0.3s;
+				white-space: nowrap;
+				pointer-events: none;
+			}
+			.toast.show {
+				transform: translateX(-50%) translateY(0);
+			}
+			.toast.error {
+				background: var(--red);
+			}
+		</style>
+	</head>
+	<body>
+		<!-- AUTH SCREEN -->
+		<div class="auth-screen" id="auth-screen">
+			<div class="auth-box">
+				<div class="auth-head">
+					<h1>ÁREA DO<br />BARBEIRO</h1>
+					<p>Acesse sua agenda e gerencie seus clientes</p>
+				</div>
+				<div class="auth-body">
+					<div class="social-btns">
+						<button class="social-btn" onclick="loginSocial('google')">
+							<svg viewBox="0 0 24 24">
+								<path
+									d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+									fill="#4285F4"
+								/>
+								<path
+									d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+									fill="#34A853"
+								/>
+								<path
+									d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+									fill="#FBBC05"
+								/>
+								<path
+									d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+									fill="#EA4335"
+								/>
+							</svg>
+							Entrar com Google
+						</button>
+						<button class="social-btn" onclick="loginSocial('facebook')">
+							<svg viewBox="0 0 24 24">
+								<path
+									d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+									fill="#1877F2"
+								/>
+							</svg>
+							Entrar com Facebook
+						</button>
+					</div>
+					<div class="divider">ou entre com email</div>
+					<div class="aig">
+						<label>E-mail</label
+						><input
+							type="email"
+							id="auth-email"
+							placeholder="barbeiro@barbearia.com"
+						/>
+					</div>
+					<div class="aig">
+						<label>Senha</label
+						><input
+							type="password"
+							id="auth-pass"
+							placeholder="••••••••"
+							onkeydown="if (event.key === 'Enter') loginEmail();"
+						/>
+					</div>
+					<p class="auth-error" id="auth-error">E-mail ou senha incorretos.</p>
+					<button class="btn-primary" id="btn-login" onclick="loginEmail()">
+						Entrar no Painel →
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- SIDEBAR -->
+		<aside class="sidebar" id="sidebar" style="display: none">
+			<div class="sidebar-logo">
+				<span class="logo-dot"></span
+				><span>BARBER<em style="color: var(--red)">BOOK</em></span>
+			</div>
+			<div class="sidebar-user">
+				<div class="sidebar-avatar" id="user-avatar">AD</div>
+				<div>
+					<div class="sidebar-name" id="user-name">Admin</div>
+					<div class="sidebar-role">Administrador</div>
+				</div>
+			</div>
+			<nav class="sidebar-nav">
+				<div class="nav-item active" onclick="showPage('dashboard')">
+					<span class="nav-icon">📊</span> Dashboard
+				</div>
+				<div class="nav-item" onclick="showPage('agendamentos')">
+					<span class="nav-icon">📅</span> Agendamentos
+					<span class="nav-badge" id="nav-badge">0</span>
+				</div>
+				<div class="nav-item" onclick="showPage('notificacoes')">
+					<span class="nav-icon">🔔</span> Notificações
+					<span class="nav-badge" id="notif-badge" style="display: none">0</span>
+				</div>
+				<div class="nav-item" onclick="showPage('equipe')">
+					<span class="nav-icon">✂</span> Equipe
+				</div>
+				<div class="nav-item" onclick="showPage('config')">
+					<span class="nav-icon">⚙</span> Configurações
+				</div>
+			</nav>
+			<div class="sidebar-bottom">
+				<a href="barberbook-cliente.html">← Ver página pública</a>
+				<a onclick="logout()">Sair da conta</a>
+			</div>
+		</aside>
+
+		<!-- MAIN -->
+		<div class="main-area" id="main-area" style="display: none">
+			<div class="topbar">
+				<span class="topbar-title" id="page-title">DASHBOARD</span>
+				<div class="topbar-right">
+					<span style="font-size: 12px; color: var(--gray-400)"
+						><span class="live-dot"></span>Ao vivo</span
+					>
+					<button class="notif-btn" onclick="showPage('notificacoes')">
+						🔔<span
+							class="notif-dot"
+							id="topbar-notif-dot"
+							style="display: none"
+						></span>
+					</button>
+				</div>
+			</div>
+			<div class="content">
+				<!-- DASHBOARD -->
+				<div class="page active" id="page-dashboard">
+					<div class="stats-row">
+						<div class="stat-card red">
+							<div class="stat-lbl">Hoje</div>
+							<div class="stat-num red" id="stat-today">—</div>
+							<div class="stat-sub">agendamentos</div>
+						</div>
+						<div class="stat-card gold">
+							<div class="stat-lbl">Pendentes</div>
+							<div class="stat-num gold" id="stat-pending">—</div>
+							<div class="stat-sub">aguardando</div>
+						</div>
+						<div class="stat-card green">
+							<div class="stat-lbl">Confirmados</div>
+							<div class="stat-num green" id="stat-confirmed">—</div>
+							<div class="stat-sub">este mês</div>
+						</div>
+						<div class="stat-card black">
+							<div class="stat-lbl">Faturamento</div>
+							<div class="stat-num" id="stat-revenue">—</div>
+							<div class="stat-sub">este mês</div>
+						</div>
+					</div>
+					<div class="section-card">
+						<div class="card-header">
+							<span class="card-title">AGENDAMENTOS DE HOJE</span
+							><button class="btn-xs" onclick="showPage('agendamentos')">
+								Ver todos
+							</button>
+						</div>
+						<div id="table-today"><div class="empty-state">Carregando...</div></div>
+					</div>
+					<div class="section-card">
+						<div class="card-header">
+							<span class="card-title">ALERTAS RECENTES</span>
+						</div>
+						<div id="notif-preview"><div class="empty-state">Carregando...</div></div>
+					</div>
+				</div>
+
+				<!-- AGENDAMENTOS -->
+				<div class="page" id="page-agendamentos">
+					<div class="section-card">
+						<div class="card-header">
+							<span class="card-title">TODOS OS AGENDAMENTOS</span>
+							<div class="card-actions">
+								<button class="btn-xs" onclick="exportCSV()">⬇ CSV</button>
+							</div>
+						</div>
+						<div class="filters-row">
+							<button class="filter-btn active" onclick="filterAppts('all', this)">
+								Todos
+							</button>
+							<button class="filter-btn" onclick="filterAppts('confirmed', this)">
+								Confirmados
+							</button>
+							<button class="filter-btn" onclick="filterAppts('pending', this)">
+								Pendentes
+							</button>
+							<button class="filter-btn" onclick="filterAppts('done', this)">
+								Concluídos
+							</button>
+							<button class="filter-btn" onclick="filterAppts('cancelled', this)">
+								Cancelados
+							</button>
+							<input
+								class="search-input"
+								type="text"
+								placeholder="🔍 Buscar cliente..."
+								oninput="searchAppts(this.value)"
+							/>
+						</div>
+						<div id="appts-table"><div class="empty-state">Carregando...</div></div>
+					</div>
+				</div>
+
+				<!-- NOTIFICAÇÕES -->
+				<div class="page" id="page-notificacoes">
+					<div class="section-card">
+						<div class="card-header">
+							<span class="card-title">CENTRAL DE ALERTAS</span
+							><button class="btn-xs" onclick="markAllRead()">Marcar tudo lido</button>
+						</div>
+						<div id="notif-list"><div class="empty-state">Carregando...</div></div>
+					</div>
+				</div>
+
+				<!-- EQUIPE -->
+				<div class="page" id="page-equipe">
+					<div class="section-card">
+						<div class="card-header">
+							<span class="card-title">EQUIPE DE BARBEIROS</span
+							><button class="btn-xs red" onclick="addBarberPrompt()">
+								+ Adicionar
+							</button>
+						</div>
+						<div id="team-list"><div class="empty-state">Carregando...</div></div>
+					</div>
+				</div>
+
+				<!-- CONFIG -->
+				<div class="page" id="page-config">
+					<div class="section-card">
+						<div class="card-header">
+							<span class="card-title">CONFIGURAÇÕES</span>
+						</div>
+						<div style="padding: 24px; display: grid; gap: 16px; max-width: 560px">
+							<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px">
+								<div class="aig">
+									<label>Nome da Barbearia</label
+									><input type="text" id="cfg-name" value="BarberBook" />
+								</div>
+								<div class="aig">
+									<label>WhatsApp da Barbearia</label
+									><input type="tel" id="cfg-phone" value="(11) 99999-0000" />
+								</div>
+							</div>
+							<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px">
+								<div class="aig">
+									<label>Abertura</label
+									><input type="time" id="cfg-open" value="09:00" />
+								</div>
+								<div class="aig">
+									<label>Fechamento</label
+									><input type="time" id="cfg-close" value="19:00" />
+								</div>
+							</div>
+							<div class="aig">
+								<label>Criar usuário admin (e-mail + senha)</label
+								><input type="email" id="cfg-new-email" placeholder="novo@admin.com" />
+							</div>
+							<div class="aig">
+								<input
+									type="password"
+									id="cfg-new-pass"
+									placeholder="Senha (mínimo 6 caracteres)"
+								/>
+							</div>
+							<button
+								class="btn-xs red"
+								style="width: fit-content; padding: 10px 24px; font-size: 12px"
+								onclick="createAdmin()"
+							>
+								Criar Acesso Admin
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="toast" id="toast"></div>
+
+		<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+		<script>
+			const SUPABASE_URL = "https://iqatqjvpsocrkeilefjc.supabase.co";
+			const SUPABASE_KEY =
+				"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlxYXRxanZwc29jcmtlaWxlZmpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NzcxMzAsImV4cCI6MjA4OTU1MzEzMH0.0T7NbGmy4RfqyYGcY9_JhyGOCXhZP6ikBovbn6IGhI4";
+			const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+				auth: {
+					detectSessionInUrl: true,
+					persistSession: true,
+					autoRefreshToken: true,
+				},
+			});
+
+			let allAppts = [];
+			let allNotifs = [];
+			let realtimeSetup = false;
+
+			// ─── AUTH ────────────────────────────────────────────────
+
+			async function isAuthorizedAdmin(email) {
+				const { data, error } = await sb
+					.from("admins")
+					.select("email")
+					.eq("email", email)
+					.single();
+				return !error && !!data;
+			}
+
+			async function enterPanel(session) {
+				const authorized = await isAuthorizedAdmin(session.user.email);
+				if (!authorized) {
+					await sb.auth.signOut();
+					const errEl = document.getElementById("auth-error");
+					errEl.textContent = "⛔ Acesso negado. Seu e-mail não está autorizado.";
+					errEl.style.display = "block";
+					showToast("Acesso negado para: " + session.user.email, true);
+					return;
+				}
+				document.getElementById("auth-screen").classList.add("hidden");
+				document.getElementById("sidebar").style.display = "flex";
+				document.getElementById("main-area").style.display = "block";
+				const u = session.user;
+				const name =
+					u.user_metadata?.full_name || u.email?.split("@")[0] || "Admin";
+				document.getElementById("user-name").textContent = name;
+				document.getElementById("user-avatar").textContent = name
+					.slice(0, 2)
+					.toUpperCase();
+				await loadAll();
+				if (!realtimeSetup) {
+					setupRealtime();
+					realtimeSetup = true;
+				}
+			}
+
+			// Processa sessão existente (refresh de página) e retorno do OAuth
+			(async () => {
+				const {
+					data: { session },
+				} = await sb.auth.getSession();
+				if (session) await enterPanel(session);
+			})();
+
+			sb.auth.onAuthStateChange(async (event, session) => {
+				if (event === "SIGNED_IN" && session) {
+					if (window.location.hash)
+						window.history.replaceState(null, "", window.location.pathname);
+					await enterPanel(session);
+				} else if (event === "SIGNED_OUT") {
+					realtimeSetup = false;
+					document.getElementById("auth-screen").classList.remove("hidden");
+					document.getElementById("sidebar").style.display = "none";
+					document.getElementById("main-area").style.display = "none";
+				}
+			});
+
+			async function loginSocial(provider) {
+				const baseUrl = "http://127.0.0.1:5500/barberbook-admin.html";
+				const redirectTo = baseUrl;
+				const { error } = await sb.auth.signInWithOAuth({
+					provider,
+					options: { redirectTo },
+				});
+				if (error) showToast("Erro: " + error.message, true);
+			}
+
+			async function loginEmail() {
+				const email = document.getElementById("auth-email").value.trim();
+				const pass = document.getElementById("auth-pass").value;
+				const errEl = document.getElementById("auth-error");
+				const btn = document.getElementById("btn-login");
+				errEl.style.display = "none";
+				if (!email || !pass) {
+					errEl.textContent = "Preenche e-mail e senha.";
+					errEl.style.display = "block";
+					return;
+				}
+				btn.disabled = true;
+				btn.textContent = "Entrando...";
+				const { error } = await sb.auth.signInWithPassword({
+					email,
+					password: pass,
+				});
+				if (error) {
+					errEl.textContent = "E-mail ou senha incorretos.";
+					errEl.style.display = "block";
+					btn.disabled = false;
+					btn.textContent = "Entrar no Painel →";
+				}
+			}
+
+			async function logout() {
+				console.log(" 😭 Saindo...");
+				await sb.auth.signOut();
+			}
+
+			async function createAdmin() {
+				const email = document.getElementById("cfg-new-email").value.trim();
+				const pass = document.getElementById("cfg-new-pass").value;
+				if (!email || pass.length < 6) {
+					showToast("E-mail válido e senha com 6+ caracteres.", true);
+					return;
+				}
+				const { error } = await sb.auth.signUp({ email, password: pass });
+				if (error) {
+					showToast("Erro: " + error.message, true);
+					return;
+				}
+				const { error: err2 } = await sb.from("admins").upsert([{ email }]);
+				if (err2) {
+					showToast(
+						"Usuário criado mas erro ao liberar acesso: " + err2.message,
+						true,
+					);
+					return;
+				}
+				showToast("✅ Acesso criado e autorizado! Verifique o e-mail.");
+				document.getElementById("cfg-new-email").value = "";
+				document.getElementById("cfg-new-pass").value = "";
+			}
+
+			// ─── LOAD DATA ────────────────────────────────────────────
+			async function loadAll() {
+				await Promise.all([loadAppointments(), loadNotifications(), loadTeam()]);
+			}
+
+			async function loadAppointments() {
+				const { data, error } = await sb
+					.from("appointments")
+					.select("*")
+					.order("date", { ascending: false })
+					.order("time", { ascending: true });
+				if (error) {
+					showToast("Erro ao carregar agendamentos", true);
+					return;
+				}
+				allAppts = data || [];
+				updateStats();
+				renderTableToday();
+				renderFullTable(allAppts);
+				document.getElementById("nav-badge").textContent = allAppts.filter(
+					(a) => a.status === "pending",
+				).length;
+			}
+
+			async function loadNotifications() {
+				const { data, error } = await sb
+					.from("notifications")
+					.select("*")
+					.order("created_at", { ascending: false })
+					.limit(50);
+				if (error) return;
+				allNotifs = data || [];
+				renderNotifPreview();
+				renderNotifList();
+				updateNotifBadge();
+			}
+
+			async function loadTeam() {
+				const { data, error } = await sb
+					.from("barbers")
+					.select("*")
+					.order("created_at");
+				if (error) return;
+				renderTeam(data || []);
+			}
+
+			// ─── REALTIME ─────────────────────────────────────────────
+			function setupRealtime() {
+				sb
+					.channel("admin-live")
+					.on(
+						"postgres_changes",
+						{ event: "INSERT", schema: "public", table: "appointments" },
+						(payload) => {
+							allAppts.unshift(payload.new);
+							updateStats();
+							renderTableToday();
+							renderFullTable(allAppts);
+							document.getElementById("nav-badge").textContent = allAppts.filter(
+								(a) => a.status === "pending",
+							).length;
+							showToast("🆕 Novo agendamento: " + payload.new.client_name);
+						},
+					)
+					.on(
+						"postgres_changes",
+						{ event: "INSERT", schema: "public", table: "notifications" },
+						(payload) => {
+							allNotifs.unshift(payload.new);
+							renderNotifPreview();
+							renderNotifList();
+							updateNotifBadge();
+						},
+					)
+					.on(
+						"postgres_changes",
+						{ event: "UPDATE", schema: "public", table: "appointments" },
+						(payload) => {
+							const idx = allAppts.findIndex((a) => a.id === payload.new.id);
+							if (idx > -1) allAppts[idx] = payload.new;
+							updateStats();
+							renderTableToday();
+							renderFullTable(allAppts);
+						},
+					)
+					.subscribe();
+			}
+
+			// ─── STATS ────────────────────────────────────────────────
+			function updateStats() {
+				const today = new Date().toISOString().slice(0, 10);
+				const todayArr = allAppts.filter((a) => a.date === today);
+				const pending = allAppts.filter((a) => a.status === "pending");
+				const confirmed = allAppts.filter((a) => a.status === "confirmed");
+				const revenue = allAppts
+					.filter((a) => a.status !== "cancelled")
+					.reduce((s, a) => s + Number(a.total || 0), 0);
+				document.getElementById("stat-today").textContent = todayArr.length;
+				document.getElementById("stat-pending").textContent = pending.length;
+				document.getElementById("stat-confirmed").textContent = confirmed.length;
+				document.getElementById("stat-revenue").textContent =
+					"R$" + revenue.toFixed(0);
+			}
+
+			// ─── TABLES ───────────────────────────────────────────────
+			function renderTableToday() {
+				const today = new Date().toISOString().slice(0, 10);
+				const arr = allAppts.filter((a) => a.date === today);
+				document.getElementById("table-today").innerHTML = arr.length
+					? buildTable(arr)
+					: '<div class="empty-state">Nenhum agendamento hoje.</div>';
+			}
+
+			function renderFullTable(arr) {
+				document.getElementById("appts-table").innerHTML = arr.length
+					? buildTable(arr)
+					: '<div class="empty-state">Nenhum agendamento encontrado.</div>';
+			}
+
+			function buildTable(arr) {
+				return `<div style="overflow-x:auto"><table>
+    <thead><tr>
+      <th>Cliente</th><th>Barbeiro</th><th>Serviço</th><th>Data</th><th>Hora</th><th>Total</th><th>Status</th><th>Ações</th>
+    </tr></thead>
+    <tbody>${arr
+					.map(
+						(a) => `<tr>
+      <td><div class="client-cell">
+        <div class="client-ava">${a.client_name
+									.split(" ")
+									.map((w) => w[0])
+									.join("")
+									.slice(0, 2)}</div>
+        <div><div class="client-name">${a.client_name}</div><div class="client-phone">${a.client_phone}</div></div>
+      </div></td>
+      <td style="font-size:13px;font-weight:600">${a.barber_name || "—"}</td>
+      <td style="font-size:12px;color:var(--gray-700);max-width:160px">${a.service_names || "—"}</td>
+      <td style="font-weight:600">${formatDate(a.date)}</td>
+      <td style="font-weight:600">${a.time}</td>
+      <td style="font-family:'Bebas Neue',cursive;font-size:18px">R$${Number(a.total || 0).toFixed(0)}</td>
+      <td>${badgeHtml(a.status)}</td>
+      <td><div class="action-btns">
+        <button class="act-btn wa" title="WhatsApp" onclick="openWA('${a.client_phone}','${a.client_name}')">💬</button>
+        ${a.status === "pending" ? `<button class="act-btn" title="Confirmar" onclick="changeStatus('${a.id}','confirmed')">✅</button>` : ""}
+        ${a.status === "confirmed" ? `<button class="act-btn" title="Concluir" onclick="changeStatus('${a.id}','done')">✓</button>` : ""}
+        ${!["cancelled", "done"].includes(a.status) ? `<button class="act-btn del" title="Cancelar" onclick="changeStatus('${a.id}','cancelled')">✕</button>` : ""}
+      </div></td>
+    </tr>`,
+					)
+					.join("")}</tbody>
+  </table></div>`;
+			}
+
+			function badgeHtml(s) {
+				const m = {
+					confirmed: "✅ Confirmado",
+					pending: "⏳ Pendente",
+					cancelled: "✕ Cancelado",
+					done: "✓ Concluído",
+				};
+				return `<span class="badge ${s}">${m[s] || s}</span>`;
+			}
+
+			function formatDate(d) {
+				if (!d) return "—";
+				const [y, m, day] = d.split("-");
+				return `${day}/${m}/${y}`;
+			}
+
+			// ─── NOTIFICATIONS ────────────────────────────────────────
+			function renderNotifPreview() {
+				const preview = allNotifs.slice(0, 4);
+				document.getElementById("notif-preview").innerHTML = preview.length
+					? preview.map((n) => notifHtml(n)).join("")
+					: '<div class="empty-state">Nenhuma notificação ainda.</div>';
+			}
+
+			function renderNotifList() {
+				document.getElementById("notif-list").innerHTML = allNotifs.length
+					? allNotifs.map((n) => notifHtml(n)).join("")
+					: '<div class="empty-state">Nenhuma notificação ainda.</div>';
+			}
+
+			function notifHtml(n) {
+				const icoMap = { new: "🆕", cancel: "❌", remind: "⏰" };
+				const dt = new Date(n.created_at);
+				const timeAgo = formatTimeAgo(dt);
+				return `<div class="notif-item${!n.read ? " unread" : ""}">
+    <div class="notif-ico ${n.type || "new"}">${icoMap[n.type] || "📌"}</div>
+    <div class="notif-body">
+      <div class="notif-title">${n.title}</div>
+      <div class="notif-desc">${n.description || ""}</div>
+      <div class="notif-time">${timeAgo}</div>
+    </div>
+    ${!n.read ? '<div class="unread-dot"></div>' : ""}
+  </div>`;
+			}
+
+			function formatTimeAgo(dt) {
+				const diff = Math.floor((Date.now() - dt) / 1000);
+				if (diff < 60) return "agora mesmo";
+				if (diff < 3600) return `há ${Math.floor(diff / 60)} min`;
+				if (diff < 86400) return `há ${Math.floor(diff / 3600)}h`;
+				return dt.toLocaleDateString("pt-BR");
+			}
+
+			function updateNotifBadge() {
+				const unread = allNotifs.filter((n) => !n.read).length;
+				const badge = document.getElementById("notif-badge");
+				const dot = document.getElementById("topbar-notif-dot");
+				if (unread > 0) {
+					badge.textContent = unread;
+					badge.style.display = "inline";
+					dot.style.display = "block";
+				} else {
+					badge.style.display = "none";
+					dot.style.display = "none";
+				}
+			}
+
+			async function markAllRead() {
+				const ids = allNotifs.filter((n) => !n.read).map((n) => n.id);
+				if (!ids.length) {
+					showToast("Nada para marcar.");
+					return;
+				}
+				await sb.from("notifications").update({ read: true }).in("id", ids);
+				allNotifs.forEach((n) => (n.read = true));
+				renderNotifList();
+				renderNotifPreview();
+				updateNotifBadge();
+				showToast("✅ Todas marcadas como lidas.");
+			}
+
+			// ─── TEAM ─────────────────────────────────────────────────
+			function renderTeam(barbers) {
+				document.getElementById("team-list").innerHTML = barbers.length
+					? barbers
+							.map(
+								(b) => `<div class="barber-row">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:44px;height:44px;border-radius:50%;background:${b.color || "#0a0a0a"};color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:17px">${b.name
+											.split(" ")
+											.map((w) => w[0])
+											.join("")
+											.slice(0, 2)}</div>
+          <div>
+            <div style="font-size:15px;font-weight:700">${b.name}</div>
+            <div style="font-size:12px;color:var(--gray-500)">${b.role}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <span style="font-size:12px;color:${b.active ? "var(--green)" : "var(--gray-400)"};font-weight:600">${b.active ? "● Ativo" : "○ Inativo"}</span>
+          <div class="toggle${b.active ? " on" : ""}" onclick="toggleBarber('${b.id}',${b.active},this)"></div>
+        </div>
+      </div>`,
+							)
+							.join("")
+					: '<div class="empty-state">Nenhum barbeiro cadastrado.</div>';
+			}
+
+			async function toggleBarber(id, currentActive, el) {
+				const newVal = !currentActive;
+				el.classList.toggle("on", newVal);
+				await sb.from("barbers").update({ active: newVal }).eq("id", id);
+				loadTeam();
+			}
+
+			async function addBarberPrompt() {
+				const name = prompt("Nome do novo barbeiro:");
+				if (!name?.trim()) return;
+				const role = prompt("Especialidade (ex: Mestre em Barba):") || "Barbeiro";
+				const { error } = await sb
+					.from("barbers")
+					.insert([{ name: name.trim(), role, active: true }]);
+				if (error) showToast("Erro ao adicionar barbeiro.", true);
+				else {
+					showToast("✅ Barbeiro adicionado!");
+					loadTeam();
+				}
+			}
+
+			// ─── ACTIONS ─────────────────────────────────────────────
+			async function changeStatus(id, status) {
+				const { error } = await sb
+					.from("appointments")
+					.update({ status })
+					.eq("id", id);
+				if (error) showToast("Erro ao atualizar status.", true);
+				else {
+					const a = allAppts.find((x) => x.id === id);
+					if (a) a.status = status;
+					updateStats();
+					renderTableToday();
+					renderFullTable(allAppts);
+					showToast("Status atualizado!");
+				}
+			}
+
+			function openWA(phone, name) {
+				const p = phone.replace(/\D/g, "");
+				const full = p.startsWith("55") ? p : `55${p}`;
+				window.open(
+					`https://wa.me/${full}?text=${encodeURIComponent(`Olá ${name}! 👋 Passando para confirmar seu agendamento na BarberBook.`)}`,
+					"_blank",
+				);
+			}
+
+			function filterAppts(status, btn) {
+				document
+					.querySelectorAll(".filter-btn")
+					.forEach((b) => b.classList.remove("active"));
+				btn.classList.add("active");
+				const filtered =
+					status === "all" ? allAppts : allAppts.filter((a) => a.status === status);
+				renderFullTable(filtered);
+			}
+
+			function searchAppts(q) {
+				if (!q) {
+					renderFullTable(allAppts);
+					return;
+				}
+				const filtered = allAppts.filter(
+					(a) =>
+						a.client_name?.toLowerCase().includes(q.toLowerCase()) ||
+						a.client_phone?.includes(q) ||
+						a.barber_name?.toLowerCase().includes(q.toLowerCase()),
+				);
+				renderFullTable(filtered);
+			}
+
+			function exportCSV() {
+				const rows = [
+					"ID,Barbeiro,Serviço,Data,Hora,Cliente,Telefone,Total,Status",
+					...allAppts.map(
+						(a) =>
+							`${a.id.slice(0, 8)},${a.barber_name},"${a.service_names}",${formatDate(a.date)},${a.time},${a.client_name},${a.client_phone},R$${Number(a.total || 0).toFixed(0)},${a.status}`,
+					),
+				];
+				const blob = new Blob([rows.join("\n")], { type: "text/csv" });
+				const url = URL.createObjectURL(blob);
+				const a = document.createElement("a");
+				a.href = url;
+				a.download = "barberbook-agendamentos.csv";
+				a.click();
+			}
+
+			// ─── NAVIGATION ───────────────────────────────────────────
+			const PAGE_TITLES = {
+				dashboard: "DASHBOARD",
+				agendamentos: "AGENDAMENTOS",
+				notificacoes: "NOTIFICAÇÕES",
+				equipe: "EQUIPE",
+				config: "CONFIGURAÇÕES",
+			};
+			function showPage(name) {
+				document
+					.querySelectorAll(".page")
+					.forEach((p) => p.classList.remove("active"));
+				document.getElementById(`page-${name}`).classList.add("active");
+				document
+					.querySelectorAll(".nav-item")
+					.forEach((i) => i.classList.remove("active"));
+				document.querySelectorAll(".nav-item").forEach((i) => {
+					if (i.getAttribute("onclick")?.includes(`'${name}'`))
+						i.classList.add("active");
+				});
+				document.getElementById("page-title").textContent =
+					PAGE_TITLES[name] || name.toUpperCase();
+			}
+
+			// ─── TOAST ────────────────────────────────────────────────
+			function showToast(msg, isError = false) {
+				const t = document.getElementById("toast");
+				t.textContent = msg;
+				t.className = "toast" + (isError ? " error" : "");
+				t.classList.add("show");
+				setTimeout(() => t.classList.remove("show"), 3500);
+			}
+		</script>
+	</body>
+</html>
