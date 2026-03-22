@@ -100,11 +100,11 @@ export default function AdminLayoutClient({
 						</span>
 						<Link
 							href="/admin/notificacoes"
-							className="w-9 h-9 border-2 border-gray-200 rounded flex items-center justify-center relative hover:border-black transition-colors"
+							className="flex items-center justify-center relative w-9 h-9 rounded "
 						>
 							🔔
 							{unreadCount > 0 && (
-								<div className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border border-white" />
+								<div className="absolute top-1 right-1 w-2 h-2 rounded-full border bg-red-500 border-white" />
 							)}
 						</Link>
 					</div>
