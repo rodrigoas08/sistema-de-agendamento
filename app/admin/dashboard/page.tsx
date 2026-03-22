@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
+import { formatPhone } from "@/utils/format";
 
 // ─── TYPES ───────────────────────────────────────────────
 type Appointment = {
@@ -280,7 +281,7 @@ export default function DashboardPage() {
 				</div>
 
 				{/* ── MOBILE: cards (< md) ── */}
-				<div className="divide-y divide-gray-100 md:hidden">
+				<div className="divide-y divide-gray-200 md:hidden">
 					{loading ? (
 						<p className="py-10 text-center text-sm text-gray-400">Carregando...</p>
 					) : filtered.length === 0 ? (
@@ -293,12 +294,14 @@ export default function DashboardPage() {
 								{/* linha 1 — avatar · nome · hora · status */}
 								<div className="flex items-center gap-3">
 									<div className="flex-1 min-w-0">
-										<p className="truncate text-sm font-bold">{a.client_name}</p>
-										<p className="text-xs text-gray-400">{a.client_phone}</p>
+										<p className="truncate text-sm font-bold capitalize">
+											Cliente: {a.client_name}
+										</p>
+										<p className="text-xs text-gray-500">Cel: {formatPhone(a.client_phone)}</p>
 									</div>
 
 									<div className="flex shrink-0 flex-col items-end gap-1">
-										<span className="font-['Bebas_Neue'] text-base leading-none">{a.time}</span>
+										<span className="font-['Bebas_Neue'] text-base leading-none">{a.time}h</span>
 										<span
 											className={`
 											px-2 py-0.5
@@ -313,10 +316,14 @@ export default function DashboardPage() {
 								</div>
 
 								{/* linha 2 — barbeiro · serviço · total */}
-								<div className="flex items-center justify-between gap-2 rounded-lg bg-gray-50 px-3 py-2">
+								<div className="flex items-center justify-between gap-2 rounded-lg bg-gray-50 py-2">
 									<div className="min-w-0">
-										<p className="truncate text-xs font-bold text-red-500">{a.barber_name}</p>
-										<p className="truncate text-xs text-gray-500">{a.service_names}</p>
+										<p className="truncate text-xs font-semibold">
+											<span className="">Barbeiro(a):</span> {a.barber_name}
+										</p>
+										<p className="text-xs text-gray-500">
+											Serviço: {a.service_names.split(",").join(" + ")}
+										</p>
 									</div>
 									<span className="shrink-0 font-['Bebas_Neue'] text-xl">
 										R${Number(a.total ?? 0).toFixed(0)}
@@ -374,21 +381,28 @@ export default function DashboardPage() {
 				<div className="hidden overflow-x-auto md:block">
 					<table className="w-full border-collapse text-left">
 						<thead>
-							<tr className="bg-gray-50">
-								{["Cliente", "Barbeiro", "Serviço", "Hora", "Total", "Status", "Ações"].map(
-									(h) => (
-										<th
-											key={h}
-											className="
-											border-b border-gray-200 py-3 px-5
+							<tr className="bg-gray-100">
+								{[
+									"Cliente",
+									"Telefone",
+									"Barbeiro",
+									"Serviço",
+									"Hora",
+									"Total",
+									"Status",
+									"Ações",
+								].map((h) => (
+									<th
+										key={h}
+										className="
+											border-b-2 border-gray-100 py-3 px-5
 											font-['Barlow_Condensed'] text-[11px] font-bold tracking-[1.5px] uppercase
 											text-gray-500
 										"
-										>
-											{h}
-										</th>
-									),
-								)}
+									>
+										{h}
+									</th>
+								))}
 							</tr>
 						</thead>
 						<tbody>
@@ -409,22 +423,21 @@ export default function DashboardPage() {
 								</tr>
 							) : (
 								filtered.map((a) => (
-									<tr key={a.id} className="border-b border-gray-100 hover:bg-gray-50">
+									<tr key={a.id} className="border-b border-gray-100 text-sm hover:bg-gray-50">
 										{/* Cliente */}
 										<td className="py-3 px-5">
-											<p className="text-sm font-bold leading-tight">{a.client_name}</p>
-											<p className="text-xs text-gray-400">{a.client_phone}</p>
+											<p className="font-semibold leading-tight capitalize">{a.client_name}</p>
 										</td>
+										{/* Telefone */}
+										<td className="py-3 px-5 text-gray-400">{formatPhone(a.client_phone)}</td>
 										{/* Barbeiro */}
-										<td className="py-3 px-5 text-sm font-semibold text-red-500">
-											{a.barber_name}
-										</td>
+										<td className="py-3 px-5 font-semibold text-red-500">{a.barber_name}</td>
 										{/* Serviço */}
-										<td className="max-w-[180px] py-3 px-5 text-sm text-gray-600">
-											{a.service_names}
+										<td className="max-w-[180px] py-3 px-5 text-gray-500">
+											{a.service_names.split(",").join(" + ")}
 										</td>
 										{/* Hora */}
-										<td className="py-3 px-5 text-sm font-bold">{a.time}</td>
+										<td className="py-3 px-5 font-bold">{a.time}</td>
 										{/* Total */}
 										<td className="py-3 px-5 font-['Bebas_Neue'] text-lg">
 											R${Number(a.total ?? 0).toFixed(0)}

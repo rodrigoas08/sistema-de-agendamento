@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import LoginButton from "@/components/ui/LoginButton";
 import { createClient } from "@/utils/supabase/client";
+import { formatPhone } from "@/utils/format";
 import { cn } from "@/lib/utils";
 
 type Barber = {
@@ -639,7 +640,7 @@ export default function Home() {
 									className="px-3.5 py-3 border-[1.5px] border-[#e0e0e0] rounded-md font-['Barlow'] text-[15px] text-[#0a0a0a] bg-white transition-colors w-full focus:outline-none focus:border-[#0a0a0a]"
 									placeholder="(11) 99999-9999"
 									value={clientPhone}
-									onChange={(e) => setClientPhone(e.target.value)}
+									onChange={(e) => setClientPhone(formatPhone(e.target.value))}
 								/>
 							</div>
 							<div className="flex flex-col gap-2 sm:col-span-2">
