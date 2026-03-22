@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import { createClient } from "@/utils/supabase/client";
 import { Loader2 } from "lucide-react";
+import { useMediaQuery } from "react-responsive";
 
 // ─── TYPES ───────────────────────────────────────────────
 type RawRow = {
@@ -113,6 +114,7 @@ export default function AppointmentsChart() {
 	const [period, setPeriod] = useState<6 | 12>(6);
 	const [year, setYear] = useState<number | null>(null); // null = usar period
 	const supabase = createClient();
+	const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
 
 	const availableYears = useMemo(() => {
 		const cur = new Date().getFullYear();
@@ -287,7 +289,7 @@ export default function AppointmentsChart() {
 									fontWeight: 600,
 								}}
 								/* no mobile mostra 1 em cada 2 labels se houver muitos meses */
-								interval={chartData.length > 8 ? 1 : 0}
+								interval={isMobile ? 1 : 0}
 							/>
 							<YAxis
 								axisLine={false}
