@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import { formatPhone } from "@/utils/format";
+import AppointmentsChart from "@/components/admin/AppointmentsChart";
 
 // ─── TYPES ───────────────────────────────────────────────
 type Appointment = {
@@ -235,6 +236,9 @@ export default function DashboardPage() {
 					</div>
 				))}
 			</div>
+
+			{/* ── GRÁFICO ── */}
+			<AppointmentsChart />
 
 			{/* ── AGENDAMENTOS DE HOJE ── */}
 			<div className="mb-6 overflow-hidden rounded-xl border-2 border-gray-200 bg-white">
