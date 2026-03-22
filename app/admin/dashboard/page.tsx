@@ -320,7 +320,7 @@ export default function DashboardPage() {
 								</div>
 
 								{/* linha 2 — barbeiro · serviço · total */}
-								<div className="flex items-center justify-between gap-2 rounded-lg bg-gray-50 py-2">
+								<div className="flex items-center justify-between gap-2 py-2 rounded-lg">
 									<div className="min-w-0">
 										<p className="truncate text-xs font-semibold">
 											<span className="">Barbeiro(a):</span> {a.barber_name}
