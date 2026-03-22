@@ -5,6 +5,7 @@ import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import { formatPhone } from "@/utils/format";
 import AppointmentsChart from "@/components/admin/AppointmentsChart";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
 
 // ─── TYPES ───────────────────────────────────────────────
 type Appointment = {
@@ -78,6 +79,9 @@ export default function DashboardPage() {
 	const [toast, setToast] = useState<{ msg: string; error?: boolean } | null>(
 		null,
 	);
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [selectedAppt, setSelectedAppt] = useState<Appointment | null>(null);
+	const [cancelling, setCancelling] = useState(false);
 	const supabase = createClient();
 
 	const showToast = useCallback((msg: string, error = false) => {
@@ -158,6 +162,20 @@ export default function DashboardPage() {
 			prev.map((a) => (a.id === id ? { ...a, status } : a)),
 		);
 		showToast("Status atualizado!");
+	}
+
+	function handleCancelClick(appt: Appointment) {
+		setSelectedAppt(appt);
+		setIsModalOpen(true);
+	}
+
+	async function confirmCancellation() {
+		if (!selectedAppt) return;
+		setCancelling(true);
+		await changeStatus(selectedAppt.id, "cancelled");
+		setCancelling(false);
+		setIsModalOpen(false);
+		setSelectedAppt(null);
 	}
 
 	// ── Derived state ──────────────────────────────────────
@@ -362,7 +380,7 @@ export default function DashboardPage() {
 									)}
 									{!["cancelled", "done"].includes(a.status) && (
 										<button
-											onClick={() => changeStatus(a.id, "cancelled")}
+											onClick={() => handleCancelClick(a)}
 											className="
 												flex items-center justify-center
 												px-3 py-2
@@ -491,7 +509,7 @@ export default function DashboardPage() {
 												)}
 												{!["cancelled", "done"].includes(a.status) && (
 													<button
-														onClick={() => changeStatus(a.id, "cancelled")}
+														onClick={() => handleCancelClick(a)}
 														title="Cancelar"
 														className={`${actionBtn} hover:border-red-500 hover:bg-red-50`}
 													>
@@ -584,6 +602,16 @@ export default function DashboardPage() {
 					{toast.msg}
 				</div>
 			)}
+
+			<ConfirmationModal
+				isOpen={isModalOpen}
+				onClose={() => setIsModalOpen(false)}
+				onConfirm={confirmCancellation}
+				loading={cancelling}
+				title={`Cancelar agendamento de ${selectedAppt?.client_name}`}
+				subtitle="Tem certeza que deseja cancelar?"
+				confirmText="Confirmar"
+			/>
 		</>
 	);
 }
