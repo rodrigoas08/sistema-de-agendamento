@@ -50,11 +50,11 @@ export default function LoginButton() {
 			email: data.usuario,
 			password: data.senha,
 		});
-		setIsLoading(false);
 		if (error) {
 			setLoginError("E-mail ou senha incorretos.");
 			return;
 		}
+		setIsLoading(false);
 		window.location.href = "/admin/dashboard";
 	};
 
@@ -203,7 +203,9 @@ export default function LoginButton() {
 									className="flex items-center justify-center w-full mt-4 py-4 text-white font-bold bg-red-500 hover:bg-red-600 disabled:bg-red-300 rounded transition-colors tracking-wide"
 								>
 									{isLoading ? (
-										<Loader2 className="animate-spin" />
+										<span className="flex items-center gap-2">
+											<Loader2 className="animate-spin" /> ENTRANDO...
+										</span>
 									) : (
 										"ENTRAR NA ÁREA ADMINISTRATIVA"
 									)}
