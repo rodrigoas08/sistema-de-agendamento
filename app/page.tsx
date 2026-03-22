@@ -218,26 +218,26 @@ export default function Home() {
 						✂ Agendar Agora
 					</button>
 				</div>
-				<div className="relative flex flex-1 justify-center mt-12 pt-8 md:px-18 lg:px-55 border-t border-white/10 text-3xl">
-					<div className="text-center px-5 border-r border-white/10">
+				<div className="grid grid-cols-4 mt-12 pt-8 md:px-18 lg:px-55 border-t border-white/10 text-3xl">
+					<div className="text-center px-0 border-r border-white/10">
 						<b className="text-[#d4a017] block leading-none">{barbers.length || 0}</b>
 						<span className="text-[11px] text-[#888] uppercase tracking-[2px] font-semibold">
 							Barbeiros
 						</span>
 					</div>
-					<div className="text-center px-5 border-r border-white/10">
+					<div className="text-center border-r border-white/10">
 						<b className="text-[#d4a017] block leading-none">{services.length || 0}</b>
 						<span className="text-[11px] text-[#888] uppercase tracking-[2px] font-semibold">
 							Serviços
 						</span>
 					</div>
-					<div className="text-center px-5 border-r border-white/10">
+					<div className="text-center border-r border-white/10">
 						<b className="text-[#d4a017] block leading-none">100%</b>
 						<span className="text-[11px] text-[#888] uppercase tracking-[2px] font-semibold">
 							Online
 						</span>
 					</div>
-					<div className="text-center px-5">
+					<div className="text-center">
 						<b className="text-[#d4a017] block leading-none">0</b>
 						<span className="text-[11px] text-[#888] uppercase tracking-[2px] font-semibold">
 							Fila
