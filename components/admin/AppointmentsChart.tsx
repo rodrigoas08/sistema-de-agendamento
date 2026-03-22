@@ -12,6 +12,7 @@ import {
 	YAxis,
 } from "recharts";
 import { createClient } from "@/utils/supabase/client";
+import { Loader2 } from "lucide-react";
 
 // ─── TYPES ───────────────────────────────────────────────
 type RawRow = {
@@ -254,7 +255,10 @@ export default function AppointmentsChart() {
 			<div className="p-3 md:p-5">
 				{loading ? (
 					<div className="flex h-48 items-center justify-center md:h-64">
-						<p className="text-sm text-gray-400">Carregando gráfico...</p>
+						<span className="flex items-center gap-2">
+							<Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+							<p className="text-sm text-gray-400">Carregando gráfico...</p>
+						</span>
 					</div>
 				) : isEmpty ? (
 					<div className="flex h-48 items-center justify-center md:h-64">
