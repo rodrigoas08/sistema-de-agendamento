@@ -1,48 +1,48 @@
-import { NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url)
-  const code = searchParams.get('code')
-  
-  // if "next" is in param, use it as the redirect URL
-  const next = searchParams.get('next') ?? '/admin'
+	const { searchParams, origin } = new URL(request.url);
+	const code = searchParams.get("code");
 
-  if (code) {
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll()
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              )
-            } catch {
-              // The `setAll` method was called from a Server Component.
-            }
-          },
-        },
-      }
-    )
-    
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    
-    if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
-    } else {
-      console.error("Supabase Auth Error no Callback:", error.message);
-    }
-  } else {
-     console.error("Nenhum código (code) foi recebido na URL do callback.");
-  }
+	// if "next" is in param, use it as the redirect URL
+	const next = searchParams.get("next") ?? "/admin/dashboard";
 
-  // Se houver erro ou não houver code
-  return NextResponse.redirect(`${origin}/?error=auth`)
+	if (code) {
+		const cookieStore = await cookies();
+		const supabase = createServerClient(
+			process.env.NEXT_PUBLIC_SUPABASE_URL!,
+			process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+			{
+				cookies: {
+					getAll() {
+						return cookieStore.getAll();
+					},
+					setAll(cookiesToSet) {
+						try {
+							cookiesToSet.forEach(({ name, value, options }) =>
+								cookieStore.set(name, value, options),
+							);
+						} catch {
+							// The `setAll` method was called from a Server Component.
+						}
+					},
+				},
+			},
+		);
+
+		const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+		if (!error) {
+			return NextResponse.redirect(`${origin}${next}`);
+		} else {
+			console.error("Supabase Auth Error no Callback:", error.message);
+		}
+	} else {
+		console.error("Nenhum código (code) foi recebido na URL do callback.");
+	}
+
+	// Se houver erro ou não houver code
+	return NextResponse.redirect(`${origin}/?error=auth`);
 }
