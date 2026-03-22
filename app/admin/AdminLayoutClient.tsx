@@ -8,7 +8,7 @@ const NAV = [
 	{ href: "/admin/dashboard", label: "Dashboard", icon: "📊", exact: true },
 	{ href: "/admin/agendamentos", label: "Agendamentos", icon: "📅" },
 	{ href: "/admin/notificacoes", label: "Notificações", icon: "🔔" },
-	{ href: "/admin/equipe", label: "Equipe", icon: "✂" },
+	{ href: "/admin/equipe", label: "Equipe", icon: "👥" },
 	{ href: "/admin/configuracoes", label: "Configurações", icon: "⚙️" },
 ];
 
@@ -39,16 +39,15 @@ export default function AdminLayoutClient({
 	return (
 		<div className="flex min-h-screen bg-gray-50 font-sans text-black">
 			{/* SIDEBAR */}
-			<aside className="w-[240px] bg-[#0a0a0a] hidden md:flex flex-col min-h-screen shrink-0 sticky top-0 h-screen text-white">
-				<div className="p-5 border-b border-white/10 flex items-center gap-2">
-					<div className="w-2 h-2 bg-red-500 rounded-full shrink-0" />
+			<aside className="sticky hidden md:flex flex-col top-0 w-[240px] h-dvh min-h-screen bg-[#0a0a0a] shrink-0 text-white">
+				<div className="flex items-center px-7 h-[60px] border-b border-white/10">
 					<span className="font-['Bebas_Neue'] text-2xl tracking-[3px]">
 						Seu<em className="text-red-500 not-italic">Negócio</em>
 					</span>
 				</div>
 
-				<div className="p-4 border-b border-white/10 flex items-center gap-3">
-					<div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center font-['Bebas_Neue'] text-sm shrink-0">
+				<div className="flex items-center gap-3 p-7 border-b border-white/10 ">
+					<div className="flex shrink-0 items-center justify-center w-10 h-10 rounded-full bg-red-500 font-['Bebas_Neue'] text-sm ">
 						{userName.slice(0, 2).toUpperCase()}
 					</div>
 					<div>

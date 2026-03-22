@@ -47,17 +47,17 @@ function buildWALink(phone: string, name: string) {
 }
 
 const STATUS_LABEL: Record<string, string> = {
-	pending: "⏳ Pendente",
-	confirmed: "✅ Confirmado",
-	done: "✓ Concluído",
-	cancelled: "✕ Cancelado",
+	pending: "Pendente",
+	confirmed: "Confirmado",
+	done: "Concluído",
+	cancelled: "Cancelado",
 };
 
 const STATUS_CLASS: Record<string, string> = {
-	pending: "bg-yellow-500 text-yellow-700",
-	confirmed: "bg-green-100 text-green-700",
-	done: "bg-gray-100 text-gray-500",
-	cancelled: "bg-red-100 text-red-600",
+	pending: "bg-yellow-400 text-black/80",
+	confirmed: "bg-green-400 text-black/80",
+	done: "bg-gray-400 text-black/80",
+	cancelled: "bg-red-400 text-black/80",
 };
 
 // ─── COMPONENT ───────────────────────────────────────────
@@ -224,7 +224,7 @@ export default function DashboardPage() {
 			</div>
 
 			{/* ── AGENDAMENTOS DE HOJE ── */}
-			<div className="bg-white border-2 border-gray-200 rounded-xl overflow-hidden mb-6">
+			<div className="mb-6 border-2 rounded-xl border-gray-200 bg-white overflow-hidden">
 				{/* header */}
 				<div className="p-5 border-b border-gray-200 flex items-center justify-between flex-wrap gap-3">
 					<h2 className="font-['Bebas_Neue'] text-xl tracking-[1.5px]">
@@ -294,14 +294,6 @@ export default function DashboardPage() {
 										{/* Cliente */}
 										<td className="py-3 px-5">
 											<div className="flex items-center gap-2">
-												<div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-['Bebas_Neue'] text-xs shrink-0">
-													{a.client_name
-														.split(" ")
-														.map((w) => w[0])
-														.join("")
-														.slice(0, 2)
-														.toUpperCase()}
-												</div>
 												<div>
 													<div className="text-sm font-bold leading-tight">{a.client_name}</div>
 													<div className="text-xs text-gray-400">{a.client_phone}</div>
@@ -325,7 +317,7 @@ export default function DashboardPage() {
 										{/* Status */}
 										<td className="py-3 px-5">
 											<span
-												className={`px-1 py-[2px] rounded text-xs font-bold ${STATUS_CLASS[a.status] ?? "bg-gray-100 text-gray-500"}`}
+												className={`px-2 py-1 rounded text-xs font-semibold ${STATUS_CLASS[a.status] ?? "bg-gray-100 text-gray-500"}`}
 											>
 												{STATUS_LABEL[a.status] ?? a.status}
 											</span>
