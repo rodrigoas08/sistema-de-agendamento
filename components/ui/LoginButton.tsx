@@ -55,7 +55,7 @@ export default function LoginButton() {
 			setLoginError("E-mail ou senha incorretos.");
 			return;
 		}
-		window.location.href = "/admin";
+		window.location.href = "/admin/dashboard";
 	};
 
 	const handleGoogleLogin = async () => {
