@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import LoginButton from "@/components/ui/LoginButton";
 import { createClient } from "@/utils/supabase/client";
+import Footer from "@/components/Footer";
+import Gallery from "@/components/Gallery";
 
 export default function Home() {
 	const supabase = createClient();
@@ -13,8 +15,8 @@ export default function Home() {
 	useEffect(() => {
 		const loadInitialData = async () => {
 			const [{ count: bCount }, { count: sCount }] = await Promise.all([
-				supabase.from("barbers").select("*", { count: 'exact', head: true }),
-				supabase.from("services").select("*", { count: 'exact', head: true }),
+				supabase.from("barbers").select("*", { count: "exact", head: true }),
+				supabase.from("services").select("*", { count: "exact", head: true }),
 			]);
 			if (bCount !== null) setBarbersCount(bCount);
 			if (sCount !== null) setServicesCount(sCount);
@@ -38,64 +40,58 @@ export default function Home() {
 			</header>
 
 			<section className="bg-[#0a0a0a] flex-1 flex flex-col justify-center px-4 py-16 text-center relative overflow-hidden before:content-[''] before:absolute before:inset-0 before:bg-[url('data:image/svg+xml,%3Csvg%20width=%2760%27%20height=%2760%27%20xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cpath%20d=%27M0%2060L60%200M-10%2010L10-10M50%2070L70%2050%27%20stroke=%27%23E63946%27%20stroke-width=%270.3%27%20opacity=%270.12%27/%3E%3C/svg%3E')] before:opacity-60">
-                <div className="relative z-10 w-full mb-12">
-                    <p className="font-['Barlow_Condensed'] text-xs font-bold tracking-[4px] uppercase text-[#e63946] mb-3.5 relative inline-block px-3 py-1.5 bg-[#e63946]/10 rounded-md">
-                        ✂ Agendamento Online
-                    </p>
-                    <h1 className="font-['Bebas_Neue'] text-[clamp(56px,11vw,100px)] text-white leading-[0.9] tracking-[3px] relative mb-5">
-                        BARBEARIA
-                        <br />
-                        <em className="text-[#e63946] not-italic">DO SEU JEITO</em>
-                    </h1>
-                    <p className="text-base text-[#c4c4c4] mt-4 relative font-medium max-w-[400px] mx-auto leading-relaxed">
-                        Escolha seu barbeiro, seu horário e apareça na hora — sem fila, sem papo.
-                    </p>
-                    <div className="mt-9 flex justify-center relative">
-                        <Link
-                            href="/agendamento"
-                            className="font-['Bebas_Neue'] text-[22px] tracking-[2px] bg-[#e63946] text-white px-12 py-4 rounded-md cursor-pointer transition-all hover:bg-[#c1121f] hover:-translate-y-0.5 inline-flex items-center gap-3 w-max"
-                        >
-                            ✂ Agendar Agora
-                        </Link>
-                    </div>
-                </div>
-                <div className="relative z-10 grid grid-cols-4 mt-auto pt-8 md:px-18 lg:px-55 border-t border-white/10 text-3xl">
-                    <div className="text-center px-0 border-r border-white/10">
-                        <b className="text-[#d4a017] block leading-none">{barbersCount}</b>
-                        <span className="text-[11px] text-[#888] uppercase tracking-[2px] font-semibold">
-                            Barbeiros
-                        </span>
-                    </div>
-                    <div className="text-center border-r border-white/10">
-                        <b className="text-[#d4a017] block leading-none">{servicesCount}</b>
-                        <span className="text-[11px] text-[#888] uppercase tracking-[2px] font-semibold">
-                            Serviços
-                        </span>
-                    </div>
-                    <div className="text-center border-r border-white/10">
-                        <b className="text-[#d4a017] block leading-none">100%</b>
-                        <span className="text-[11px] text-[#888] uppercase tracking-[2px] font-semibold">
-                            Online
-                        </span>
-                    </div>
-                    <div className="text-center">
-                        <b className="text-[#d4a017] block leading-none">0</b>
-                        <span className="text-[11px] text-[#888] uppercase tracking-[2px] font-semibold">
-                            Fila
-                        </span>
-                    </div>
-                </div>
+				<div className="relative z-10 w-full mb-12">
+					<p className="font-['Barlow_Condensed'] text-xs font-bold tracking-[4px] uppercase text-[#e63946] mb-3.5 relative inline-block px-3 py-1.5 bg-[#e63946]/10 rounded-md">
+						✂ Agendamento Online
+					</p>
+					<h1 className="font-['Bebas_Neue'] text-[clamp(56px,11vw,100px)] text-white leading-[0.9] tracking-[3px] relative mb-5">
+						BARBEARIA
+						<br />
+						<em className="text-[#e63946] not-italic">DO SEU JEITO</em>
+					</h1>
+					<p className="text-base text-[#c4c4c4] mt-4 relative font-medium max-w-[400px] mx-auto leading-relaxed">
+						Escolha seu barbeiro, seu horário e apareça na hora — sem fila, sem papo.
+					</p>
+					<div className="mt-9 flex justify-center relative">
+						<Link
+							href="/agendamento"
+							className="font-['Bebas_Neue'] text-[22px] tracking-[2px] bg-[#e63946] text-white px-12 py-4 rounded-md cursor-pointer transition-all hover:bg-[#c1121f] hover:-translate-y-0.5 inline-flex items-center gap-3 w-max"
+						>
+							✂ Agendar Agora
+						</Link>
+					</div>
+				</div>
+				<div className="relative z-10 grid grid-cols-4 mt-auto pt-8 md:px-18 lg:px-55 border-t border-white/10 text-3xl">
+					<div className="text-center px-0 border-r border-white/10">
+						<b className="text-[#d4a017] block leading-none">{barbersCount}</b>
+						<span className="text-[11px] text-[#888] uppercase tracking-[2px] font-semibold">
+							Barbeiros
+						</span>
+					</div>
+					<div className="text-center border-r border-white/10">
+						<b className="text-[#d4a017] block leading-none">{servicesCount}</b>
+						<span className="text-[11px] text-[#888] uppercase tracking-[2px] font-semibold">
+							Serviços
+						</span>
+					</div>
+					<div className="text-center border-r border-white/10">
+						<b className="text-[#d4a017] block leading-none">100%</b>
+						<span className="text-[11px] text-[#888] uppercase tracking-[2px] font-semibold">
+							Online
+						</span>
+					</div>
+					<div className="text-center">
+						<b className="text-[#d4a017] block leading-none">0</b>
+						<span className="text-[11px] text-[#888] uppercase tracking-[2px] font-semibold">
+							Fila
+						</span>
+					</div>
+				</div>
 			</section>
 
-			<footer className="bg-black text-center py-6 text-gray-500 text-xs border-t border-gray-800 shrink-0 z-20 relative">
-				<p>
-					Desenvolvido por <span className="text-red-500">Rodrigo</span>
-					<span className="text-white italic">as</span>
-					<span className="text-red-500">Dev</span>.
-					<br />
-					Sistema de Agendamento
-				</p>
-			</footer>
+			<Gallery />
+
+			<Footer />
 		</div>
 	);
 }
