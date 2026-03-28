@@ -64,7 +64,7 @@ export default function CTASection() {
 			</ul>
 
 			{/* CTA Button */}
-			<div className="flex flex-col items-center justify-center gap-y-4">
+			<div className="flex flex-col items-center max-w-2xl mx-auto gap-y-4">
 				<Link
 					href="/agendamento"
 					className="flex items-center justify-center gap-2 w-full px-2 py-4 rounded-md bg-[#e63946] font-['Bebas_Neue'] text-sm lg:text-xl text-white hover:bg-[#e63946] hover:border-[#e63946] hover:text-[#0a0a0a] transition-all duration-300 hover:-translate-y-0.5 shadow-[0_0_24px_rgba(212,160,23,0.15)] hover:shadow-[0_0_36px_rgba(212,160,23,0.35)]"
