@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import LoginButton from "@/components/ui/LoginButton";
 import { createClient } from "@/utils/supabase/client";
 import { formatPhone } from "@/utils/format";
@@ -210,14 +211,12 @@ export default function Home() {
 					Escolha seu barbeiro, seu horário e apareça na hora — sem fila, sem papo.
 				</p>
 				<div className="mt-9 relative">
-					<button
-						onClick={() =>
-							document.getElementById("booking")?.scrollIntoView({ behavior: "smooth" })
-						}
+					<Link
+						href="/agendamento"
 						className="font-['Bebas_Neue'] text-[22px] tracking-[2px] bg-[#e63946] text-white px-12 py-4 rounded-md cursor-pointer transition-all hover:bg-[#c1121f] hover:-translate-y-0.5 inline-flex items-center gap-3"
 					>
 						✂ Agendar Agora
-					</button>
+					</Link>
 				</div>
 				<div className="grid grid-cols-4 mt-12 pt-8 md:px-18 lg:px-55 border-t border-white/10 text-3xl">
 					<div className="text-center px-0 border-r border-white/10">
