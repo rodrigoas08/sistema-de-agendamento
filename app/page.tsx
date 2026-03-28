@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import LoginButton from "@/components/ui/LoginButton";
 import { createClient } from "@/utils/supabase/client";
 import Footer from "@/components/Footer";
 import Gallery from "@/components/Gallery";
 import CTASection from "@/components/CTASection";
+import Header from "@/components/Header";
 
 export default function Home() {
 	const supabase = createClient();
@@ -27,18 +27,7 @@ export default function Home() {
 
 	return (
 		<div className="font-['Barlow'] bg-[#0a0a0a] text-white min-h-dvh flex flex-col overflow-x-hidden">
-			<header className="flex items-center justify-between h-16 px-4 md:px-18 lg:px-58 bg-[#0a0a0a] border-b-2 border-b-[#e63946] shrink-0 z-20 relative">
-				<Link
-					href="/"
-					className="font-['Bebas_Neue'] text-[26px] text-white tracking-[3px] flex items-center gap-2.5 no-underline"
-				>
-					<span className="w-2.5 h-2.5 bg-[#e63946] rounded-full inline-block"></span>
-					Seu<em className="text-[#e63946] italic">Negócio</em>
-				</Link>
-				<nav className="flex gap-2 items-center">
-					<LoginButton />
-				</nav>
-			</header>
+			<Header />
 
 			<section className="bg-[#0a0a0a] flex-1 flex flex-col justify-center px-4 pt-16 pb-8 text-center relative overflow-hidden before:content-[''] before:absolute before:inset-0 before:bg-[url('data:image/svg+xml,%3Csvg%20width=%2760%27%20height=%2760%27%20xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cpath%20d=%27M0%2060L60%200M-10%2010L10-10M50%2070L70%2050%27%20stroke=%27%23E63946%27%20stroke-width=%270.3%27%20opacity=%270.12%27/%3E%3C/svg%3E')] before:opacity-60">
 				<div className="relative z-10 w-full mb-12">
@@ -50,14 +39,13 @@ export default function Home() {
 						<br />
 						<em className="text-[#e63946] not-italic">DO SEU JEITO</em>
 					</h1>
-					<p className="text-base text-[#c4c4c4] mt-4 relative font-medium max-w-[400px] mx-auto leading-relaxed">
-						Escolha seu barbeiro, seu horário e apareça na hora — sem fila, sem papo.
+					<p className="mt-4 relative max-w-[400px] mx-auto text-base text-[#c4c4c4] font-medium tracking-[1px] leading-relaxed">
+						Escolha seu barbeiro, seu horário e apareça na hora sem fila, sem papo.
 					</p>
 					<div className="mt-9 flex justify-center relative">
 						<Link
 							href="/agendamento"
-							// className="font-['Bebas_Neue'] text-[22px] tracking-[2px] bg-[#e63946] text-white px-12 py-4 rounded-md cursor-pointer transition-all hover:bg-[#c1121f] hover:-translate-y-0.5 inline-flex items-center gap-3 w-max"
-							className="flex items-center justify-center gap-2 w-max px-12 py-4 rounded-md bg-[#e63946] font-['Bebas_Neue'] text-sm lg:text-xl text-white hover:bg-[#e63946] hover:border-[#e63946] hover:text-[#0a0a0a] transition-all duration-300 hover:-translate-y-0.5 shadow-[0_0_24px_rgba(212,160,23,0.15)] hover:shadow-[0_0_36px_rgba(212,160,23,0.35)]"
+							className="flex items-center justify-center gap-2 w-max px-12 py-4 rounded-md bg-[#e63946] font-['Bebas_Neue'] text-[22px] text-white tracking-[2px] hover:bg-[#e63946] hover:border-[#e63946] hover:text-[#0a0a0a] transition-all duration-300 hover:-translate-y-0.5 shadow-[0_0_24px_rgba(212,160,23,0.15)] hover:shadow-[0_0_36px_rgba(212,160,23,0.35)]"
 						>
 							✂ Agendar Agora
 						</Link>

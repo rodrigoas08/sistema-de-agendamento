@@ -199,8 +199,6 @@ export default function Agendamento() {
 				</nav>
 			</header>
 
-
-
 			<main id="booking" className="relative mx-auto mt-4 px-4 pb-24">
 				{step <= 5 && (
 					<>
@@ -295,7 +293,9 @@ export default function Agendamento() {
 											<div
 												className={cn(
 													"w-[60px] h-[60px] rounded-full flex items-center justify-center font-['Bebas_Neue'] text-[22px] text-white shrink-0 border-[2.5px] transition-colors",
-													selectedBarber?.id === barber.id ? "border-[#e63946]" : "border-[#e0e0e0]",
+													selectedBarber?.id === barber.id
+														? "border-[#e63946]"
+														: "border-[#e0e0e0]",
 												)}
 												style={{ background: barber.color || "#0a0a0a" }}
 											>
@@ -309,7 +309,9 @@ export default function Agendamento() {
 												<div className="font-['Barlow_Condensed'] text-[20px] font-bold">
 													{barber.name}
 												</div>
-												<div className="text-[12px] text-[#888] font-medium mt-0.5">{barber.role}</div>
+												<div className="text-[12px] text-[#888] font-medium mt-0.5">
+													{barber.role}
+												</div>
 												<div className="flex items-center gap-1 text-[12px] font-semibold text-[#d4a017]">
 													{"★".repeat(Math.round(barber.rating || 5))}{" "}
 													<em className="text-[#888] not-italic font-normal">
@@ -384,8 +386,12 @@ export default function Agendamento() {
 											{s.icon || "✂"}
 										</div>
 										<div className="flex-1">
-											<div className="font-['Barlow_Condensed'] text-[16px] font-bold">{s.name}</div>
-											<div className="text-[11px] text-[#888] font-medium mt-0.5">⏱ {s.duration}</div>
+											<div className="font-['Barlow_Condensed'] text-[16px] font-bold">
+												{s.name}
+											</div>
+											<div className="text-[11px] text-[#888] font-medium mt-0.5">
+												⏱ {s.duration}
+											</div>
 										</div>
 										<div
 											className={cn(
@@ -485,7 +491,9 @@ export default function Agendamento() {
 													isPast
 														? "text-[#c4c4c4] cursor-not-allowed"
 														: "hover:bg-[#f2f2f2] hover:border-[#c4c4c4]",
-													isToday && !isSelected ? "border-[#e63946] text-[#e63946] font-bold" : "",
+													isToday && !isSelected
+														? "border-[#e63946] text-[#e63946] font-bold"
+														: "",
 													isSelected ? "bg-[#0a0a0a] text-white border-[#0a0a0a]" : "",
 													isToday && isSelected ? "bg-[#e63946] border-[#e63946]" : "",
 												)}
@@ -625,8 +633,8 @@ export default function Agendamento() {
 						<div className="bg-[#fffbea] border-[1.5px] border-[#d4a017] rounded-md px-4 py-3 text-xs text-[#444] mt-4 flex gap-2 items-start leading-1.5">
 							<span>📱</span>
 							<span className="leading-[initial]">
-								Você vai receber a confirmação no seu WhatsApp. Guarda o número do barbeiro por
-								lá caso precise cancelar ou remarcar!
+								Você vai receber a confirmação no seu WhatsApp. Guarda o número da
+								barbearia por lá caso precise cancelar ou remarcar!
 							</span>
 						</div>
 
@@ -706,7 +714,7 @@ export default function Agendamento() {
 							disabled={isSubmitting}
 							onClick={handleConfirm}
 						>
-							{isSubmitting ? <Loader2/> : "Confirmar Agendamento"}
+							{isSubmitting ? <Loader2 /> : "Confirmar Agendamento"}
 						</button>
 
 						<div className="flex justify-center mt-3">
