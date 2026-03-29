@@ -8,6 +8,7 @@ import Gallery from "@/components/Gallery";
 import CTASection from "@/components/CTASection";
 import Header from "@/components/Header";
 import LocalSEOSection from "@/components/LocalSEOSection";
+import Testimonials from "@/components/Testimonials";
 
 export default function Home() {
 	const supabase = createClient();
@@ -82,6 +83,8 @@ export default function Home() {
 			</section>
 
 			<Gallery />
+
+			<Testimonials />
 
 			<CTASection />
 
