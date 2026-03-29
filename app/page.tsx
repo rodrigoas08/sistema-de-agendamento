@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import Gallery from "@/components/Gallery";
 import CTASection from "@/components/CTASection";
 import Header from "@/components/Header";
+import LocalSEOSection from "@/components/LocalSEOSection";
 
 export default function Home() {
 	const supabase = createClient();
@@ -41,7 +42,7 @@ export default function Home() {
 						<em className="text-[#e63946] not-italic">DO SEU JEITO</em>
 					</h1>
 					<p className="mt-4 relative max-w-[400px] mx-auto text-base text-[#c4c4c4] font-medium tracking-[1px] leading-relaxed">
-						Agendamento Online e Corte na Régua
+						Corte moderno, barba na régua e atendimento premium.
 					</p>
 					<div className="mt-9 flex justify-center relative">
 						<Link
@@ -83,6 +84,8 @@ export default function Home() {
 			<Gallery />
 
 			<CTASection />
+
+			<LocalSEOSection />
 
 			<Footer />
 		</div>
