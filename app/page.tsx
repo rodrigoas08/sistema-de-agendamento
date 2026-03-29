@@ -35,13 +35,13 @@ export default function Home() {
 						✂ Agendamento Online{" "}
 						<span className="w-2.5 h-2.5 bg-green-500/80 rounded-full inline-block animate-pulse"></span>
 					</p>
-					<h1 className="font-['Bebas_Neue'] text-[clamp(56px,11vw,100px)] text-white leading-[0.9] tracking-[3px] relative mb-5">
+					<h1 className="font-['Bebas_Neue'] text-[clamp(36px,11vw,56px)] text-white leading-[0.9] tracking-[3px] relative mb-5">
 						BARBEARIA
 						<br />
 						<em className="text-[#e63946] not-italic">DO SEU JEITO</em>
 					</h1>
 					<p className="mt-4 relative max-w-[400px] mx-auto text-base text-[#c4c4c4] font-medium tracking-[1px] leading-relaxed">
-						Escolha seu barbeiro, seu horário e apareça na hora sem fila, sem papo.
+						Agendamento Online e Corte na Régua
 					</p>
 					<div className="mt-9 flex justify-center relative">
 						<Link
