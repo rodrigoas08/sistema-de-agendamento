@@ -1,0 +1,40 @@
+name: Lint e Deploy
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Instala o pnpm
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      # Prepara o Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      # Limpa o cache do pnpm
+      - name: Clear pnpm cache
+        run: pnpm store prune
+
+      # Instala exatamente o que está no seu pnpm-lock.yaml
+      - name: Install Dependencies
+        run: pnpm install
+
+      # Roda o seu comando de lint
+      - name: Run ESLint
+        run: pnpm lint
