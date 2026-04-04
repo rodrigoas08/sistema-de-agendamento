@@ -1,4 +1,4 @@
-name: Lint e Deploy # Pode manter o nome que preferir
+name: Lint e Deploy
 
 on:
   push:
@@ -27,7 +27,11 @@ jobs:
           node-version: 20
           cache: 'pnpm'
 
-      # Instala exatamente o que está no seu pnpm-lock.yaml (incluindo o ESLint 9 correto)
+      # Limpa o cache do pnpm
+      - name: Clear pnpm cache
+        run: pnpm store prune
+
+      # Instala exatamente o que está no seu pnpm-lock.yaml
       - name: Install Dependencies
         run: pnpm install
 
