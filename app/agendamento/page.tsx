@@ -693,7 +693,7 @@ export default function Agendamento() {
 							<Button
 								handleNext={() => router.push("/")}
 								text="Voltar para a página inicial"
-								className="shrink-0 flex-1 py-1 px-2 lg:px-5 lg:text-sm font-bold uppercase bg-transpfont-['Bebas_Neue']t-[#888] border-[1.5px] border-[#e0e0e0] cursor-pointer transition-all hover:border-[#0a0a0a] hover:text-[#0a0a0a] hover:bg-white"
+								className="shrink-0 flex-1 py-1 px-2 lg:px-5 lg:text-sm font-bold bg-transparent font-['Bebas_Neue'] text-[#888] border border-[#888] cursor-pointer transition-all hover:border-[#0a0a0a] hover:text-[#0a0a0a] hover:bg-white"
 							/>
 						</div>
 					)}
