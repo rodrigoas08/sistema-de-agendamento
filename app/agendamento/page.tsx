@@ -85,10 +85,21 @@ export default function Agendamento() {
 	);
 
 	useEffect(() => {
-		if (selectedBarber && selectedDate) {
-			loadBusySlots(selectedBarber.id, selectedDate);
-		}
-	}, [selectedDate, selectedBarber, loadBusySlots]);
+		if (!selectedBarber || !selectedDate) return;
+		let cancelled = false;
+		supabase
+			.from("appointments")
+			.select("time")
+			.eq("date", selectedDate)
+			.eq("barber_id", selectedBarber.id)
+			.in("status", ["pending", "confirmed"])
+			.then(({ data, error }) => {
+				if (cancelled) return;
+				if (error) { console.error("Erro na busca:", error.message); return; }
+				if (data) setBusySlots(data.map((d) => d.time));
+			});
+		return () => { cancelled = true; };
+	}, [selectedDate, selectedBarber, supabase]);
 
 	const totalServiceCost = selectedServices.reduce(
 		(a, s) => a + Number(s.price),

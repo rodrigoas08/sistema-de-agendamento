@@ -1,12 +1,13 @@
 "use client";
 import * as z from "zod";
 import { cn } from "@/lib/utils";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { useEffect, useState } from "react";
 import Button from "@/components/ui/Button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { X, Loader2, Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
 
 const loginSchema = z.object({
 	usuario: z
@@ -23,11 +24,12 @@ export default function LoginButton() {
 	const [loginError, setLoginError] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
+	const router = useRouter();
 
 	const {
 		register,
 		handleSubmit,
-		watch,
+		control,
 		setValue,
 		formState: { errors },
 	} = useForm<LoginFormValues>({
@@ -35,8 +37,10 @@ export default function LoginButton() {
 		mode: "onSubmit",
 	});
 
-	const usuarioValue = watch("usuario");
-	const senhaValue = watch("senha") || "";
+	const usuarioValue = useWatch({
+		control,
+		name: "usuario",
+	});
 
 	const handleShowPassword = () => {
 		setShowPassword(!showPassword);
@@ -55,7 +59,7 @@ export default function LoginButton() {
 			return;
 		}
 		setIsLoading(false);
-		window.location.href = "/admin/dashboard";
+		router.push("/admin/dashboard");
 	};
 
 	const handleGoogleLogin = async () => {
@@ -146,7 +150,7 @@ export default function LoginButton() {
 										)}
 										placeholder="seu@email.com"
 									/>
-									{usuarioValue && (
+									{usuarioValue ? (
 										<button
 											type="button"
 											onClick={() => setValue("usuario", "", { shouldValidate: true })}
@@ -154,7 +158,7 @@ export default function LoginButton() {
 										>
 											<X size={18} />
 										</button>
-									)}
+									) : null}
 								</div>
 								{errors.usuario && (
 									<p className="text-red-500 text-xs mt-1 font-semibold">
