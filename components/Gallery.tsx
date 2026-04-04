@@ -16,7 +16,7 @@ const IMAGES = [
 
 export default function Gallery() {
 	return (
-		<section className="bg-[#0a0a0a] py-20 px-4 md:px-18 lg:px-58 border-t border-white/5 relative overflow-hidden">
+		<section className="relative py-20 px-4 md:px-18 lg:px-58 bg-[#0a0a0a] overflow-hidden">
 			{/* Decorative background elements */}
 			<div className="absolute top-0 right-0 w-[300px] h-[300px] bg-[#e63946]/5 blur-[100px] -z-10"></div>
 			<div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#d4a017]/5 blur-[120px] -z-10"></div>

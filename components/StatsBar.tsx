@@ -37,7 +37,7 @@ export function StatsBar({
 
 	return (
 		<Suspense fallback={<LoaderSpinner />}>
-			<div className="relative z-10 grid grid-cols-4 mt-auto pt-8 md:px-18 lg:px-55 border-t border-white/10 text-3xl">
+			<div className="relative z-10 grid grid-cols-4 mt-auto py-8 md:px-18 lg:px-55 border-y border-white/10 text-3xl">
 				<div className="text-center px-0 border-r border-white/10">
 					<b className={cn(statsCountColor, "block leading-none")}>{barbersCount}</b>
 					<span className="text-[11px] text-[#888] uppercase tracking-[2px] font-semibold">

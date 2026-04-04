@@ -3,7 +3,7 @@ import { StatsBar } from "./StatsBar";
 
 export default function HeroSection() {
 	return (
-		<section className="relative flex-1 flex flex-col justify-center px-4 pt-16 pb-8 text-center bg-[#0a0a0a]">
+		<section className="relative flex-1 flex flex-col justify-center px-0 pt-16 pb-8 text-center bg-[#0a0a0a]">
 			<div className="relative z-10 w-full mb-12">
 				<p className="font-['Barlow_Condensed'] text-xs font-bold tracking-[4px] uppercase text-[#e63946] mb-3.5 relative inline-block px-3 py-1.5 bg-[#e63946]/10 rounded-md">
 					✂ Agendamento Online{" "}
