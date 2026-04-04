@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BarberBook — Sistema de Agendamento para Barbearias
 
-## Getting Started
+Sistema web de agendamento online criado para organizar a agenda de barbearias de forma simples e sem burocracia. Clientes agendam pelo site em minutos; barbeiros e administradores gerenciam tudo pelo painel admin.
 
-First, run the development server:
+## O problema que resolve
+
+Barbearias que dependem de telefone ou WhatsApp para agendar perdem clientes por demora na resposta e têm dificuldade em controlar a agenda com clareza. Este sistema permite que o cliente escolha barbeiro, serviço, data e horário de forma totalmente autônoma — e o admin confirma ou cancela pelo painel, com os horários sendo bloqueados automaticamente para novos agendamentos.
+
+---
+
+## Stack
+
+- **Framework:** Next.js (App Router)
+- **Banco de dados / Auth:** Supabase
+- **Estilização:** Tailwind CSS
+- **Deploy:** Vercel
+
+---
+
+## Rodando localmente
+
+**Pré-requisito:** ter o [pnpm](https://pnpm.io) instalado.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+# Instalar dependências
+pnpm install
+
+# Iniciar servidor de desenvolvimento
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse [http://localhost:3000](http://localhost:3000) no navegador.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+> Certifique-se de configurar as variáveis de ambiente no arquivo `.env.local` com as credenciais do Supabase antes de rodar.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Deploy para produção
 
-To learn more about Next.js, take a look at the following resources:
+Para fazer o deploy da branch atual direto para produção na Vercel:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npx vercel --prod
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+> É necessário estar autenticado na Vercel CLI (`npx vercel login`) antes do primeiro deploy.
