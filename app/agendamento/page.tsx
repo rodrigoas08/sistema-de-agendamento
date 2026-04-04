@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import LoginButton from "@/components/ui/LoginButton";
 import { createClient } from "@/utils/supabase/client";
@@ -66,20 +66,29 @@ export default function Agendamento() {
 		loadInitialData();
 	}, [supabase]);
 
+	const loadBusySlots = useCallback(
+		async (barberId: string, date: string) => {
+			const { data, error } = await supabase
+				.from("appointments")
+				.select("time")
+				.eq("date", date)
+				.eq("barber_id", barberId)
+				.in("status", ["pending", "confirmed"]);
+
+			if (error) {
+				console.error("Erro na busca:", error.message);
+				return;
+			}
+			if (data) setBusySlots(data.map((d) => d.time));
+		},
+		[supabase],
+	);
+
 	useEffect(() => {
 		if (selectedBarber && selectedDate) {
-			const loadBusy = async () => {
-				const { data } = await supabase
-					.from("appointments")
-					.select("time")
-					.eq("date", selectedDate)
-					.eq("barber_id", selectedBarber.id)
-					.in("status", ["pending", "confirmed"]);
-				if (data) setBusySlots(data.map((d) => d.time));
-			};
-			loadBusy();
+			loadBusySlots(selectedBarber.id, selectedDate);
 		}
-	}, [selectedDate, selectedBarber, supabase]);
+	}, [selectedDate, selectedBarber, loadBusySlots]);
 
 	const totalServiceCost = selectedServices.reduce(
 		(a, s) => a + Number(s.price),
@@ -90,6 +99,11 @@ export default function Agendamento() {
 		setStep(nextStep);
 		if (nextStep > 1) {
 			window.scrollTo({ top: 0, behavior: "smooth" });
+		}
+		// Sempre que entrar no step de horários, recarrega os slots ocupados
+		// para garantir que changes feitas no admin (confirmações, etc.) sejam refletidas.
+		if (nextStep === 3 && selectedBarber && selectedDate) {
+			loadBusySlots(selectedBarber.id, selectedDate);
 		}
 	};
 
