@@ -3,7 +3,7 @@ import { StatsBar } from "./StatsBar";
 
 export default function HeroSection() {
 	return (
-		<section className="bg-[#0a0a0a] flex-1 flex flex-col justify-center px-4 pt-16 pb-8 text-center relative overflow-hidden before:content-[''] before:absolute before:inset-0 before:bg-[url('data:image/svg+xml,%3Csvg%20width=%2760%27%20height=%2760%27%20xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cpath%20d=%27M0%2060L60%200M-10%2010L10-10M50%2070L70%2050%27%20stroke=%27%23E63946%27%20stroke-width=%270.3%27%20opacity=%270.12%27/%3E%3C/svg%3E')] before:opacity-60">
+		<section className="relative flex-1 flex flex-col justify-center px-4 pt-16 pb-8 text-center bg-[#0a0a0a]">
 			<div className="relative z-10 w-full mb-12">
 				<p className="font-['Barlow_Condensed'] text-xs font-bold tracking-[4px] uppercase text-[#e63946] mb-3.5 relative inline-block px-3 py-1.5 bg-[#e63946]/10 rounded-md">
 					✂ Agendamento Online{" "}
