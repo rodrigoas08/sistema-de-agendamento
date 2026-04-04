@@ -8,6 +8,14 @@ interface StatsBarProps {
 	statsCountColor?: string;
 }
 
+function LoaderSpinner() {
+	return (
+		<div className="flex flex-col items-center justify-center text-lg text-[#d4a017]/90">
+			<Loader2 className="animate-spin" /> Carregando...
+		</div>
+	);
+}
+
 export function StatsBar({
 	statsCountColor = "text-[#d4a017]",
 }: StatsBarProps) {
@@ -26,14 +34,6 @@ export function StatsBar({
 		};
 		loadInitialData();
 	}, [supabase]);
-
-	function LoaderSpinner() {
-		return (
-			<div className="flex flex-col items-center justify-center text-lg text-[#d4a017]/90">
-				<Loader2 className="animate-spin" /> Carregando...
-			</div>
-		);
-	}
 
 	return (
 		<Suspense fallback={<LoaderSpinner />}>

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Barlow_Condensed, Geist } from "next/font/google";
+import { Barlow_Condensed, Barlow, Bebas_Neue, Geist } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -9,6 +9,18 @@ const geistSans = Geist({
 
 const barlowCondensed = Barlow_Condensed({
 	variable: "--font-barlow-condensed",
+	subsets: ["latin"],
+	weight: ["400", "600", "700", "900"],
+});
+
+const barlow = Barlow({
+	variable: "--font-barlow",
+	subsets: ["latin"],
+	weight: ["400", "500", "600", "700"],
+});
+
+const bebasNeue = Bebas_Neue({
+	variable: "--font-bebas-neue",
 	subsets: ["latin"],
 	weight: "400",
 });
@@ -74,20 +86,8 @@ export default function RootLayout({
 	return (
 		<html
 			lang="pt-BR"
-			className={`${geistSans.variable} ${barlowCondensed.variable} h-full antialiased`}
+			className={`${geistSans.variable} ${barlowCondensed.variable} ${barlow.variable} ${bebasNeue.variable} h-full antialiased`}
 		>
-			<head>
-				<link rel="preconnect" href="https://fonts.googleapis.com" />
-				<link
-					rel="preconnect"
-					href="https://fonts.gstatic.com"
-					crossOrigin="anonymous"
-				/>
-				<link
-					href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@400;600;700;900&display=swap"
-					rel="stylesheet"
-				/>
-			</head>
 			<body className="min-h-full flex flex-col">{children}</body>
 		</html>
 	);
