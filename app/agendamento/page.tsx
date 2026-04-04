@@ -590,7 +590,7 @@ export default function Agendamento() {
 
 							<div className="max-w-[700px] mx-auto flex gap-3 mt-6">
 								<Button
-									disabled={!clientName || !clientPhone}
+									disabled={!clientName || clientPhone.length <= 14}
 									handleNext={() => handleNext(5)}
 									text="Próximo: Revisar Agendamento →"
 									className="shrink lg:px-0"
