@@ -5,13 +5,37 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import SidebarContent from "@/components/SidebarContent";
+import {
+	ChartColumnIncreasing,
+	CalendarDays,
+	Bell,
+	Users,
+	Settings,
+} from "lucide-react";
 
 export const NAV = [
-	{ href: "/admin/dashboard", label: "Dashboard", icon: "📊", exact: true },
-	{ href: "/admin/agendamentos", label: "Agendamentos", icon: "📅" },
-	{ href: "/admin/notificacoes", label: "Notificações", icon: "🔔" },
-	{ href: "/admin/equipe", label: "Equipe", icon: "👥" },
-	{ href: "/admin/configuracoes", label: "Configurações", icon: "⚙️" },
+	{
+		href: "/admin/dashboard",
+		label: "Dashboard",
+		icon: <ChartColumnIncreasing size={18} />,
+		exact: true,
+	},
+	{
+		href: "/admin/agendamentos",
+		label: "Agendamentos",
+		icon: <CalendarDays size={18} />,
+	},
+	{
+		href: "/admin/notificacoes",
+		label: "Notificações",
+		icon: <Bell size={18} />,
+	},
+	{ href: "/admin/equipe", label: "Equipe", icon: <Users size={18} /> },
+	{
+		href: "/admin/configuracoes",
+		label: "Configurações",
+		icon: <Settings size={18} />,
+	},
 ];
 
 const PAGE_TITLES: Record<string, string> = {
