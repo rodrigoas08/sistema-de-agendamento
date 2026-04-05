@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import SidebarContent from "@/components/SidebarContent";
+import { createClient } from "@/utils/supabase/client";
 import {
 	ChartColumnIncreasing,
 	CalendarDays,
@@ -49,7 +50,7 @@ const PAGE_TITLES: Record<string, string> = {
 export default function AdminLayoutClient({
 	children,
 	userName,
-	unreadCount,
+	unreadCount: initialUnreadCount,
 }: {
 	children: React.ReactNode;
 	userName: string;
@@ -57,11 +58,41 @@ export default function AdminLayoutClient({
 }) {
 	const pathname = usePathname();
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+	const [unreadCount, setUnreadCount] = useState(initialUnreadCount);
+
+	const supabase = createClient();
 
 	const isActive = (item: (typeof NAV)[0]) =>
 		item.exact ? pathname === item.href : pathname.startsWith(item.href);
 
 	const title = PAGE_TITLES[pathname] ?? "PAINEL";
+
+	// Busca a contagem atualizada
+	const refreshUnreadCount = useCallback(async () => {
+		const { count } = await supabase
+			.from("notifications")
+			.select("*", { count: "exact", head: true })
+			.eq("read", false);
+		if (count !== null) setUnreadCount(count);
+	}, [supabase]);
+
+	useEffect(() => {
+		// Listener para mudanças nas notificações
+		const channel = supabase
+			.channel("notifications-badge")
+			.on(
+				"postgres_changes",
+				{ event: "*", schema: "public", table: "notifications" },
+				() => {
+					refreshUnreadCount();
+				},
+			)
+			.subscribe();
+
+		return () => {
+			supabase.removeChannel(channel);
+		};
+	}, [supabase, refreshUnreadCount]);
 
 	// Impede scroll do body quando menu mobile está aberto
 	useEffect(() => {

@@ -8,6 +8,7 @@ import { DataTable } from "@/components/ui/DataTable";
 import { createColumnHelper, ColumnDef } from "@tanstack/react-table";
 import AppointmentsChart from "@/components/admin/AppointmentsChart";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
+import { CalendarCheck2Icon } from "lucide-react";
 
 // ─── TYPES ───────────────────────────────────────────────
 type Appointment = {
@@ -581,12 +582,18 @@ export default function DashboardPage() {
 							<div
 								className={`
 								flex shrink-0 items-center justify-center
-								w-9 h-9
+								w-8 h-8
 								rounded-full text-base
-								${n.type === "new" ? "bg-red-100" : n.type === "cancel" ? "bg-yellow-100" : "bg-green-100"}
+								${n.type === "new" ? "bg-red-100" : n.type === "cancel" ? "bg-yellow-100" : "bg-green-400"}
 							`}
 							>
-								{n.type === "new" ? "🆕" : n.type === "cancel" ? "❌" : "✅"}
+								{n.type === "new" ? (
+									"🆕"
+								) : n.type === "cancel" ? (
+									"❌"
+								) : (
+									<CalendarCheck2Icon size={18} className="text-white" />
+								)}
 							</div>
 
 							<div className="flex-1 min-w-0">

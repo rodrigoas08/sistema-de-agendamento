@@ -26,13 +26,11 @@ export default async function AdminLayout({
 	// Conta notificações não lidas para o badge
 	const { count: unreadCount } = await supabase
 		.from("notifications")
-		.select("id", { count: "exact", head: true })
+		.select("*", { count: "exact", head: true })
 		.eq("read", false);
 
 	const userName =
-		user.user_metadata?.full_name ||
-		user.email?.split("@")[0] ||
-		"Admin";
+		user.user_metadata?.full_name || user.email?.split("@")[0] || "Admin";
 
 	return (
 		<AdminLayoutClient userName={userName} unreadCount={unreadCount ?? 0}>
