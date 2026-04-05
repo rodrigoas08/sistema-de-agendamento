@@ -95,10 +95,15 @@ export default function Agendamento() {
 			.in("status", ["pending", "confirmed"])
 			.then(({ data, error }) => {
 				if (cancelled) return;
-				if (error) { console.error("Erro na busca:", error.message); return; }
+				if (error) {
+					console.error("Erro na busca:", error.message);
+					return;
+				}
 				if (data) setBusySlots(data.map((d) => d.time));
 			});
-		return () => { cancelled = true; };
+		return () => {
+			cancelled = true;
+		};
 	}, [selectedDate, selectedBarber, supabase]);
 
 	const totalServiceCost = selectedServices.reduce(
@@ -163,6 +168,8 @@ export default function Agendamento() {
 			time: selectedTime,
 			client_name: clientName,
 			client_phone: clientPhone,
+			total: totalServiceCost,
+			notified_wa: true,
 			status: "pending",
 		});
 
@@ -500,7 +507,11 @@ export default function Agendamento() {
 										) : (
 											<div className="grid grid-cols-3 gap-2">
 												{ALL_SLOTS.map((time) => {
-													const busy = busySlots.includes(time);
+													const currentNow = new Date();
+													const isToday = selectedDate === `${currentNow.getFullYear()}-${String(currentNow.getMonth() + 1).padStart(2, '0')}-${String(currentNow.getDate()).padStart(2, '0')}`;
+													const currentTime = `${String(currentNow.getHours()).padStart(2, '0')}:${String(currentNow.getMinutes()).padStart(2, '0')}`;
+													const isPastToday = isToday && time < currentTime;
+													const busy = busySlots.includes(time) || isPastToday;
 
 													return (
 														<div

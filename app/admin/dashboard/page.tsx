@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
-import { formatPhone } from "@/utils/format";
+import { formatCurrency, formatPhone } from "@/utils/format";
+import { DataTable } from "@/components/ui/DataTable";
+import { createColumnHelper, ColumnDef } from "@tanstack/react-table";
 import AppointmentsChart from "@/components/admin/AppointmentsChart";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 
@@ -58,9 +60,9 @@ const STATUS_LABEL: Record<string, string> = {
 
 const STATUS_CLASS: Record<string, string> = {
 	pending: "bg-yellow-400 text-black/80",
-	confirmed: "bg-green-400 text-black/80",
-	done: "bg-gray-400 text-black/80",
-	cancelled: "bg-red-400 text-black/80",
+	confirmed: "bg-[#5DBE3F] text-black/80",
+	done: "bg-[#79B6EB] text-black/80",
+	cancelled: "bg-[#FF0000] text-black/80",
 };
 
 // Botão de ação reutilizável — ordem: layout > box > visual > interativo
@@ -69,6 +71,8 @@ const actionBtn =
 
 const mobileActionBtn =
 	"flex flex-1 items-center justify-center gap-1.5 py-2 rounded border-2 border-gray-200 font-['Barlow_Condensed'] text-xs font-bold tracking-wide transition-all";
+
+const columnHelper = createColumnHelper<Appointment>();
 
 // ─── COMPONENT ───────────────────────────────────────────
 export default function DashboardPage() {
@@ -80,13 +84,14 @@ export default function DashboardPage() {
 		null,
 	);
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [selectedAppt, setSelectedAppt] = useState<Appointment | null>(null);
+	const [selectedAppointment, setselectedAppointment] =
+		useState<Appointment | null>(null);
 	const [cancelling, setCancelling] = useState(false);
 	const supabase = createClient();
 
 	const showToast = useCallback((msg: string, error = false) => {
 		setToast({ msg, error });
-		setTimeout(() => setToast(null), 3500);
+		setTimeout(() => setToast(null), 5000);
 	}, []);
 
 	useEffect(() => {
@@ -149,39 +154,46 @@ export default function DashboardPage() {
 		};
 	}, [supabase, showToast]);
 
-	async function changeStatus(id: string, status: Appointment["status"]) {
-		const { error } = await supabase
-			.from("appointments")
-			.update({ status })
-			.eq("id", id);
-		if (error) {
-			showToast("Erro ao atualizar status.", true);
-			return;
-		}
-		setAppointments((prev) =>
-			prev.map((a) => (a.id === id ? { ...a, status } : a)),
-		);
-		showToast("Status atualizado!");
-	}
+	const changeStatus = useCallback(
+		async (id: string, status: Appointment["status"]) => {
+			const { error } = await supabase
+				.from("appointments")
+				.update({ status })
+				.eq("id", id);
+			if (error) {
+				showToast("Erro ao atualizar status.", true);
+				return;
+			}
+			setAppointments((prev) =>
+				prev.map((a) => (a.id === id ? { ...a, status } : a)),
+			);
+			showToast("Status atualizado!");
+		},
+		[supabase, showToast],
+	);
 
-	function handleCancelClick(appt: Appointment) {
-		setSelectedAppt(appt);
+	const handleCancelClick = useCallback((appt: Appointment) => {
+		setselectedAppointment(appt);
 		setIsModalOpen(true);
-	}
+	}, []);
 
 	async function confirmCancellation() {
-		if (!selectedAppt) return;
+		if (!selectedAppointment) return;
 		setCancelling(true);
-		await changeStatus(selectedAppt.id, "cancelled");
+		await changeStatus(selectedAppointment.id, "cancelled");
 		setCancelling(false);
 		setIsModalOpen(false);
-		setSelectedAppt(null);
+		setselectedAppointment(null);
 	}
 
 	// ── Derived state ──────────────────────────────────────
 	const today = new Date().toISOString().split("T")[0];
 	const todayAppts = appointments.filter((a) => a.date === today);
 	const pendingCount = todayAppts.filter((a) => a.status === "pending").length;
+	const doneCount = todayAppts.filter((a) => a.status === "done").length;
+	const cancelledCount = todayAppts.filter(
+		(a) => a.status === "cancelled",
+	).length;
 	const confirmedCount = todayAppts.filter(
 		(a) => a.status === "confirmed",
 	).length;
@@ -206,8 +218,8 @@ export default function DashboardPage() {
 		{
 			label: "HOJE",
 			value: todayAppts.length,
-			accent: "before:bg-red-500",
-			text: "text-red-500",
+			accent: "before:bg-black",
+			text: "text-black",
 		},
 		{
 			label: "PENDENTES",
@@ -216,24 +228,143 @@ export default function DashboardPage() {
 			text: "text-yellow-500",
 		},
 		{
+			label: "CANCELADOS",
+			value: cancelledCount,
+			accent: "before:bg-red-500",
+			text: "text-red-500",
+		},
+		{
 			label: "CONFIRMADOS",
 			value: confirmedCount,
 			accent: "before:bg-green-500",
 			text: "text-green-500",
 		},
 		{
-			label: "FATURAMENTO",
-			value: `R$${revenue.toFixed(0)}`,
+			label: "CONCLUÍDOS",
+			value: doneCount,
+			accent: "before:bg-[#79B6EB]",
+			text: "text-[#79B6EB]",
+		},
+		{
+			label: "FATURAMENTO PARCIAL",
+			value: `${formatCurrency(revenue)}`,
 			accent: "before:bg-black",
 			text: "text-black",
 		},
 	];
 
+	// ── COLUMNS CONFIG ──────────────────────────────────────────────
+	const columns = useMemo(
+		() => [
+			columnHelper.accessor("client_name", {
+				header: "Cliente",
+				cell: (info) => (
+					<p className="font-semibold leading-tight capitalize">{info.getValue()}</p>
+				),
+			}),
+			columnHelper.accessor("client_phone", {
+				header: "Telefone",
+				cell: (info) => (
+					<span className="text-gray-400">{formatPhone(info.getValue())}</span>
+				),
+			}),
+			columnHelper.accessor("barber_name", {
+				header: "Barbeiro",
+				cell: (info) => (
+					<span className="font-semibold text-red-500">{info.getValue()}</span>
+				),
+			}),
+			columnHelper.accessor("service_names", {
+				header: "Serviço",
+				cell: (info) => (
+					<div className="max-w-[180px] text-gray-500">
+						{info.getValue().split(",").join(" + ")}
+					</div>
+				),
+			}),
+			columnHelper.accessor("time", {
+				header: "Hora",
+				cell: (info) => <span className="font-bold">{info.getValue()}</span>,
+			}),
+			columnHelper.accessor("total", {
+				header: "Total",
+				cell: (info) => (
+					<span className="font-['Bebas_Neue'] text-lg">
+						R${Number(info.getValue() ?? 0).toFixed(0)}
+					</span>
+				),
+			}),
+			columnHelper.accessor("status", {
+				header: "Status",
+				cell: (info) => {
+					const status = info.getValue() as string;
+					return (
+						<span
+							className={`px-2 py-1 rounded text-xs font-semibold ${
+								STATUS_CLASS[status] ?? "bg-gray-100 text-gray-500"
+							}`}
+						>
+							{STATUS_LABEL[status] ?? status}
+						</span>
+					);
+				},
+			}),
+			columnHelper.display({
+				id: "actions",
+				header: "Ações",
+				cell: (info) => {
+					const a = info.row.original;
+					return (
+						<div className="flex items-center gap-1.5">
+							<a
+								href={buildWALink(a.client_phone, a.client_name)}
+								target="_blank"
+								rel="noopener noreferrer"
+								title="WhatsApp"
+								className={`${actionBtn} hover:border-green-500 hover:bg-green-50`}
+							>
+								💬
+							</a>
+							{a.status === "pending" && (
+								<button
+									onClick={() => changeStatus(a.id, "confirmed")}
+									title="Confirmar"
+									className={`${actionBtn} hover:border-green-500 hover:bg-green-50`}
+								>
+									✅
+								</button>
+							)}
+							{a.status === "confirmed" && (
+								<button
+									onClick={() => changeStatus(a.id, "done")}
+									title="Concluir"
+									className={`${actionBtn} hover:border-black hover:bg-gray-50`}
+								>
+									✓
+								</button>
+							)}
+							{!["cancelled", "done"].includes(a.status) && (
+								<button
+									onClick={() => handleCancelClick(a)}
+									title="Cancelar"
+									className={`${actionBtn} hover:border-red-500 hover:bg-red-50`}
+								>
+									✕
+								</button>
+							)}
+						</div>
+					);
+				},
+			}),
+		],
+		[changeStatus, handleCancelClick],
+	);
+
 	// ─── RENDER ───────────────────────────────────────────
 	return (
 		<>
 			{/* ── STATS ── */}
-			<div className="grid grid-cols-2 gap-4 mb-7 lg:grid-cols-4">
+			<div className="grid grid-cols-2 gap-4 mb-7 lg:grid-cols-6">
 				{STATS.map((s) => (
 					<div
 						key={s.label}
@@ -400,129 +531,12 @@ export default function DashboardPage() {
 				</div>
 
 				{/* ── DESKTOP: tabela (>= md) ── */}
-				<div className="hidden overflow-x-auto md:block">
-					<table className="w-full border-collapse text-left">
-						<thead>
-							<tr className="bg-gray-100">
-								{[
-									"Cliente",
-									"Telefone",
-									"Barbeiro",
-									"Serviço",
-									"Hora",
-									"Total",
-									"Status",
-									"Ações",
-								].map((h) => (
-									<th
-										key={h}
-										className="
-											border-b-2 border-gray-100 py-3 px-5
-											font-['Barlow_Condensed'] text-[11px] font-bold tracking-[1.5px] uppercase
-											text-gray-500
-										"
-									>
-										{h}
-									</th>
-								))}
-							</tr>
-						</thead>
-						<tbody>
-							{loading ? (
-								<tr>
-									<td colSpan={7} className="py-10 text-center text-sm text-gray-400">
-										Carregando...
-									</td>
-								</tr>
-							) : filtered.length === 0 ? (
-								<tr>
-									<td
-										colSpan={7}
-										className="py-10 text-center text-sm font-semibold text-gray-400"
-									>
-										Nenhum agendamento encontrado.
-									</td>
-								</tr>
-							) : (
-								filtered.map((a) => (
-									<tr key={a.id} className="border-b border-gray-100 text-sm hover:bg-gray-50">
-										{/* Cliente */}
-										<td className="py-3 px-5">
-											<p className="font-semibold leading-tight capitalize">{a.client_name}</p>
-										</td>
-										{/* Telefone */}
-										<td className="py-3 px-5 text-gray-400">{formatPhone(a.client_phone)}</td>
-										{/* Barbeiro */}
-										<td className="py-3 px-5 font-semibold text-red-500">{a.barber_name}</td>
-										{/* Serviço */}
-										<td className="max-w-[180px] py-3 px-5 text-gray-500">
-											{a.service_names.split(",").join(" + ")}
-										</td>
-										{/* Hora */}
-										<td className="py-3 px-5 font-bold">{a.time}</td>
-										{/* Total */}
-										<td className="py-3 px-5 font-['Bebas_Neue'] text-lg">
-											R${Number(a.total ?? 0).toFixed(0)}
-										</td>
-										{/* Status */}
-										<td className="py-3 px-5">
-											<span
-												className={`
-												px-2 py-1
-												rounded
-												text-xs font-semibold
-												${STATUS_CLASS[a.status] ?? "bg-gray-100 text-gray-500"}
-											`}
-											>
-												{STATUS_LABEL[a.status] ?? a.status}
-											</span>
-										</td>
-										{/* Ações */}
-										<td className="py-3 px-5">
-											<div className="flex items-center gap-1.5">
-												<a
-													href={buildWALink(a.client_phone, a.client_name)}
-													target="_blank"
-													rel="noopener noreferrer"
-													title="WhatsApp"
-													className={`${actionBtn} hover:border-green-500 hover:bg-green-50`}
-												>
-													💬
-												</a>
-												{a.status === "pending" && (
-													<button
-														onClick={() => changeStatus(a.id, "confirmed")}
-														title="Confirmar"
-														className={`${actionBtn} hover:border-green-500 hover:bg-green-50`}
-													>
-														✅
-													</button>
-												)}
-												{a.status === "confirmed" && (
-													<button
-														onClick={() => changeStatus(a.id, "done")}
-														title="Concluir"
-														className={`${actionBtn} hover:border-black hover:bg-gray-50`}
-													>
-														✓
-													</button>
-												)}
-												{!["cancelled", "done"].includes(a.status) && (
-													<button
-														onClick={() => handleCancelClick(a)}
-														title="Cancelar"
-														className={`${actionBtn} hover:border-red-500 hover:bg-red-50`}
-													>
-														✕
-													</button>
-												)}
-											</div>
-										</td>
-									</tr>
-								))
-							)}
-						</tbody>
-					</table>
+				<div className="hidden md:block border-t border-gray-100">
+					<DataTable
+						data={filtered}
+						loading={loading}
+						columns={columns as ColumnDef<Appointment, unknown>[]}
+					/>
 				</div>
 			</div>
 
@@ -590,13 +604,13 @@ export default function DashboardPage() {
 			{toast && (
 				<div
 					className={`
-					fixed bottom-6 left-1/2 z-50
+					fixed top-6 left-1/2 z-50
 					-translate-x-1/2
 					px-6 py-3
 					rounded
 					text-sm font-semibold text-white whitespace-nowrap
 					shadow-lg transition-all
-					${toast.error ? "bg-red-500" : "bg-[#0a0a0a]"}
+					${toast.error ? "bg-red-500" : "bg-blue-700"}
 				`}
 				>
 					{toast.msg}
@@ -608,7 +622,7 @@ export default function DashboardPage() {
 				onClose={() => setIsModalOpen(false)}
 				onConfirm={confirmCancellation}
 				loading={cancelling}
-				title={`Cancelar agendamento de ${selectedAppt?.client_name}`}
+				title={`Cancelar agendamento de ${selectedAppointment?.client_name}`}
 				subtitle="Tem certeza que deseja cancelar?"
 				confirmText="Confirmar"
 			/>
