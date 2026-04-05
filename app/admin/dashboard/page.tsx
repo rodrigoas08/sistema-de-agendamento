@@ -294,10 +294,11 @@ export default function DashboardPage() {
 					</span>
 				),
 			}),
-			columnHelper.accessor("status", {
+			columnHelper.display({
+				id: "status",
 				header: "Status",
 				cell: (info) => {
-					const status = info.getValue() as string;
+					const status = info.row.original.status;
 					return (
 						<span
 							className={`px-2 py-1 rounded text-xs font-semibold ${
