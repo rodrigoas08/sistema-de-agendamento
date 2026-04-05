@@ -5,7 +5,7 @@ import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import { formatCurrency, formatPhone } from "@/utils/format";
 import { DataTable } from "@/components/ui/DataTable";
-import { createColumnHelper } from "@tanstack/react-table";
+import { createColumnHelper, ColumnDef } from "@tanstack/react-table";
 import AppointmentsChart from "@/components/admin/AppointmentsChart";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 
@@ -154,25 +154,28 @@ export default function DashboardPage() {
 		};
 	}, [supabase, showToast]);
 
-	async function changeStatus(id: string, status: Appointment["status"]) {
-		const { error } = await supabase
-			.from("appointments")
-			.update({ status })
-			.eq("id", id);
-		if (error) {
-			showToast("Erro ao atualizar status.", true);
-			return;
-		}
-		setAppointments((prev) =>
-			prev.map((a) => (a.id === id ? { ...a, status } : a)),
-		);
-		showToast("Status atualizado!");
-	}
+	const changeStatus = useCallback(
+		async (id: string, status: Appointment["status"]) => {
+			const { error } = await supabase
+				.from("appointments")
+				.update({ status })
+				.eq("id", id);
+			if (error) {
+				showToast("Erro ao atualizar status.", true);
+				return;
+			}
+			setAppointments((prev) =>
+				prev.map((a) => (a.id === id ? { ...a, status } : a)),
+			);
+			showToast("Status atualizado!");
+		},
+		[supabase, showToast],
+	);
 
-	function handleCancelClick(appt: Appointment) {
+	const handleCancelClick = useCallback((appt: Appointment) => {
 		setselectedAppointment(appt);
 		setIsModalOpen(true);
-	}
+	}, []);
 
 	async function confirmCancellation() {
 		if (!selectedAppointment) return;
@@ -354,7 +357,7 @@ export default function DashboardPage() {
 				},
 			}),
 		],
-		[changeStatus],
+		[changeStatus, handleCancelClick],
 	);
 
 	// ─── RENDER ───────────────────────────────────────────
@@ -529,7 +532,11 @@ export default function DashboardPage() {
 
 				{/* ── DESKTOP: tabela (>= md) ── */}
 				<div className="hidden md:block border-t border-gray-100">
-					<DataTable data={filtered} loading={loading} columns={columns as any} />
+					<DataTable
+						data={filtered}
+						loading={loading}
+						columns={columns as ColumnDef<Appointment, unknown>[]}
+					/>
 				</div>
 			</div>
 

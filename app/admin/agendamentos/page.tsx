@@ -5,7 +5,7 @@ import { createClient } from "@/utils/supabase/client";
 import { formatPhone } from "@/utils/format";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import { DataTable } from "@/components/ui/DataTable";
-import { createColumnHelper } from "@tanstack/react-table";
+import { createColumnHelper, ColumnDef } from "@tanstack/react-table";
 
 // ─── TYPES ───────────────────────────────────────────────
 type Appointment = {
@@ -123,25 +123,28 @@ export default function AgendamentosPage() {
 		};
 	}, [supabase, showToast]);
 
-	async function changeStatus(id: string, status: Appointment["status"]) {
-		const { error } = await supabase
-			.from("appointments")
-			.update({ status })
-			.eq("id", id);
-		if (error) {
-			showToast("Erro ao atualizar status.", true);
-			return;
-		}
-		setAppointments((prev) =>
-			prev.map((a) => (a.id === id ? { ...a, status } : a)),
-		);
-		showToast("Status atualizado!");
-	}
+	const changeStatus = useCallback(
+		async (id: string, status: Appointment["status"]) => {
+			const { error } = await supabase
+				.from("appointments")
+				.update({ status })
+				.eq("id", id);
+			if (error) {
+				showToast("Erro ao atualizar status.", true);
+				return;
+			}
+			setAppointments((prev) =>
+				prev.map((a) => (a.id === id ? { ...a, status } : a)),
+			);
+			showToast("Status atualizado!");
+		},
+		[supabase, showToast],
+	);
 
-	function handleCancelClick(appt: Appointment) {
+	const handleCancelClick = useCallback((appt: Appointment) => {
 		setSelectedAppointment(appt);
 		setIsModalOpen(true);
-	}
+	}, []);
 
 	async function confirmCancellation() {
 		if (!selectedAppointment) return;
@@ -188,26 +191,25 @@ export default function AgendamentosPage() {
 	};
 
 	// ── Derived state ──────────────────────────────────────
-	const filtered = useMemo(() => {
-		let result = appointments;
+	const filtered = appointments.filter((a) => {
 		if (statusFilter !== "all") {
-			result = result.filter((a) => {
-				const old = isOlderThan2Days(a.date);
-				return a.status === statusFilter && !old;
-			});
+			if (a.status !== statusFilter || isOlderThan2Days(a.date)) {
+				return false;
+			}
 		}
 		if (searchQuery.trim()) {
 			const q = searchQuery.toLowerCase();
-			result = result.filter(
-				(a) =>
-					a.client_name?.toLowerCase().includes(q) ||
-					a.barber_name?.toLowerCase().includes(q) ||
-					a.client_phone?.toLowerCase().includes(q) ||
-					a.service_names?.toLowerCase().includes(q),
-			);
+			const matches =
+				a.client_name?.toLowerCase().includes(q) ||
+				a.barber_name?.toLowerCase().includes(q) ||
+				a.client_phone?.toLowerCase().includes(q) ||
+				a.service_names?.toLowerCase().includes(q);
+			if (!matches) {
+				return false;
+			}
 		}
-		return result;
-	}, [appointments, statusFilter, searchQuery]);
+		return true;
+	});
 
 	const FILTERS: { value: StatusFilter; label: string }[] = [
 		{ value: "all", label: "Todos" },
@@ -345,7 +347,7 @@ export default function AgendamentosPage() {
 							</a>
 							<button
 								disabled={old}
-								onClick={(e) => {
+								onClick={() => {
 									if (!old) {
 										changeStatus(a.id, "confirmed");
 									}
@@ -530,7 +532,11 @@ export default function AgendamentosPage() {
 
 				{/* ── DESKTOP TABELA (>= lg) ── */}
 				<div className="hidden lg:block border-t border-gray-100">
-					<DataTable data={filtered} columns={columns as any} loading={loading} />
+					<DataTable
+						data={filtered}
+						columns={columns as ColumnDef<Appointment, unknown>[]}
+						loading={loading}
+					/>
 				</div>
 			</div>
 
