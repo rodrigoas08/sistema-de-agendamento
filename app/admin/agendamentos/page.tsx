@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { formatPhone } from "@/utils/format";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
+import { DataTable } from "@/components/ui/DataTable";
+import { createColumnHelper } from "@tanstack/react-table";
 
 // ─── TYPES ───────────────────────────────────────────────
 type Appointment = {
@@ -38,10 +40,10 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 const STATUS_CLASS: Record<string, string> = {
-	pending: "bg-yellow-100 text-yellow-800",
-	confirmed: "bg-green-100 text-green-800",
-	done: "bg-gray-100 text-gray-800",
-	cancelled: "bg-red-100 text-red-800",
+	pending: "bg-yellow-400 text-black/80",
+	confirmed: "bg-[#5DBE3F] text-black/80",
+	done: "bg-[#79B6EB] text-black/80",
+	cancelled: "bg-[#FF0000] text-black/80",
 };
 
 // Botão de ação
@@ -55,6 +57,8 @@ function isOlderThan2Days(dateStr: string) {
 	const diffDays = (today.getTime() - apptDate.getTime()) / (1000 * 3600 * 24);
 	return diffDays > 2;
 }
+
+const columnHelper = createColumnHelper<Appointment>();
 
 // ─── COMPONENT ───────────────────────────────────────────
 export default function AgendamentosPage() {
@@ -213,6 +217,166 @@ export default function AgendamentosPage() {
 		{ value: "cancelled", label: "Cancelados" },
 	];
 
+	// ── COLUMNS CONFIG ──────────────────────────────────────────────
+	const columns = useMemo(
+		() => [
+			columnHelper.accessor("client_name", {
+				header: "Cliente",
+				cell: (info) => {
+					const a = info.row.original;
+					const old = isOlderThan2Days(a.date);
+					return (
+						<div className={`flex items-center gap-3 ${old ? "opacity-60 grayscale" : ""}`}>
+							<div className="flex shrink-0 items-center justify-center w-[40px] h-[40px] rounded-full bg-[#0a0a0a] text-white font-['Bebas_Neue'] text-lg">
+								{a.client_name
+									.split(" ")
+									.map((w) => w[0])
+									.join("")
+									.slice(0, 2)}
+							</div>
+							<div>
+								<p className="font-semibold leading-tight capitalize text-[#0a0a0a] font-['Barlow']">
+									{a.client_name}
+								</p>
+								<p className="text-[11px] text-[#888] font-medium pt-0.5">
+									{formatPhone(a.client_phone)}
+								</p>
+							</div>
+						</div>
+					);
+				},
+			}),
+			columnHelper.accessor("barber_name", {
+				header: "Barbeiro",
+				cell: (info) => {
+					const old = isOlderThan2Days(info.row.original.date);
+					return (
+						<span className={`font-semibold text-[#0a0a0a] ${old ? "opacity-60" : ""}`}>
+							{info.getValue()}
+						</span>
+					);
+				},
+			}),
+			columnHelper.accessor("service_names", {
+				header: "Serviço",
+				cell: (info) => {
+					const old = isOlderThan2Days(info.row.original.date);
+					return (
+						<div
+							className={`max-w-[200px] text-[#888] text-[13px] font-medium ${old ? "opacity-60" : ""}`}
+						>
+							{info.getValue().split(",").join(", ")}
+						</div>
+					);
+				},
+			}),
+			columnHelper.accessor("date", {
+				header: "Data",
+				cell: (info) => {
+					const old = isOlderThan2Days(info.row.original.date);
+					return (
+						<span className={`font-bold text-[13px] ${old ? "opacity-60" : ""}`}>
+							{info.getValue().split("-").reverse().join("/")}
+						</span>
+					);
+				},
+			}),
+			columnHelper.accessor("time", {
+				header: "Hora",
+				cell: (info) => {
+					const old = isOlderThan2Days(info.row.original.date);
+					return (
+						<span className={`font-bold text-[13px] ${old ? "opacity-60" : ""}`}>
+							{info.getValue()}
+						</span>
+					);
+				},
+			}),
+			columnHelper.accessor("total", {
+				header: "Total",
+				cell: (info) => {
+					const old = isOlderThan2Days(info.row.original.date);
+					return (
+						<span
+							className={`font-['Bebas_Neue'] text-lg text-[#0a0a0a] ${old ? "opacity-60" : ""}`}
+						>
+							R${Number(info.getValue() ?? 0).toFixed(0)}
+						</span>
+					);
+				},
+			}),
+			columnHelper.display({
+				id: "status",
+				header: "Status",
+				cell: (info) => {
+					const status = info.row.original.status;
+					const old = isOlderThan2Days(info.row.original.date);
+					return (
+						<span
+							className={`px-2 py-[2px] rounded text-[10px] font-bold font-['Barlow_Condensed'] uppercase tracking-[1px] ${
+								STATUS_CLASS[status] ?? "bg-gray-100 text-gray-500"
+							} ${old ? "opacity-60 grayscale" : ""}`}
+						>
+							⏳ {STATUS_LABEL[status] ?? status}
+						</span>
+					);
+				},
+			}),
+			columnHelper.display({
+				id: "actions",
+				header: "Ações",
+				cell: (info) => {
+					const a = info.row.original;
+					const old = isOlderThan2Days(a.date);
+					return (
+						<div
+							className={`flex items-center gap-1.5 ${old ? "pointer-events-none opacity-60 grayscale" : ""}`}
+						>
+							<a
+								href={old ? "#" : buildWALink(a.client_phone, a.client_name)}
+								target={old ? undefined : "_blank"}
+								rel={old ? undefined : "noopener noreferrer"}
+								title="WhatsApp"
+								className={`${actionBtn} ${
+									old ? "" : "hover:border-green-500 hover:bg-green-50"
+								} text-[#a0a0a0]`}
+							>
+								💬
+							</a>
+							<button
+								disabled={old}
+								onClick={(e) => {
+									if (!old) {
+										changeStatus(a.id, "confirmed");
+									}
+								}}
+								title="Confirmar"
+								className={`${actionBtn} ${
+									old ? "" : "hover:border-green-500 hover:bg-green-50 text-green-500"
+								}`}
+							>
+								✅
+							</button>
+							{!["cancelled", "done"].includes(a.status) && (
+								<button
+									disabled={old}
+									onClick={() => !old && handleCancelClick(a)}
+									title="Cancelar"
+									className={`${actionBtn} ${
+										old ? "" : "hover:border-red-500 hover:bg-red-50"
+									} font-bold text-[#888]`}
+								>
+									✕
+								</button>
+							)}
+						</div>
+					);
+				},
+			}),
+		],
+		[changeStatus, handleCancelClick],
+	);
+
 	// ─── RENDER ───────────────────────────────────────────
 	return (
 		<>
@@ -365,147 +529,8 @@ export default function AgendamentosPage() {
 				</div>
 
 				{/* ── DESKTOP TABELA (>= lg) ── */}
-				<div className="hidden overflow-x-auto lg:block">
-					<table className="w-full border-collapse text-left">
-						<thead>
-							<tr className="bg-[#f9f9f9] border-b-2 border-gray-100">
-								{[
-									"Cliente",
-									"Barbeiro",
-									"Serviço",
-									"Data",
-									"Hora",
-									"Total",
-									"Status",
-									"Ações",
-								].map((h) => (
-									<th
-										key={h}
-										className="
-											py-4 px-5
-											font-['Barlow_Condensed'] text-[11px] font-bold tracking-[1.5px] uppercase
-											text-gray-400
-										"
-									>
-										{h}
-									</th>
-								))}
-							</tr>
-						</thead>
-						<tbody>
-							{loading ? (
-								<tr>
-									<td colSpan={8} className="py-10 text-center text-sm text-gray-400">
-										Carregando...
-									</td>
-								</tr>
-							) : filtered.length === 0 ? (
-								<tr>
-									<td
-										colSpan={8}
-										className="py-10 text-center text-sm font-semibold text-gray-400"
-									>
-										Nenhum agendamento encontrado.
-									</td>
-								</tr>
-							) : (
-								filtered.map((a) => {
-									const old = isOlderThan2Days(a.date);
-
-									return (
-										<tr
-											key={a.id}
-											className={`border-b border-gray-100 text-sm hover:bg-gray-50 bg-white ${old ? "opacity-60 bg-gray-50 grayscale" : ""}`}
-										>
-											{/* Cliente */}
-											<td className="py-4 px-5">
-												<div className="flex items-center gap-3">
-													<div className="flex shrink-0 items-center justify-center w-[40px] h-[40px] rounded-full bg-[#0a0a0a] text-white font-['Bebas_Neue'] text-lg">
-														{a.client_name
-															.split(" ")
-															.map((w) => w[0])
-															.join("")
-															.slice(0, 2)}
-													</div>
-													<div>
-														<p className="font-semibold leading-tight capitalize text-[#0a0a0a] font-['Barlow']">
-															{a.client_name}
-														</p>
-														<p className="text-[11px] text-[#888] font-medium pt-0.5">
-															{formatPhone(a.client_phone)}
-														</p>
-													</div>
-												</div>
-											</td>
-											{/* Barbeiro */}
-											<td className="py-4 px-5 font-semibold text-[#0a0a0a]">{a.barber_name}</td>
-											{/* Serviço */}
-											<td className="max-w-[200px] py-4 px-5 text-[#888] text-[13px] font-medium">
-												{a.service_names.split(",").join(", ")}
-											</td>
-											{/* Data */}
-											<td className="py-4 px-5 font-bold text-[13px]">
-												{a.date.split("-").reverse().join("/")}
-											</td>
-											{/* Hora */}
-											<td className="py-4 px-5 font-bold text-[13px]">{a.time}</td>
-											{/* Total */}
-											<td className="py-4 px-5 font-['Bebas_Neue'] text-lg text-[#0a0a0a]">
-												R${Number(a.total ?? 0).toFixed(0)}
-											</td>
-											{/* Status */}
-											<td className="py-4 px-5">
-												<span
-													className={`px-2 py-[2px] rounded text-[10px] font-bold font-['Barlow_Condensed'] uppercase tracking-[1px] ${STATUS_CLASS[a.status] ?? "bg-gray-100 text-gray-500"}`}
-												>
-													⏳ {STATUS_LABEL[a.status] ?? a.status}
-												</span>
-											</td>
-											{/* Ações */}
-											<td className="py-4 px-5">
-												<div
-													className={`flex items-center gap-1.5 ${old ? "pointer-events-none" : ""}`}
-												>
-													<a
-														href={old ? "#" : buildWALink(a.client_phone, a.client_name)}
-														target={old ? undefined : "_blank"}
-														rel={old ? undefined : "noopener noreferrer"}
-														title="WhatsApp"
-														className={`${actionBtn} ${old ? "" : "hover:border-green-500 hover:bg-green-50"} text-[#a0a0a0]`}
-													>
-														💬
-													</a>
-													<button
-														disabled={old}
-														onClick={(e) => {
-															if (!old) {
-																const btn = e.currentTarget;
-																changeStatus(a.id, "confirmed");
-															}
-														}}
-														title="Confirmar"
-														className={`${actionBtn} ${old ? "" : "hover:border-green-500 hover:bg-green-50 text-green-500"}`}
-													>
-														✅
-													</button>
-													{!["cancelled", "done"].includes(a.status) && (
-														<button
-															disabled={old}
-															onClick={() => !old && handleCancelClick(a)}
-															title="Cancelar"
-															className={`${actionBtn} ${old ? "" : "hover:border-red-500 hover:bg-red-50"} font-bold text-[#888]`}
-														>
-															✕
-														</button>
-													)}
-												</div>
-											</td>
-										</tr>
-									);
-								})
-							)}
-						</tbody>
-					</table>
+				<div className="hidden lg:block border-t border-gray-100">
+					<DataTable data={filtered} columns={columns as any} loading={loading} />
 				</div>
 			</div>
 

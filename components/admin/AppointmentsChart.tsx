@@ -170,6 +170,8 @@ export default function AppointmentsChart() {
 				(r) => r.status === "confirmed" || r.status === "done",
 			).length;
 
+			const concluidos = monthRows.filter((r) => r.status === "done").length;
+
 			const cancelados = monthRows.filter((r) => r.status === "cancelled").length;
 
 			const faturamento = monthRows
@@ -182,6 +184,7 @@ export default function AppointmentsChart() {
 				confirmados,
 				cancelados,
 				faturamento,
+				concluidos,
 			};
 		});
 	}, [rows, period, year]);
@@ -199,9 +202,6 @@ export default function AppointmentsChart() {
 			<div className="flex flex-wrap items-start justify-between gap-2 border-b border-gray-100 p-4 md:p-5">
 				<div>
 					<h2 className="font-['Bebas_Neue'] text-xl tracking-[1.5px]">VISÃO GERAL</h2>
-					<p className="mt-0.5 text-xs text-gray-400">
-						{mode === "appointments" ? "Confirmados vs cancelados" : "Faturamento mensal"}
-					</p>
 				</div>
 
 				{/* toggle modo — sempre visível no canto direito */}
@@ -319,15 +319,21 @@ export default function AppointmentsChart() {
 							{mode === "appointments" ? (
 								<>
 									<Bar
+										dataKey="concluidos"
+										name="Concluídos"
+										fill="#79B6EB"
+										radius={[3, 3, 0, 0]}
+									/>
+									<Bar
 										dataKey="confirmados"
 										name="Confirmados"
-										fill="#4ade80"
+										fill="#5DBE3F"
 										radius={[3, 3, 0, 0]}
 									/>
 									<Bar
 										dataKey="cancelados"
 										name="Cancelados"
-										fill="#f87171"
+										fill="#FF0000"
 										radius={[3, 3, 0, 0]}
 									/>
 								</>
