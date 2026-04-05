@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
 import Link from "next/link";
-import LogoutButton from "@/components/ui/LogoutButton";
-import { Menu, X } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Menu } from "lucide-react";
+import SidebarContent from "@/components/SidebarContent";
 
-const NAV = [
+export const NAV = [
 	{ href: "/admin/dashboard", label: "Dashboard", icon: "📊", exact: true },
 	{ href: "/admin/agendamentos", label: "Agendamentos", icon: "📅" },
 	{ href: "/admin/notificacoes", label: "Notificações", icon: "🔔" },
@@ -42,101 +42,55 @@ export default function AdminLayoutClient({
 	// Impede scroll do body quando menu mobile está aberto
 	useEffect(() => {
 		if (isMobileMenuOpen) {
-			document.body.style.overflow = "hidden";
+			document.body.style.overflowY = "hidden";
 		} else {
-			document.body.style.overflow = "auto";
+			document.body.style.overflowY = "auto";
 		}
 	}, [isMobileMenuOpen]);
-
-	const SidebarContent = () => (
-		<>
-			<div className="flex items-center justify-between px-7 h-[60px] border-b border-white/10 shrink-0">
-				<span className="font-['Bebas_Neue'] text-2xl tracking-[3px]">
-					Seu<em className="text-red-500 not-italic">Negócio</em>
-				</span>
-				<button 
-					onClick={() => setIsMobileMenuOpen(false)}
-					className="md:hidden text-gray-400 hover:text-white"
-				>
-					<X size={24} />
-				</button>
-			</div>
-
-			<div className="flex items-center gap-3 p-7 border-b border-white/10 shrink-0">
-				<div className="flex shrink-0 items-center justify-center w-10 h-10 rounded-full bg-red-500 font-['Bebas_Neue'] text-sm ">
-					{userName.slice(0, 2).toUpperCase()}
-				</div>
-				<div className="min-w-0">
-					<div className="text-sm font-semibold leading-tight truncate">{userName}</div>
-					<div className="text-xs text-gray-500">Administrador</div>
-				</div>
-			</div>
-
-			<nav className="flex-1 py-4 overflow-y-auto">
-				{NAV.map((item) => (
-					<Link
-						key={item.href}
-						href={item.href}
-						onClick={() => setIsMobileMenuOpen(false)}
-						className={`flex items-center gap-3 px-5 py-3 text-sm font-semibold transition-colors border-l-4 ${
-							isActive(item)
-								? "text-white bg-red-500/10 border-red-500"
-								: "text-white/50 hover:text-white hover:bg-white/5 border-transparent"
-						}`}
-					>
-						<span className="w-4 text-center text-base shrink-0">{item.icon}</span>
-						<span className="truncate">{item.label}</span>
-						{item.href === "/admin/agendamentos" && unreadCount > 0 && (
-							<span className="ml-auto shrink-0 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center">
-								{unreadCount}
-							</span>
-						)}
-					</Link>
-				))}
-			</nav>
-
-			<div className="p-4 border-t border-white/10 flex flex-col gap-3 shrink-0">
-				<Link
-					href="/"
-					onClick={() => setIsMobileMenuOpen(false)}
-					className="text-xs text-gray-500 hover:text-white transition-colors"
-				>
-					← Ver página pública
-				</Link>
-				<LogoutButton />
-			</div>
-		</>
-	);
 
 	return (
 		<div className="flex h-dvh min-h-screen bg-gray-50 font-sans text-black overflow-hidden relative">
 			{/* OVERLAY BACKGROUND MOBILE */}
-			<div 
+			<div
 				className={`fixed inset-0 bg-black/50 z-60 md:hidden transition-opacity duration-300 ${
-					isMobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+					isMobileMenuOpen
+						? "opacity-100 pointer-events-auto"
+						: "opacity-0 pointer-events-none"
 				}`}
 				onClick={() => setIsMobileMenuOpen(false)}
 			/>
 
 			{/* MOBILE SIDEBAR */}
-			<aside 
+			<aside
 				className={`fixed top-0 left-0 h-full w-[80%] max-w-[300px] bg-[#0a0a0a] z-70 transform transition-transform duration-300 md:hidden flex flex-col text-white ${
-					isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+					isMobileMenuOpen
+						? "translate-x-0 duration-300"
+						: "-translate-x-full duration-1000"
 				}`}
 			>
-				<SidebarContent />
+				<SidebarContent
+					userName={userName}
+					unreadCount={unreadCount}
+					setIsMobileMenuOpen={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+					isActive={isActive}
+				/>
 			</aside>
 
 			{/* DESKTOP SIDEBAR */}
 			<aside className="hidden md:flex flex-col top-0 w-[240px] h-full bg-[#0a0a0a] shrink-0 text-white">
-				<SidebarContent />
+				<SidebarContent
+					userName={userName}
+					unreadCount={unreadCount}
+					setIsMobileMenuOpen={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+					isActive={isActive}
+				/>
 			</aside>
 
 			{/* MAIN */}
 			<div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
 				<header className="bg-white border-b border-gray-200 px-4 md:px-7 h-[60px] flex items-center justify-between sticky top-0 z-50 shrink-0">
 					<div className="flex items-center gap-3">
-						<button 
+						<button
 							onClick={() => setIsMobileMenuOpen(true)}
 							className="md:hidden text-gray-600 hover:text-black p-1 -ml-1 transition-colors"
 						>
