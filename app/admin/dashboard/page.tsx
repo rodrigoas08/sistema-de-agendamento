@@ -80,13 +80,14 @@ export default function DashboardPage() {
 		null,
 	);
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [selectedAppt, setSelectedAppt] = useState<Appointment | null>(null);
+	const [selectedAppointment, setselectedAppointment] =
+		useState<Appointment | null>(null);
 	const [cancelling, setCancelling] = useState(false);
 	const supabase = createClient();
 
 	const showToast = useCallback((msg: string, error = false) => {
 		setToast({ msg, error });
-		setTimeout(() => setToast(null), 3500);
+		setTimeout(() => setToast(null), 5000);
 	}, []);
 
 	useEffect(() => {
@@ -165,17 +166,17 @@ export default function DashboardPage() {
 	}
 
 	function handleCancelClick(appt: Appointment) {
-		setSelectedAppt(appt);
+		setselectedAppointment(appt);
 		setIsModalOpen(true);
 	}
 
 	async function confirmCancellation() {
-		if (!selectedAppt) return;
+		if (!selectedAppointment) return;
 		setCancelling(true);
-		await changeStatus(selectedAppt.id, "cancelled");
+		await changeStatus(selectedAppointment.id, "cancelled");
 		setCancelling(false);
 		setIsModalOpen(false);
-		setSelectedAppt(null);
+		setselectedAppointment(null);
 	}
 
 	// ── Derived state ──────────────────────────────────────
@@ -590,13 +591,13 @@ export default function DashboardPage() {
 			{toast && (
 				<div
 					className={`
-					fixed bottom-6 left-1/2 z-50
+					fixed top-6 left-1/2 z-50
 					-translate-x-1/2
 					px-6 py-3
 					rounded
 					text-sm font-semibold text-white whitespace-nowrap
 					shadow-lg transition-all
-					${toast.error ? "bg-red-500" : "bg-[#0a0a0a]"}
+					${toast.error ? "bg-red-500" : "bg-blue-700"}
 				`}
 				>
 					{toast.msg}
@@ -608,7 +609,7 @@ export default function DashboardPage() {
 				onClose={() => setIsModalOpen(false)}
 				onConfirm={confirmCancellation}
 				loading={cancelling}
-				title={`Cancelar agendamento de ${selectedAppt?.client_name}`}
+				title={`Cancelar agendamento de ${selectedAppointment?.client_name}`}
 				subtitle="Tem certeza que deseja cancelar?"
 				confirmText="Confirmar"
 			/>
