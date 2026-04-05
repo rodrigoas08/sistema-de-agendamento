@@ -6,6 +6,7 @@ import { formatPhone } from "@/utils/format";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import { DataTable } from "@/components/ui/DataTable";
 import { createColumnHelper, ColumnDef } from "@tanstack/react-table";
+import { Download } from "lucide-react";
 
 // ─── TYPES ───────────────────────────────────────────────
 type Appointment = {
@@ -399,7 +400,7 @@ export default function AgendamentosPage() {
 							transition-all bg-white
 						"
 					>
-						⬇ CSV
+						<Download size={14} /> CSV
 					</button>
 				</div>
 

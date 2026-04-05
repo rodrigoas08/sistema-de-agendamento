@@ -146,6 +146,33 @@ export default function Agendamento() {
 		setCalYear(newY);
 	};
 
+	async function sendNotification() {
+		const data = await supabase
+			.from("appointments")
+			.select("id")
+			.eq("date", selectedDate)
+			.eq("barber_id", selectedBarber?.id)
+			.eq("time", selectedTime)
+			.eq("client_name", clientName)
+			.eq("client_phone", clientPhone)
+			.eq("total", totalServiceCost)
+			.eq("status", "pending");
+
+		console.log("appointmentID", data.data?.[0]?.id);
+
+		const { error: notifError } = await supabase.from("notifications").insert({
+			title: "Novo agendamento",
+			description: `Agendamento de ${clientName} para o dia ${new Date(selectedDate).toLocaleDateString("pt-BR", { timeZone: "UTC" })} às ${selectedTime}`,
+			read: false,
+			type: "appointment",
+			appointment_id: data?.data?.[0]?.id,
+			created_at: new Date().toISOString(),
+		});
+		if (notifError) {
+			console.error("Erro ao criar notificação:", notifError.message);
+		}
+	}
+
 	const handleConfirm = async () => {
 		if (
 			!selectedBarber ||
@@ -174,9 +201,11 @@ export default function Agendamento() {
 		});
 
 		setIsSubmitting(false);
-		if (!error)
+
+		if (!error) {
+			sendNotification();
 			handleNext(6); // Success screen is step 6 here
-		else alert("Erro ao agendar. Tente novamente.");
+		} else alert("Erro ao agendar. Tente novamente.");
 	};
 
 	// Calendar Generation Helper
@@ -508,8 +537,10 @@ export default function Agendamento() {
 											<div className="grid grid-cols-3 gap-2">
 												{ALL_SLOTS.map((time) => {
 													const currentNow = new Date();
-													const isToday = selectedDate === `${currentNow.getFullYear()}-${String(currentNow.getMonth() + 1).padStart(2, '0')}-${String(currentNow.getDate()).padStart(2, '0')}`;
-													const currentTime = `${String(currentNow.getHours()).padStart(2, '0')}:${String(currentNow.getMinutes()).padStart(2, '0')}`;
+													const isToday =
+														selectedDate ===
+														`${currentNow.getFullYear()}-${String(currentNow.getMonth() + 1).padStart(2, "0")}-${String(currentNow.getDate()).padStart(2, "0")}`;
+													const currentTime = `${String(currentNow.getHours()).padStart(2, "0")}:${String(currentNow.getMinutes()).padStart(2, "0")}`;
 													const isPastToday = isToday && time < currentTime;
 													const busy = busySlots.includes(time) || isPastToday;
 

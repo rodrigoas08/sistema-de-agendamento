@@ -56,7 +56,7 @@ export default function SidebarContent({
 					>
 						<span className="w-4 text-center text-base shrink-0">{item.icon}</span>
 						<span className="truncate">{item.label}</span>
-						{item.href === "/admin/agendamentos" && unreadCount > 0 && (
+						{item.href === "/admin/notificacoes" && unreadCount > 0 && (
 							<span className="ml-auto shrink-0 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center">
 								{unreadCount}
 							</span>
