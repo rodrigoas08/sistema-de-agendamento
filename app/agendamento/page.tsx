@@ -10,7 +10,7 @@ import { Loader2 } from "lucide-react";
 import { MONTHS, DAYS, ALL_SLOTS } from "@/constants";
 import Button from "@/components/agendamento/Button";
 import Footer from "@/components/Footer";
-import { formatCurrency } from "@/utils/format";
+import { formatBRLCurrency } from "@/utils/format";
 import { useRouter } from "next/navigation";
 
 type Barber = {
@@ -416,7 +416,7 @@ export default function Agendamento() {
 													isSec ? "text-[#e63946]" : "text-[#0a0a0a]",
 												)}
 											>
-												{formatCurrency(Number(s.price))}
+												{formatBRLCurrency(Number(s.price))}
 											</div>
 										</div>
 									);
@@ -426,7 +426,7 @@ export default function Agendamento() {
 							<div className="max-w-[700px] mx-auto mt-4 font-['Barlow_Condensed'] text-[14px] text-[#888] font-semibold tracking-[1px]">
 								{selectedServices.length > 0 && (
 									<span className="text-[#e63946] text-[18px] font-['Bebas_Neue'] tracking-[1px]">
-										Total: {formatCurrency(totalServiceCost)}
+										Total: {formatBRLCurrency(totalServiceCost)}
 									</span>
 								)}
 							</div>
@@ -719,7 +719,7 @@ export default function Agendamento() {
 								<div className="flex justify-between items-center py-2.5 border-b-0 text-[14px] mt-3.5">
 									<span className="text-[#888] font-medium">Total</span>
 									<span className="font-['Bebas_Neue'] text-[30px] text-[#e63946]">
-										{formatCurrency(totalServiceCost)}
+										{formatBRLCurrency(totalServiceCost)}
 									</span>
 								</div>
 							</div>

@@ -3,12 +3,20 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
-import { formatCurrency, formatPhone } from "@/utils/format";
+import { formatBRLCurrency, formatPhone } from "@/utils/format";
 import { DataTable } from "@/components/ui/DataTable";
 import { createColumnHelper, ColumnDef } from "@tanstack/react-table";
 import AppointmentsChart from "@/components/admin/AppointmentsChart";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
-import { CalendarCheck2Icon } from "lucide-react";
+import {
+	CalendarCheck2Icon,
+	MoveRight,
+	MessageCircleMore,
+	Check,
+	X,
+	CheckCheck,
+} from "lucide-react";
+import ActionButton from "@/components/admin/ActionButton";
 
 // ─── TYPES ───────────────────────────────────────────────
 type Appointment = {
@@ -65,13 +73,6 @@ const STATUS_CLASS: Record<string, string> = {
 	done: "bg-[#79B6EB] text-black/80",
 	cancelled: "bg-[#FF0000] text-black/80",
 };
-
-// Botão de ação reutilizável — ordem: layout > box > visual > interativo
-const actionBtn =
-	"flex items-center justify-center w-8 h-8 rounded border-2 border-gray-200 text-sm transition-all";
-
-const mobileActionBtn =
-	"flex flex-1 items-center justify-center gap-1.5 py-2 rounded border-2 border-gray-200 font-['Barlow_Condensed'] text-xs font-bold tracking-wide transition-all";
 
 const columnHelper = createColumnHelper<Appointment>();
 
@@ -248,7 +249,7 @@ export default function DashboardPage() {
 		},
 		{
 			label: "FATURAMENTO PARCIAL",
-			value: `${formatCurrency(revenue)}`,
+			value: formatBRLCurrency(revenue),
 			accent: "before:bg-black",
 			text: "text-black",
 		},
@@ -311,48 +312,50 @@ export default function DashboardPage() {
 					);
 				},
 			}),
+
 			columnHelper.display({
 				id: "actions",
 				header: "Ações",
 				cell: (info) => {
-					const a = info.row.original;
+					const appointment = info.row.original;
 					return (
-						<div className="flex items-center gap-1.5">
-							<a
-								href={buildWALink(a.client_phone, a.client_name)}
-								target="_blank"
-								rel="noopener noreferrer"
-								title="WhatsApp"
-								className={`${actionBtn} hover:border-green-500 hover:bg-green-50`}
-							>
-								💬
-							</a>
-							{a.status === "pending" && (
-								<button
-									onClick={() => changeStatus(a.id, "confirmed")}
+						<div className="flex items-center gap-1.5 focus-within:opacity-100">
+							{!["cancelled", "done"].includes(appointment.status) && (
+								<ActionButton
+									href={buildWALink(appointment.client_phone, appointment.client_name)}
+									target="_blank"
+									rel="noopener noreferrer"
+									title="WhatsApp"
+									icon={<MessageCircleMore size={16} />}
+									className="hover:border-green-500 hover:bg-green-500 hover:text-white"
+								/>
+							)}
+
+							{appointment.status === "pending" && (
+								<ActionButton
+									onClick={() => changeStatus(appointment.id, "confirmed")}
 									title="Confirmar"
-									className={`${actionBtn} hover:border-green-500 hover:bg-green-50`}
-								>
-									✅
-								</button>
+									icon={<Check size={16} />}
+									className="text-green-500 hover:border-green-500 hover:bg-green-500 hover:text-white"
+								/>
 							)}
-							{a.status === "confirmed" && (
-								<button
-									onClick={() => changeStatus(a.id, "done")}
+
+							{appointment.status === "confirmed" && (
+								<ActionButton
+									onClick={() => changeStatus(appointment.id, "done")}
 									title="Concluir"
-									className={`${actionBtn} hover:border-black hover:bg-gray-50`}
-								>
-									✓
-								</button>
+									icon={<CheckCheck size={16} />}
+									className="text-blue-500 hover:border-blue-500 hover:bg-blue-500 hover:text-white"
+								/>
 							)}
-							{!["cancelled", "done"].includes(a.status) && (
-								<button
-									onClick={() => handleCancelClick(a)}
+
+							{!["cancelled", "done"].includes(appointment.status) && (
+								<ActionButton
+									onClick={() => handleCancelClick(appointment)}
 									title="Cancelar"
-									className={`${actionBtn} hover:border-red-500 hover:bg-red-50`}
-								>
-									✕
-								</button>
+									icon={<X size={16} />}
+									className="hover:border-red-500 hover:bg-red-500 hover:text-white"
+								/>
 							)}
 						</div>
 					);
@@ -401,6 +404,7 @@ export default function DashboardPage() {
 					<Link
 						href="/admin/agendamentos"
 						className="
+							flex items-center gap-1
 							px-4 py-2
 							font-['Barlow_Condensed'] text-xs font-bold tracking-widest uppercase
 							rounded border-2 border-gray-200
@@ -408,7 +412,7 @@ export default function DashboardPage() {
 							transition-all
 						"
 					>
-						Ver Todos →
+						Ver Todos <MoveRight size={14} />
 					</Link>
 				</div>
 
@@ -444,28 +448,32 @@ export default function DashboardPage() {
 							Nenhum agendamento encontrado.
 						</p>
 					) : (
-						filtered.map((a) => (
-							<div key={a.id} className="flex flex-col gap-3 p-4">
+						filtered.map((appointment) => (
+							<div key={appointment.id} className="flex flex-col gap-3 p-4 odd:bg-gray-50">
 								{/* linha 1 — avatar · nome · hora · status */}
 								<div className="flex items-center gap-3">
 									<div className="flex-1 min-w-0">
 										<p className="truncate text-sm font-bold capitalize">
-											Cliente: {a.client_name}
+											Cliente: {appointment.client_name}
 										</p>
-										<p className="text-xs text-gray-500">Cel: {formatPhone(a.client_phone)}</p>
+										<p className="text-xs text-gray-500">
+											Cel: {formatPhone(appointment.client_phone)}
+										</p>
 									</div>
 
 									<div className="flex shrink-0 flex-col items-end gap-1">
-										<span className="font-['Bebas_Neue'] text-base leading-none">{a.time}h</span>
+										<span className="font-['Bebas_Neue'] text-base leading-none">
+											{appointment.time}h
+										</span>
 										<span
 											className={`
 											px-2 py-0.5
 											rounded
 											text-[10px] font-bold
-											${STATUS_CLASS[a.status] ?? "bg-gray-100 text-gray-500"}
+											${STATUS_CLASS[appointment.status] ?? "bg-gray-100 text-gray-500"}
 										`}
 										>
-											{STATUS_LABEL[a.status] ?? a.status}
+											{STATUS_LABEL[appointment.status] ?? appointment.status}
 										</span>
 									</div>
 								</div>
@@ -474,57 +482,67 @@ export default function DashboardPage() {
 								<div className="flex items-center justify-between gap-2 py-2 rounded-lg">
 									<div className="min-w-0">
 										<p className="truncate text-xs font-semibold">
-											<span className="">Barbeiro(a):</span> {a.barber_name}
+											<span className="">Barbeiro(a):</span> {appointment.barber_name}
 										</p>
 										<p className="text-xs text-gray-500">
-											Serviço: {a.service_names.split(",").join(" + ")}
+											Serviço: {appointment.service_names.split(",").join(" + ")}
 										</p>
 									</div>
 									<span className="shrink-0 font-['Bebas_Neue'] text-xl">
-										R${Number(a.total ?? 0).toFixed(0)}
+										{formatBRLCurrency(appointment.total ?? 0)}
 									</span>
 								</div>
 
 								{/* linha 3 — ações */}
 								<div className="flex gap-2">
-									<a
-										href={buildWALink(a.client_phone, a.client_name)}
-										target="_blank"
-										rel="noopener noreferrer"
-										className={`${mobileActionBtn} hover:border-green-500 hover:bg-green-50`}
-									>
-										💬 WhatsApp
-									</a>
-									{a.status === "pending" && (
-										<button
-											onClick={() => changeStatus(a.id, "confirmed")}
-											className={`${mobileActionBtn} hover:border-green-500 hover:bg-green-50`}
+									{!["cancelled", "done"].includes(appointment.status) && (
+										<ActionButton
+											href={buildWALink(appointment.client_phone, appointment.client_name)}
+											target="_blank"
+											rel="noopener noreferrer"
+											title="WhatsApp"
+											icon={<MessageCircleMore size={16} />}
+											mobileActionBtn
+											className="text-black hover:border-green-500 hover:bg-green-500 hover:text-white"
 										>
-											✅ Confirmar
-										</button>
+											WhatsApp
+										</ActionButton>
 									)}
-									{a.status === "confirmed" && (
-										<button
-											onClick={() => changeStatus(a.id, "done")}
-											className={`${mobileActionBtn} hover:border-black hover:bg-gray-50`}
+
+									{appointment.status === "pending" && (
+										<ActionButton
+											onClick={() => changeStatus(appointment.id, "confirmed")}
+											title="Confirmar"
+											icon={<Check size={16} />}
+											mobileActionBtn
+											className="text-green-500 hover:border-green-500 hover:bg-green-500 hover:text-white"
 										>
-											✓ Concluir
-										</button>
+											Confirmar
+										</ActionButton>
 									)}
-									{!["cancelled", "done"].includes(a.status) && (
-										<button
-											onClick={() => handleCancelClick(a)}
-											className="
-												flex items-center justify-center
-												px-3 py-2
-												rounded border-2 border-gray-200
-												text-xs font-bold
-												hover:border-red-500 hover:bg-red-50
-												transition-all
-											"
+
+									{appointment.status === "confirmed" && (
+										<ActionButton
+											onClick={() => changeStatus(appointment.id, "done")}
+											title="Concluir"
+											icon={<CheckCheck size={16} />}
+											mobileActionBtn
+											className="text-blue-500 hover:border-blue-500 hover:bg-blue-500 hover:text-white"
 										>
-											✕
-										</button>
+											Concluir
+										</ActionButton>
+									)}
+
+									{!["cancelled", "done"].includes(appointment.status) && (
+										<ActionButton
+											onClick={() => handleCancelClick(appointment)}
+											title="Cancelar"
+											icon={<X size={16} />}
+											mobileActionBtn
+											className="text-red-500 hover:border-red-500 hover:bg-red-500 hover:text-white"
+										>
+											Cancelar
+										</ActionButton>
 									)}
 								</div>
 							</div>
@@ -552,6 +570,7 @@ export default function DashboardPage() {
 					<Link
 						href="/admin/notificacoes"
 						className="
+							flex items-center gap-1
 							px-4 py-2
 							font-['Barlow_Condensed'] text-xs font-bold tracking-widest uppercase
 							rounded border-2 border-gray-200
@@ -559,7 +578,7 @@ export default function DashboardPage() {
 							transition-all
 						"
 					>
-						Ver Todos →
+						Ver Todos <MoveRight size={14} />
 					</Link>
 				</div>
 
