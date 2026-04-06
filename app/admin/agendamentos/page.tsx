@@ -540,7 +540,7 @@ export default function AgendamentosPage() {
 												title="Cancelar"
 												icon={<X size={16} />}
 												mobileActionBtn
-												className="hover:border-red-500 hover:bg-red-500 hover:text-white"
+												className="text-red-500 hover:border-red-500 hover:bg-red-500 hover:text-white"
 											>
 												Cancelar
 											</ActionButton>
