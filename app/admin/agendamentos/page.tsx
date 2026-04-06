@@ -309,7 +309,7 @@ export default function AgendamentosPage() {
 						<span
 							className={`font-['Bebas_Neue'] text-lg text-[#0a0a0a] ${old ? "opacity-60" : ""}`}
 						>
-							R${Number(info.getValue() ?? 0).toFixed(0)}
+							{formatBRLCurrency(Number(info.getValue()))}
 						</span>
 					);
 				},
