@@ -449,7 +449,13 @@ export default function DashboardPage() {
 						</p>
 					) : (
 						filtered.map((appointment) => (
-							<div key={appointment.id} className="flex flex-col gap-3 p-4 odd:bg-gray-50">
+							<div
+								key={appointment.id}
+								className={`
+									flex flex-col gap-3 p-4 odd:bg-gray-50
+									${["done", "cancelled"].includes(appointment.status) ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}
+								`}
+							>
 								{/* linha 1 — avatar · nome · hora · status */}
 								<div className="flex items-center gap-3">
 									<div className="flex-1 min-w-0">
@@ -556,6 +562,11 @@ export default function DashboardPage() {
 						data={filtered}
 						loading={loading}
 						columns={columns as ColumnDef<Appointment, unknown>[]}
+						getRowClassName={(a) =>
+							["done", "cancelled"].includes(a.status)
+								? "opacity-50 cursor-not-allowed pointer-events-none"
+								: ""
+						}
 					/>
 				</div>
 			</div>
