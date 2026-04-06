@@ -460,7 +460,11 @@ export default function AgendamentosPage() {
 							return (
 								<div
 									key={appointment.id}
-									className={`flex flex-col gap-3 p-4 odd:bg-gray-50 ${old ? "opacity-50 grayscale bg-gray-50" : ""}`}
+									className={`
+										flex flex-col gap-3 p-4 odd:bg-gray-50
+										${["done", "cancelled"].includes(appointment.status) ? "opacity-50 cursor-not-allowed pointer-events-none" : ""} 
+										${old ? "opacity-50 bg-gray-50" : ""}
+									`}
 								>
 									<div className="flex items-center gap-3">
 										<div className="flex-1 min-w-0">
@@ -558,6 +562,11 @@ export default function AgendamentosPage() {
 						data={filtered}
 						columns={columns as ColumnDef<Appointment, unknown>[]}
 						loading={loading}
+						getRowClassName={(appointment) =>
+							["done", "cancelled"].includes(appointment.status)
+								? "opacity-50 cursor-not-allowed pointer-events-none"
+								: ""
+						}
 					/>
 				</div>
 			</div>

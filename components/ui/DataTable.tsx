@@ -18,6 +18,7 @@ interface DataTableProps<TData, TValue> {
 	loading?: boolean;
 	emptyMessage?: string;
 	className?: string;
+	getRowClassName?: (data: TData) => string;
 }
 
 export function DataTable<TData, TValue>({
@@ -26,6 +27,7 @@ export function DataTable<TData, TValue>({
 	loading = false,
 	emptyMessage = "Nenhum resultado encontrado.",
 	className = "",
+	getRowClassName,
 }: DataTableProps<TData, TValue>) {
 	const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -100,7 +102,12 @@ export function DataTable<TData, TValue>({
 							table.getRowModel().rows.map((row) => (
 								<tr
 									key={row.id}
-									className="border-b border-gray-100 text-sm hover:bg-gray-50 bg-white group transition-colors"
+									className={`
+										border-b border-gray-100 text-sm hover:bg-gray-50 bg-white group transition-colors
+										${getRowClassName ? getRowClassName(row.original) : ""}
+									`
+										.replace(/\s+/g, " ")
+										.trim()}
 								>
 									{row.getVisibleCells().map((cell) => (
 										<td key={cell.id} className="py-4 px-5 align-middle">
