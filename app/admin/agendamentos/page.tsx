@@ -2,11 +2,19 @@
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { createClient } from "@/utils/supabase/client";
-import { formatPhone } from "@/utils/format";
+import { formatPhone, formatBRLCurrency } from "@/utils/format";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import { DataTable } from "@/components/ui/DataTable";
 import { createColumnHelper, ColumnDef } from "@tanstack/react-table";
-import { Download } from "lucide-react";
+import {
+	Download,
+	Search,
+	MessageCircleMore,
+	Check,
+	CheckCheck,
+	X,
+} from "lucide-react";
+import ActionButton from "@/components/admin/ActionButton";
 
 // ─── TYPES ───────────────────────────────────────────────
 type Appointment = {
@@ -48,8 +56,6 @@ const STATUS_CLASS: Record<string, string> = {
 };
 
 // Botão de ação
-const actionBtn =
-	"flex items-center justify-center w-8 h-8 rounded border-2 border-gray-200 text-sm transition-all";
 
 function isOlderThan2Days(dateStr: string) {
 	const today = new Date();
@@ -226,12 +232,12 @@ export default function AgendamentosPage() {
 			columnHelper.accessor("client_name", {
 				header: "Cliente",
 				cell: (info) => {
-					const a = info.row.original;
-					const old = isOlderThan2Days(a.date);
+					const appointment = info.row.original;
+					const old = isOlderThan2Days(appointment.date);
 					return (
 						<div className={`flex items-center gap-3 ${old ? "opacity-60 grayscale" : ""}`}>
 							<div className="flex shrink-0 items-center justify-center w-[40px] h-[40px] rounded-full bg-[#0a0a0a] text-white font-['Bebas_Neue'] text-lg">
-								{a.client_name
+								{appointment.client_name
 									.split(" ")
 									.map((w) => w[0])
 									.join("")
@@ -239,10 +245,10 @@ export default function AgendamentosPage() {
 							</div>
 							<div>
 								<p className="font-semibold leading-tight capitalize text-[#0a0a0a] font-['Barlow']">
-									{a.client_name}
+									{appointment.client_name}
 								</p>
 								<p className="text-[11px] text-[#888] font-medium pt-0.5">
-									{formatPhone(a.client_phone)}
+									{formatPhone(appointment.client_phone)}
 								</p>
 							</div>
 						</div>
@@ -316,11 +322,11 @@ export default function AgendamentosPage() {
 					const old = isOlderThan2Days(info.row.original.date);
 					return (
 						<span
-							className={`px-2 py-[2px] rounded text-[10px] font-bold font-['Barlow_Condensed'] uppercase tracking-[1px] ${
+							className={`px-2 py-1 rounded text-xs font-semibold ${
 								STATUS_CLASS[status] ?? "bg-gray-100 text-gray-500"
 							} ${old ? "opacity-60 grayscale" : ""}`}
 						>
-							⏳ {STATUS_LABEL[status] ?? status}
+							{STATUS_LABEL[status] ?? status}
 						</span>
 					);
 				},
@@ -329,48 +335,46 @@ export default function AgendamentosPage() {
 				id: "actions",
 				header: "Ações",
 				cell: (info) => {
-					const a = info.row.original;
-					const old = isOlderThan2Days(a.date);
+					const appointment = info.row.original;
+					const old = isOlderThan2Days(appointment.date);
 					return (
 						<div
 							className={`flex items-center gap-1.5 ${old ? "pointer-events-none opacity-60 grayscale" : ""}`}
 						>
-							<a
-								href={old ? "#" : buildWALink(a.client_phone, a.client_name)}
-								target={old ? undefined : "_blank"}
-								rel={old ? undefined : "noopener noreferrer"}
-								title="WhatsApp"
-								className={`${actionBtn} ${
-									old ? "" : "hover:border-green-500 hover:bg-green-50"
-								} text-[#a0a0a0]`}
-							>
-								💬
-							</a>
-							<button
-								disabled={old}
-								onClick={() => {
-									if (!old) {
-										changeStatus(a.id, "confirmed");
-									}
-								}}
-								title="Confirmar"
-								className={`${actionBtn} ${
-									old ? "" : "hover:border-green-500 hover:bg-green-50 text-green-500"
-								}`}
-							>
-								✅
-							</button>
-							{!["cancelled", "done"].includes(a.status) && (
-								<button
+							{!["cancelled", "done"].includes(appointment.status) && (
+								<ActionButton
+									href={buildWALink(appointment.client_phone, appointment.client_name)}
+									target="_blank"
+									rel="noopener noreferrer"
+									title="WhatsApp"
+									icon={<MessageCircleMore size={16} />}
+									className="hover:border-green-500 hover:bg-green-500 hover:text-white"
+								/>
+							)}
+							{appointment.status === "pending" && (
+								<ActionButton
+									onClick={() => changeStatus(appointment.id, "confirmed")}
+									title="Confirmar"
+									icon={<Check size={16} />}
+									className="text-green-500 hover:border-green-500 hover:bg-green-500 hover:text-white"
+								/>
+							)}
+							{appointment.status === "confirmed" && (
+								<ActionButton
+									onClick={() => changeStatus(appointment.id, "done")}
+									title="Concluir"
+									icon={<CheckCheck size={16} />}
+									className="text-blue-500 hover:border-blue-500 hover:bg-blue-500 hover:text-white"
+								/>
+							)}
+							{!["cancelled", "done"].includes(appointment.status) && (
+								<ActionButton
 									disabled={old}
-									onClick={() => !old && handleCancelClick(a)}
+									onClick={() => handleCancelClick(appointment)}
 									title="Cancelar"
-									className={`${actionBtn} ${
-										old ? "" : "hover:border-red-500 hover:bg-red-50"
-									} font-bold text-[#888]`}
-								>
-									✕
-								</button>
+									icon={<X size={16} />}
+									className="text-red-500 hover:border-red-500 hover:bg-red-500 hover:text-white"
+								/>
 							)}
 						</div>
 					);
@@ -430,14 +434,14 @@ export default function AgendamentosPage() {
 
 					<div className="w-full md:w-64 relative">
 						<span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-							🔍
+							<Search size={14} />
 						</span>
 						<input
 							type="text"
 							placeholder="Buscar agendamento..."
 							value={searchQuery}
 							onChange={(e) => setSearchQuery(e.target.value)}
-							className="w-full rounded-md border border-[#e0e0e0] py-2 pl-9 pr-3 text-sm focus:border-black focus:outline-none"
+							className="w-full rounded-md border border-[#e0e0e0] py-2 pl-7 pr-3 text-sm focus:border-black focus:outline-none"
 						/>
 					</div>
 				</div>
@@ -451,78 +455,95 @@ export default function AgendamentosPage() {
 							Nenhum agendamento encontrado.
 						</p>
 					) : (
-						filtered.map((a) => {
-							const old = isOlderThan2Days(a.date);
+						filtered.map((appointment) => {
+							const old = isOlderThan2Days(appointment.date);
 							return (
 								<div
-									key={a.id}
-									className={`flex flex-col gap-3 p-4 ${old ? "opacity-50 grayscale bg-gray-50" : ""}`}
+									key={appointment.id}
+									className={`flex flex-col gap-3 p-4 odd:bg-gray-50 ${old ? "opacity-50 grayscale bg-gray-50" : ""}`}
 								>
 									<div className="flex items-center gap-3">
 										<div className="flex-1 min-w-0">
-											<p className="truncate text-sm font-bold capitalize">{a.client_name}</p>
-											<p className="text-xs text-gray-500">{formatPhone(a.client_phone)}</p>
+											<p className="truncate text-sm font-bold capitalize">
+												{appointment.client_name}
+											</p>
+											<p className="text-xs text-gray-500">{formatPhone(appointment.client_phone)}</p>
 										</div>
 										<div className="flex shrink-0 flex-col items-end gap-1">
 											<span className="font-['Bebas_Neue'] text-base leading-none">
-												{a.date.split("-").reverse().join("/")} às {a.time}h
+												{appointment.date.split("-").reverse().join("/")} às {appointment.time}h
 											</span>
 											<span
-												className={`px-2 py-0.5 rounded text-[10px] font-bold ${STATUS_CLASS[a.status] ?? "bg-gray-100 text-gray-500"}`}
+												className={`px-2 py-0.5 rounded text-[10px] font-bold ${STATUS_CLASS[appointment.status] ?? "bg-gray-100 text-gray-500"}`}
 											>
-												{STATUS_LABEL[a.status] ?? a.status}
+												{STATUS_LABEL[appointment.status] ?? appointment.status}
 											</span>
 										</div>
 									</div>
 
 									<div className="flex items-center justify-between gap-2 py-2">
 										<div className="min-w-0">
-											<p className="truncate text-xs font-semibold">Barbeiro: {a.barber_name}</p>
+											<p className="truncate text-xs font-semibold">
+												Barbeiro: {appointment.barber_name}
+											</p>
 											<p className="text-xs text-gray-500">
-												{a.service_names.split(",").join(" + ")}
+												{appointment.service_names.split(",").join(" + ")}
 											</p>
 										</div>
 										<span className="shrink-0 font-['Bebas_Neue'] text-xl">
-											R${Number(a.total ?? 0).toFixed(0)}
+											{formatBRLCurrency(Number(appointment.total))}
 										</span>
 									</div>
 
 									<div className="flex gap-2">
-										<button
-											disabled={old}
-											onClick={() => {
-												if (!old) window.open(buildWALink(a.client_phone, a.client_name), "_blank");
-											}}
-											className="flex-1 items-center justify-center py-2 rounded border-2 border-gray-200 font-['Barlow_Condensed'] text-xs font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:border-green-500 hover:bg-green-50"
-										>
-											💬 WhatsApp
-										</button>
-										{a.status === "pending" && (
-											<button
-												disabled={old}
-												onClick={() => !old && changeStatus(a.id, "confirmed")}
-												className="flex-1 items-center justify-center py-2 rounded border-2 border-gray-200 font-['Barlow_Condensed'] text-xs font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:border-green-500 hover:bg-green-50"
+										{!["cancelled", "done"].includes(appointment.status) && (
+											<ActionButton
+												href={buildWALink(appointment.client_phone, appointment.client_name)}
+												target="_blank"
+												rel="noopener noreferrer"
+												title="WhatsApp"
+												icon={<MessageCircleMore size={16} />}
+												mobileActionBtn
+												className="hover:border-green-500 hover:bg-green-500 hover:text-white"
 											>
-												✅ Confirmar
-											</button>
+												WhatsApp
+											</ActionButton>
 										)}
-										{a.status === "confirmed" && (
-											<button
-												disabled={old}
-												onClick={() => !old && changeStatus(a.id, "done")}
-												className="flex-1 items-center justify-center py-2 rounded border-2 border-gray-200 font-['Barlow_Condensed'] text-xs font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:border-black hover:bg-gray-50"
+
+										{appointment.status === "pending" && (
+											<ActionButton
+												onClick={() => changeStatus(appointment.id, "confirmed")}
+												title="Confirmar"
+												icon={<Check size={16} />}
+												mobileActionBtn
+												className="text-green-500 hover:border-green-500 hover:bg-green-500 hover:text-white"
 											>
-												✓ Concluir
-											</button>
+												Confirmar
+											</ActionButton>
 										)}
-										{!["cancelled", "done"].includes(a.status) && (
-											<button
-												disabled={old}
-												onClick={() => !old && handleCancelClick(a)}
-												className="flex-1 items-center justify-center py-2 rounded border-2 border-gray-200 font-['Barlow_Condensed'] text-xs font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:border-red-500 hover:bg-red-50"
+
+										{appointment.status === "confirmed" && (
+											<ActionButton
+												onClick={() => changeStatus(appointment.id, "done")}
+												title="Concluir"
+												icon={<CheckCheck size={16} />}
+												mobileActionBtn
+												className="text-blue-500 hover:border-blue-500 hover:bg-blue-500 hover:text-white"
 											>
-												✕
-											</button>
+												Concluir
+											</ActionButton>
+										)}
+
+										{!["cancelled", "done"].includes(appointment.status) && (
+											<ActionButton
+												onClick={() => handleCancelClick(appointment)}
+												title="Cancelar"
+												icon={<X size={16} />}
+												mobileActionBtn
+												className="hover:border-red-500 hover:bg-red-500 hover:text-white"
+											>
+												Cancelar
+											</ActionButton>
 										)}
 									</div>
 								</div>

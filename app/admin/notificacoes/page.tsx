@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Check, CheckCheck, Trash2, Bell } from "lucide-react";
+import ActionButton from "@/components/admin/ActionButton";
 
 type Notification = {
 	id: string;
@@ -195,24 +196,23 @@ export default function NotificacoesPage() {
 									</span>
 								</div>
 
+
 								{/* AÇÕES (Visíveis ao hover md ou fixas no mobile) */}
 								<div className="flex items-center gap-2 shrink-0 md:opacity-0 md:group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
 									{!n.read && (
-										<button
+										<ActionButton
 											onClick={() => markAsRead(n.id)}
 											title="Marcar como lida"
-											className="p-2 rounded text-gray-400 hover:text-green-600 hover:bg-green-50 transition-colors"
-										>
-											<Check size={18} />
-										</button>
+											icon={<Check size={18} />}
+											className="text-gray-400 hover:text-green-600 hover:border-green-600 hover:bg-green-50"
+										/>
 									)}
-									<button
+									<ActionButton
 										onClick={() => removeNotification(n.id)}
 										title="Excluir notificação"
-										className="p-2 rounded text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-									>
-										<Trash2 size={18} />
-									</button>
+										icon={<Trash2 size={18} />}
+										className="text-gray-400 hover:text-red-600 hover:border-red-600 hover:bg-red-50"
+									/>
 								</div>
 							</div>
 						))}

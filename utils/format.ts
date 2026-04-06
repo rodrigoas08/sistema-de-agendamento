@@ -36,7 +36,7 @@ export function unformatPhone(value: string): string {
  * Formata um número para moeda brasileira
  * Ex: 1000 -> R$ 1.000,00
  */
-export function formatCurrency(value: number): string {
+export function formatBRLCurrency(value: number): string {
 	return new Intl.NumberFormat("pt-BR", {
 		style: "currency",
 		currency: "BRL",
