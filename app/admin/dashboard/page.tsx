@@ -292,7 +292,7 @@ export default function DashboardPage() {
 				header: "Total",
 				cell: (info) => (
 					<span className="font-['Bebas_Neue'] text-lg">
-						R${Number(info.getValue() ?? 0).toFixed(0)}
+						{formatBRLCurrency(Number(info.getValue()))}
 					</span>
 				),
 			}),
