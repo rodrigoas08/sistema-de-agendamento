@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/rodrigoas08/sistema-de-agendamento/compare/v1.0.0...v1.0.1) (2026-04-07)
+
+
+### Bug Fixes
+
+* change style of the button ([44a5d86](https://github.com/rodrigoas08/sistema-de-agendamento/commit/44a5d86705013339f21aa54262d722f8a29053c5))
+
 # 1.0.0 (2026-04-07)
 
 
