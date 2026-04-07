@@ -1,22 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { createClient } from "@/utils/supabase/client";
-import { Check, CheckCheck, Trash2, Bell } from "lucide-react";
+import { Check, CheckCheck, Trash2 } from "lucide-react";
 import ActionButton from "@/components/admin/ActionButton";
+import { DataTable } from "@/components/ui/DataTable";
+import { createColumnHelper, ColumnDef } from "@tanstack/react-table";
 
 type Notification = {
-	id: string;
+	id: Filter;
 	title: string;
 	description: string;
 	read: boolean;
 	created_at: string;
 };
 
+type Filter = "all" | "unread" | "read";
+
+const columnHelper = createColumnHelper<Notification>();
+
 export default function NotificacoesPage() {
 	const [notifications, setNotifications] = useState<Notification[]>([]);
 	const [loading, setLoading] = useState(true);
-	const [filter, setFilter] = useState<"all" | "unread" | "read">("all");
+	const [filter, setFilter] = useState<Filter>("all");
 
 	const supabase = createClient();
 
@@ -41,8 +47,8 @@ export default function NotificacoesPage() {
 				"postgres_changes",
 				{ event: "INSERT", schema: "public", table: "notifications" },
 				(payload) => {
-					const newNotif = payload.new as Notification;
-					setNotifications((prev) => [newNotif, ...prev]);
+					const newNotification = payload.new as Notification;
+					setNotifications((prev) => [newNotification, ...prev]);
 				},
 			)
 			.on(
@@ -51,7 +57,9 @@ export default function NotificacoesPage() {
 				(payload) => {
 					const updated = payload.new as Notification;
 					setNotifications((prev) =>
-						prev.map((n) => (n.id === updated.id ? updated : n)),
+						prev.map((notification) =>
+							notification.id === updated.id ? updated : notification,
+						),
 					);
 				},
 			)
@@ -60,7 +68,9 @@ export default function NotificacoesPage() {
 				{ event: "DELETE", schema: "public", table: "notifications" },
 				(payload) => {
 					const deleted = payload.old as { id: string };
-					setNotifications((prev) => prev.filter((n) => n.id !== deleted.id));
+					setNotifications((prev) =>
+						prev.filter((notification) => notification.id !== deleted.id),
+					);
 				},
 			)
 			.subscribe();
@@ -70,95 +80,214 @@ export default function NotificacoesPage() {
 		};
 	}, [supabase]);
 
-	const markAsRead = async (id: string) => {
-		// Atualiza otimisticamente
-		setNotifications((prev) =>
-			prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
-		);
-		await supabase.from("notifications").update({ read: true }).eq("id", id);
-	};
+	const markAsRead = useCallback(
+		async (id: string) => {
+			// Atualiza otimisticamente
+			setNotifications((prev) =>
+				prev.map((notification) =>
+					notification.id === id ? { ...notification, read: true } : notification,
+				),
+			);
+			await supabase.from("notifications").update({ read: true }).eq("id", id);
+		},
+		[supabase],
+	);
 
 	const markAllAsRead = async () => {
-		const unreadIds = notifications.filter((n) => !n.read).map((n) => n.id);
+		const unreadIds = notifications
+			.filter((notification) => !notification.read)
+			.map((notification) => notification.id);
 		if (unreadIds.length === 0) return;
 
-		setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+		setNotifications((prev) =>
+			prev.map((notification) => ({ ...notification, read: true })),
+		);
 		await supabase.from("notifications").update({ read: true }).in("id", unreadIds);
 	};
 
-	const removeNotification = async (id: string) => {
-		setNotifications((prev) => prev.filter((n) => n.id !== id));
-		await supabase.from("notifications").delete().eq("id", id);
-	};
+	const removeNotification = useCallback(
+		async (id: string) => {
+			setNotifications((prev) =>
+				prev.filter((notification) => notification.id !== id),
+			);
+			await supabase.from("notifications").delete().eq("id", id);
+		},
+		[supabase],
+	);
 
-	const filteredNotifications = notifications.filter((n) => {
-		if (filter === "unread") return !n.read;
-		if (filter === "read") return n.read;
-		return true;
-	});
+	const filteredNotifications = useMemo(() => {
+		return notifications.filter((notification) => {
+			if (filter === "unread") return !notification.read;
+			if (filter === "read") return notification.read;
+			return true;
+		});
+	}, [notifications, filter]);
 
-	const unreadCount = notifications.filter((n) => !n.read).length;
+	const unreadCount = notifications.filter(
+		(notification) => !notification.read,
+	).length;
+
+	const columns = useMemo(
+		() => [
+			columnHelper.display({
+				id: "status",
+				header: "",
+				cell: (info) => {
+					const notification = info.row.original;
+					return (
+						<div className="flex justify-center">
+							<div
+								className={`w-2.5 h-2.5 rounded-full ${
+									notification.read ? "bg-gray-300" : "bg-red-500 animate-pulse"
+								}`}
+							/>
+						</div>
+					);
+				},
+				size: 40,
+			}),
+			columnHelper.display({
+				id: "title",
+				header: "Título",
+				cell: (info) => {
+					const notification = info.row.original;
+					return (
+						<span
+							className={`font-bold ${notification.read ? "text-gray-700" : "text-black"}`}
+						>
+							{notification.title || "Nova Notificação"}
+						</span>
+					);
+				},
+			}),
+			columnHelper.display({
+				id: "description",
+				header: "Mensagem",
+				cell: (info) => {
+					const notification = info.row.original;
+					return (
+						<span
+							className={`text-sm ${notification.read ? "text-gray-500" : "text-gray-800"}`}
+						>
+							{notification.description}
+						</span>
+					);
+				},
+			}),
+			columnHelper.display({
+				id: "created_at",
+				header: "Data/Hora",
+				cell: (info) => {
+					const notification = info.row.original;
+					return (
+						<span className="text-xs text-gray-500 font-medium">
+							{new Date(notification.created_at).toLocaleString("pt-BR", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+							})}
+						</span>
+					);
+				},
+			}),
+			columnHelper.display({
+				id: "actions",
+				header: "Ações",
+				cell: (info) => {
+					const notification = info.row.original;
+					return (
+						<div className="flex items-center gap-2">
+							{!notification.read && (
+								<ActionButton
+									onClick={() => markAsRead(notification.id)}
+									title="Marcar como lida"
+									icon={<Check size={18} />}
+									className="text-green-500 hover:text-white hover:border-green-500 hover:bg-green-500"
+								/>
+							)}
+							<ActionButton
+								onClick={() => removeNotification(notification.id)}
+								title="Excluir notificação"
+								icon={<Trash2 size={18} />}
+								className="text-red-600 hover:text-white hover:border-red-500 hover:bg-red-500"
+							/>
+						</div>
+					);
+				},
+			}),
+		],
+		[markAsRead, removeNotification],
+	);
 
 	return (
-		<div className="flex flex-col gap-6">
-			{/* HEADER E AÇÕES */}
-			<div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-				<h2 className="font-['Bebas_Neue'] text-2xl tracking-[1.5px] uppercase flex items-center gap-2">
-					<Bell className="text-gray-400" /> Minhas Notificações
+		<div className="overflow-hidden rounded-xl border-2 border-gray-200 bg-white shadow-sm">
+			{/* header */}
+			<div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 p-5">
+				<h2 className="font-['Bebas_Neue'] text-xl tracking-[1.5px] uppercase flex items-center gap-2">
+					MINHAS NOTIFICAÇÕES
 				</h2>
-
-				<div className="flex flex-wrap items-center gap-3">
-					<div className="flex bg-white rounded border border-gray-200 overflow-hidden text-sm font-semibold">
-						<button
-							onClick={() => setFilter("all")}
-							className={`px-4 py-2 transition-colors ${
-								filter === "all" ? "bg-black text-white" : "hover:bg-gray-50 text-gray-500"
-							}`}
-						>
-							Todas ({notifications.length})
-						</button>
-						<button
-							onClick={() => setFilter("unread")}
-							className={`px-4 py-2 transition-colors border-l border-r border-gray-200 ${
-								filter === "unread" ? "bg-black text-white" : "hover:bg-gray-50 text-gray-500"
-							}`}
-						>
-							Não lidas ({unreadCount})
-						</button>
-						<button
-							onClick={() => setFilter("read")}
-							className={`px-4 py-2 transition-colors ${
-								filter === "read" ? "bg-black text-white" : "hover:bg-gray-50 text-gray-500"
-							}`}
-						>
-							Lidas
-						</button>
-					</div>
-
-					<button
-						onClick={markAllAsRead}
-						disabled={unreadCount === 0}
-						className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded text-sm font-semibold hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-					>
-						<CheckCheck size={16} />
-						Marcar todas como lidas
-					</button>
-				</div>
 			</div>
 
-			{/* LISTAGEM */}
-			<div className="bg-white border-2 border-gray-200 rounded-xl overflow-hidden flex flex-col">
-				{loading ? (
-					<div className="p-10 text-center text-gray-400 font-semibold text-sm animate-pulse">
-						Carregando suas notificações...
-					</div>
-				) : filteredNotifications.length === 0 ? (
-					<div className="p-10 text-center text-sm font-semibold text-gray-400">
-						Nenhuma notificação encontrada nessa categoria.
-					</div>
-				) : (
-					<div className="divide-y divide-gray-100 flex flex-col">
-						{filteredNotifications.map((n) => (
+			{/* filtros e ações */}
+			<div className="flex flex-col gap-4 border-b border-gray-100 bg-[#f9f9f9] px-5 py-4 md:flex-row md:items-center md:justify-between">
+				<div className="flex flex-wrap gap-2">
+					{[
+						{ id: "all", label: `Todas (${notifications.length})` },
+						{ id: "unread", label: `Não lidas (${unreadCount})` },
+						{ id: "read", label: "Lidas" },
+					].map((f) => (
+						<button
+							key={f.id}
+							onClick={() => setFilter(f.id as Filter)}
+							className={`
+								px-3 py-1.5
+								font-['Barlow_Condensed'] text-xs font-bold tracking-wider uppercase
+								rounded border
+								transition-all
+								${
+								filter === f.id
+									? "border-black bg-black text-white"
+									: "border-[#e0e0e0] bg-white text-gray-600 hover:border-black hover:text-black"
+							}
+							`}
+						>
+							{f.label}
+						</button>
+					))}
+				</div>
+
+				<button
+					onClick={markAllAsRead}
+					disabled={unreadCount === 0}
+					className="
+						flex flex-row items-center gap-2
+						px-4 py-2
+						font-['Barlow_Condensed'] text-[11px] font-bold tracking-widest uppercase
+						rounded border-2 border-[#e0e0e0]
+						hover:border-[#0a0a0a] hover:bg-white
+						transition-all bg-white
+						disabled:opacity-50 disabled:cursor-not-allowed
+					"
+				>
+					<CheckCheck size={14} /> Marcar todas como lidas
+				</button>
+			</div>
+
+			<div className="flex flex-col">
+				{/* ── MOBILE CARD VIEW (< lg) ── */}
+				<div className="divide-y divide-gray-100 flex flex-col lg:hidden">
+					{loading ? (
+						<div className="p-10 text-center text-gray-400 font-semibold text-sm animate-pulse">
+							Carregando suas notificações...
+						</div>
+					) : filteredNotifications.length === 0 ? (
+						<div className="p-10 text-center text-sm font-semibold text-gray-400">
+							Nenhuma notificação encontrada nessa categoria.
+						</div>
+					) : (
+						filteredNotifications.map((n) => (
 							<div
 								key={n.id}
 								className={`
@@ -169,7 +298,9 @@ export default function NotificacoesPage() {
 								{/* ÍCONE DE STATUS */}
 								<div className="shrink-0 mt-1">
 									<div
-										className={`w-2.5 h-2.5 rounded-full ${n.read ? "bg-gray-300" : "bg-red-500 animate-pulse"}`}
+										className={`w-2.5 h-2.5 rounded-full ${
+											n.read ? "bg-gray-300" : "bg-red-500 animate-pulse"
+										}`}
 									/>
 								</div>
 
@@ -196,14 +327,14 @@ export default function NotificacoesPage() {
 									</span>
 								</div>
 
-								{/* AÇÕES (Visíveis ao hover md ou fixas no mobile) */}
+								{/* AÇÕES */}
 								<div className="flex items-center gap-2 shrink-0 md:group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
 									{!n.read && (
 										<ActionButton
 											onClick={() => markAsRead(n.id)}
 											title="Marcar como lida"
 											icon={<Check size={18} />}
-											className="text-green-500	 hover:text-white hover:border-green-500 hover:bg-green-500"
+											className="text-green-500 hover:text-white hover:border-green-500 hover:bg-green-500"
 										/>
 									)}
 									<ActionButton
@@ -214,9 +345,18 @@ export default function NotificacoesPage() {
 									/>
 								</div>
 							</div>
-						))}
-					</div>
-				)}
+						))
+					)}
+				</div>
+
+				{/* ── DESKTOP TABELA (>= lg) ── */}
+				<div className="hidden lg:block">
+					<DataTable
+						data={filteredNotifications}
+						columns={columns as ColumnDef<Notification, unknown>[]}
+						loading={loading}
+					/>
+				</div>
 			</div>
 		</div>
 	);
