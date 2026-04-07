@@ -2,25 +2,27 @@
 
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { createClient } from "@/utils/supabase/client";
-import { Check, CheckCheck, Trash2, Bell } from "lucide-react";
+import { Check, CheckCheck, Trash2 } from "lucide-react";
 import ActionButton from "@/components/admin/ActionButton";
 import { DataTable } from "@/components/ui/DataTable";
 import { createColumnHelper, ColumnDef } from "@tanstack/react-table";
 
 type Notification = {
-	id: string;
+	id: Filter;
 	title: string;
 	description: string;
 	read: boolean;
 	created_at: string;
 };
 
+type Filter = "all" | "unread" | "read";
+
 const columnHelper = createColumnHelper<Notification>();
 
 export default function NotificacoesPage() {
 	const [notifications, setNotifications] = useState<Notification[]>([]);
 	const [loading, setLoading] = useState(true);
-	const [filter, setFilter] = useState<"all" | "unread" | "read">("all");
+	const [filter, setFilter] = useState<Filter>("all");
 
 	const supabase = createClient();
 
@@ -92,10 +94,14 @@ export default function NotificacoesPage() {
 	);
 
 	const markAllAsRead = async () => {
-		const unreadIds = notifications.filter((n) => !n.read).map((n) => n.id);
+		const unreadIds = notifications
+			.filter((notification) => !notification.read)
+			.map((notification) => notification.id);
 		if (unreadIds.length === 0) return;
 
-		setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+		setNotifications((prev) =>
+			prev.map((notification) => ({ ...notification, read: true })),
+		);
 		await supabase.from("notifications").update({ read: true }).in("id", unreadIds);
 	};
 
@@ -234,7 +240,7 @@ export default function NotificacoesPage() {
 					].map((f) => (
 						<button
 							key={f.id}
-							onClick={() => setFilter(f.id as any)}
+							onClick={() => setFilter(f.id as Filter)}
 							className={`
 								px-3 py-1.5
 								font-['Barlow_Condensed'] text-xs font-bold tracking-wider uppercase
