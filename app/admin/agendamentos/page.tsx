@@ -6,14 +6,7 @@ import { formatPhone, formatBRLCurrency } from "@/utils/format";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import { DataTable } from "@/components/ui/DataTable";
 import { createColumnHelper, ColumnDef } from "@tanstack/react-table";
-import {
-	Download,
-	Search,
-	MessageCircleMore,
-	Check,
-	CheckCheck,
-	X,
-} from "lucide-react";
+import { Search, MessageCircleMore, Check, CheckCheck, X } from "lucide-react";
 import ActionButton from "@/components/admin/ActionButton";
 
 // ─── TYPES ───────────────────────────────────────────────
@@ -162,40 +155,41 @@ export default function AgendamentosPage() {
 		setSelectedAppointment(null);
 	}
 
-	const handleDownloadCSV = () => {
-		if (filtered.length === 0) return;
-		const headers = [
-			"Cliente",
-			"Telefone",
-			"Barbeiro",
-			"Serviço",
-			"Data",
-			"Hora",
-			"Total",
-			"Status",
-		];
-		const rows = filtered.map((a) => [
-			a.client_name,
-			a.client_phone,
-			a.barber_name,
-			`"${a.service_names}"`,
-			a.date,
-			a.time,
-			a.total,
-			STATUS_LABEL[a.status] || a.status,
-		]);
+	// TODO: Removido temporariamente
+	// const handleDownloadCSV = () => {
+	// 	if (filtered.length === 0) return;
+	// 	const headers = [
+	// 		"Cliente",
+	// 		"Telefone",
+	// 		"Barbeiro",
+	// 		"Serviço",
+	// 		"Data",
+	// 		"Hora",
+	// 		"Total",
+	// 		"Status",
+	// 	];
+	// 	const rows = filtered.map((a) => [
+	// 		a.client_name,
+	// 		a.client_phone,
+	// 		a.barber_name,
+	// 		`"${a.service_names}"`,
+	// 		a.date,
+	// 		a.time,
+	// 		a.total,
+	// 		STATUS_LABEL[a.status] || a.status,
+	// 	]);
 
-		const csvContent =
-			"data:text/csv;charset=utf-8," +
-			[headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
-		const encodedUri = encodeURI(csvContent);
-		const link = document.createElement("a");
-		link.setAttribute("href", encodedUri);
-		link.setAttribute("download", "agendamentos.csv");
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-	};
+	// 	const csvContent =
+	// 		"data:text/csv;charset=utf-8," +
+	// 		[headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+	// 	const encodedUri = encodeURI(csvContent);
+	// 	const link = document.createElement("a");
+	// 	link.setAttribute("href", encodedUri);
+	// 	link.setAttribute("download", "agendamentos.csv");
+	// 	document.body.appendChild(link);
+	// 	link.click();
+	// 	document.body.removeChild(link);
+	// };
 
 	// ── Derived state ──────────────────────────────────────
 	const filtered = appointments.filter((a) => {
@@ -393,7 +387,8 @@ export default function AgendamentosPage() {
 					<h2 className="font-['Bebas_Neue'] text-xl tracking-[1.5px] uppercase">
 						TODOS OS AGENDAMENTOS
 					</h2>
-					<button
+					{/* TODO: removido temporariamente */}
+					{/* <button
 						onClick={handleDownloadCSV}
 						className="
 							flex flex-row items-center gap-2
@@ -405,7 +400,7 @@ export default function AgendamentosPage() {
 						"
 					>
 						<Download size={14} /> CSV
-					</button>
+					</button> */}
 				</div>
 
 				{/* filtros e busca */}
