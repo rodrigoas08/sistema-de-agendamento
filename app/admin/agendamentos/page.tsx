@@ -564,11 +564,6 @@ export default function AgendamentosPage() {
 						data={filtered}
 						columns={columns as ColumnDef<Appointment, unknown>[]}
 						loading={loading}
-						getRowClassName={(appointment) =>
-							["done", "cancelled"].includes(appointment.status)
-								? "opacity-50 cursor-not-allowed pointer-events-none"
-								: ""
-						}
 					/>
 				</div>
 			</div>
