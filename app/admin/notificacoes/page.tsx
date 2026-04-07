@@ -196,22 +196,21 @@ export default function NotificacoesPage() {
 									</span>
 								</div>
 
-
 								{/* AÇÕES (Visíveis ao hover md ou fixas no mobile) */}
-								<div className="flex items-center gap-2 shrink-0 md:opacity-0 md:group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+								<div className="flex items-center gap-2 shrink-0 md:group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
 									{!n.read && (
 										<ActionButton
 											onClick={() => markAsRead(n.id)}
 											title="Marcar como lida"
 											icon={<Check size={18} />}
-											className="text-gray-400 hover:text-green-600 hover:border-green-600 hover:bg-green-50"
+											className="text-green-500	 hover:text-white hover:border-green-500 hover:bg-green-500"
 										/>
 									)}
 									<ActionButton
 										onClick={() => removeNotification(n.id)}
 										title="Excluir notificação"
 										icon={<Trash2 size={18} />}
-										className="text-gray-400 hover:text-red-600 hover:border-red-600 hover:bg-red-50"
+										className="text-red-600 hover:text-white hover:border-red-500 hover:bg-red-500"
 									/>
 								</div>
 							</div>
