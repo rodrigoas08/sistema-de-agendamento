@@ -324,7 +324,7 @@ export default function AgendamentosPage() {
 						<span
 							className={`px-2 py-1 rounded text-xs font-semibold ${
 								STATUS_CLASS[status] ?? "bg-gray-100 text-gray-500"
-							} ${old ? "opacity-60 grayscale" : ""}`}
+							} ${old && "opacity-70"}`}
 						>
 							{STATUS_LABEL[status] ?? status}
 						</span>
@@ -339,7 +339,7 @@ export default function AgendamentosPage() {
 					const old = isOlderThan2Days(appointment.date);
 					return (
 						<div
-							className={`flex items-center gap-1.5 ${old ? "pointer-events-none opacity-60 grayscale" : ""}`}
+							className={`flex items-center gap-1.5 ${old && "pointer-events-none opacity-60 grayscale"}`}
 						>
 							{!["cancelled", "done"].includes(appointment.status) && (
 								<ActionButton
@@ -488,7 +488,7 @@ export default function AgendamentosPage() {
 									<div className="flex items-center justify-between gap-2 py-2">
 										<div className="min-w-0">
 											<p className="truncate text-xs font-semibold">
-												Barbeiro: {appointment.barber_name}
+												Barbeiro(a): {appointment.barber_name}
 											</p>
 											<p className="text-xs text-gray-500">
 												{appointment.service_names.split(",").join(" + ")}
@@ -499,7 +499,9 @@ export default function AgendamentosPage() {
 										</span>
 									</div>
 
-									<div className="flex gap-2">
+									<div
+										className={`flex gap-2 ${old && "pointer-events-none opacity-60 grayscale"}`}
+									>
 										{!["cancelled", "done"].includes(appointment.status) && (
 											<ActionButton
 												href={buildWALink(appointment.client_phone, appointment.client_name)}
