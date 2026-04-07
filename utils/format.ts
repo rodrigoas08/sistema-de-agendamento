@@ -32,7 +32,11 @@ export function unformatPhone(value: string): string {
 	return value.replace(/\D/g, "");
 }
 
-export function formatCurrency(value: number): string {
+/**
+ * Formata um número para moeda brasileira
+ * Ex: 1000 -> R$ 1.000,00
+ */
+export function formatBRLCurrency(value: number): string {
 	return new Intl.NumberFormat("pt-BR", {
 		style: "currency",
 		currency: "BRL",

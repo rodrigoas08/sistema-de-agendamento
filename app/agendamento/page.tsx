@@ -10,7 +10,7 @@ import { Loader2 } from "lucide-react";
 import { MONTHS, DAYS, ALL_SLOTS } from "@/constants";
 import Button from "@/components/agendamento/Button";
 import Footer from "@/components/Footer";
-import { formatCurrency } from "@/utils/format";
+import { formatBRLCurrency } from "@/utils/format";
 import { useRouter } from "next/navigation";
 
 type Barber = {
@@ -95,10 +95,15 @@ export default function Agendamento() {
 			.in("status", ["pending", "confirmed"])
 			.then(({ data, error }) => {
 				if (cancelled) return;
-				if (error) { console.error("Erro na busca:", error.message); return; }
+				if (error) {
+					console.error("Erro na busca:", error.message);
+					return;
+				}
 				if (data) setBusySlots(data.map((d) => d.time));
 			});
-		return () => { cancelled = true; };
+		return () => {
+			cancelled = true;
+		};
 	}, [selectedDate, selectedBarber, supabase]);
 
 	const totalServiceCost = selectedServices.reduce(
@@ -141,6 +146,33 @@ export default function Agendamento() {
 		setCalYear(newY);
 	};
 
+	async function sendNotification() {
+		const data = await supabase
+			.from("appointments")
+			.select("id")
+			.eq("date", selectedDate)
+			.eq("barber_id", selectedBarber?.id)
+			.eq("time", selectedTime)
+			.eq("client_name", clientName)
+			.eq("client_phone", clientPhone)
+			.eq("total", totalServiceCost)
+			.eq("status", "pending");
+
+		console.log("appointmentID", data.data?.[0]?.id);
+
+		const { error: notifError } = await supabase.from("notifications").insert({
+			title: "Novo agendamento",
+			description: `Agendamento de ${clientName} para o dia ${new Date(selectedDate).toLocaleDateString("pt-BR", { timeZone: "UTC" })} às ${selectedTime}`,
+			read: false,
+			type: "appointment",
+			appointment_id: data?.data?.[0]?.id,
+			created_at: new Date().toISOString(),
+		});
+		if (notifError) {
+			console.error("Erro ao criar notificação:", notifError.message);
+		}
+	}
+
 	const handleConfirm = async () => {
 		if (
 			!selectedBarber ||
@@ -163,13 +195,17 @@ export default function Agendamento() {
 			time: selectedTime,
 			client_name: clientName,
 			client_phone: clientPhone,
+			total: totalServiceCost,
+			notified_wa: true,
 			status: "pending",
 		});
 
 		setIsSubmitting(false);
-		if (!error)
+
+		if (!error) {
+			sendNotification();
 			handleNext(6); // Success screen is step 6 here
-		else alert("Erro ao agendar. Tente novamente.");
+		} else alert("Erro ao agendar. Tente novamente.");
 	};
 
 	// Calendar Generation Helper
@@ -380,7 +416,7 @@ export default function Agendamento() {
 													isSec ? "text-[#e63946]" : "text-[#0a0a0a]",
 												)}
 											>
-												{formatCurrency(Number(s.price))}
+												{formatBRLCurrency(Number(s.price))}
 											</div>
 										</div>
 									);
@@ -390,7 +426,7 @@ export default function Agendamento() {
 							<div className="max-w-[700px] mx-auto mt-4 font-['Barlow_Condensed'] text-[14px] text-[#888] font-semibold tracking-[1px]">
 								{selectedServices.length > 0 && (
 									<span className="text-[#e63946] text-[18px] font-['Bebas_Neue'] tracking-[1px]">
-										Total: {formatCurrency(totalServiceCost)}
+										Total: {formatBRLCurrency(totalServiceCost)}
 									</span>
 								)}
 							</div>
@@ -500,7 +536,13 @@ export default function Agendamento() {
 										) : (
 											<div className="grid grid-cols-3 gap-2">
 												{ALL_SLOTS.map((time) => {
-													const busy = busySlots.includes(time);
+													const currentNow = new Date();
+													const isToday =
+														selectedDate ===
+														`${currentNow.getFullYear()}-${String(currentNow.getMonth() + 1).padStart(2, "0")}-${String(currentNow.getDate()).padStart(2, "0")}`;
+													const currentTime = `${String(currentNow.getHours()).padStart(2, "0")}:${String(currentNow.getMinutes()).padStart(2, "0")}`;
+													const isPastToday = isToday && time < currentTime;
+													const busy = busySlots.includes(time) || isPastToday;
 
 													return (
 														<div
@@ -677,7 +719,7 @@ export default function Agendamento() {
 								<div className="flex justify-between items-center py-2.5 border-b-0 text-[14px] mt-3.5">
 									<span className="text-[#888] font-medium">Total</span>
 									<span className="font-['Bebas_Neue'] text-[30px] text-[#e63946]">
-										{formatCurrency(totalServiceCost)}
+										{formatBRLCurrency(totalServiceCost)}
 									</span>
 								</div>
 							</div>

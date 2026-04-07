@@ -117,8 +117,8 @@ export default function AppointmentsChart() {
 	const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
 
 	const availableYears = useMemo(() => {
-		const cur = new Date().getFullYear();
-		return Array.from({ length: 5 }, (_, i) => cur - i);
+		const currentYear = new Date().getFullYear();
+		return Array.from({ length: 5 }, (_, i) => currentYear - i);
 	}, []);
 
 	useEffect(() => {
@@ -129,10 +129,10 @@ export default function AppointmentsChart() {
 			if (year !== null) {
 				startDate = `${year}-01-01`;
 			} else {
-				const d = new Date();
-				d.setMonth(d.getMonth() - period + 1);
-				d.setDate(1);
-				startDate = d.toISOString().split("T")[0];
+				const date = new Date();
+				date.setMonth(date.getMonth() - period + 1);
+				date.setDate(1);
+				startDate = date.toISOString().split("T")[0];
 			}
 
 			const endDate = year !== null ? `${year}-12-31` : undefined;
@@ -163,33 +163,36 @@ export default function AppointmentsChart() {
 				: getLastNMonths(period);
 
 		return monthKeys.map((key) => {
-			const [y, m] = key.split("-");
-			const monthRows = rows.filter((r) => r.date.startsWith(key));
+			const [year, month] = key.split("-");
+			const monthRows = rows.filter((row) => row.date.startsWith(key));
 
 			const confirmados = monthRows.filter(
-				(r) => r.status === "confirmed" || r.status === "done",
+				(row) => row.status === "confirmed" || row.status === "done",
 			).length;
 
-			const cancelados = monthRows.filter((r) => r.status === "cancelled").length;
+			const concluidos = monthRows.filter((row) => row.status === "done").length;
+
+			const cancelados = monthRows.filter((row) => row.status === "cancelled").length;
 
 			const faturamento = monthRows
-				.filter((r) => r.status === "confirmed" || r.status === "done")
-				.reduce((s, r) => s + Number(r.total ?? 0), 0);
+				.filter((row) => row.status === "confirmed" || row.status === "done")
+				.reduce((sum, row) => sum + Number(row.total ?? 0), 0);
 
 			return {
-				month: `${MONTH_LABELS[m] ?? m}/${y.slice(2)}`,
+				month: `${MONTH_LABELS[month] ?? month}/${year.slice(2)}`,
 				monthKey: key,
 				confirmados,
 				cancelados,
 				faturamento,
+				concluidos,
 			};
 		});
 	}, [rows, period, year]);
 
-	const isEmpty = chartData.every((d) =>
+	const isEmpty = chartData.every((data) =>
 		mode === "appointments"
-			? d.confirmados === 0 && d.cancelados === 0
-			: d.faturamento === 0,
+			? data.confirmados === 0 && data.cancelados === 0
+			: data.faturamento === 0,
 	);
 
 	// ─── RENDER ───────────────────────────────────────────
@@ -199,9 +202,6 @@ export default function AppointmentsChart() {
 			<div className="flex flex-wrap items-start justify-between gap-2 border-b border-gray-100 p-4 md:p-5">
 				<div>
 					<h2 className="font-['Bebas_Neue'] text-xl tracking-[1.5px]">VISÃO GERAL</h2>
-					<p className="mt-0.5 text-xs text-gray-400">
-						{mode === "appointments" ? "Confirmados vs cancelados" : "Faturamento mensal"}
-					</p>
 				</div>
 
 				{/* toggle modo — sempre visível no canto direito */}
@@ -319,15 +319,21 @@ export default function AppointmentsChart() {
 							{mode === "appointments" ? (
 								<>
 									<Bar
+										dataKey="concluidos"
+										name="Concluídos"
+										fill="#79B6EB"
+										radius={[3, 3, 0, 0]}
+									/>
+									<Bar
 										dataKey="confirmados"
 										name="Confirmados"
-										fill="#4ade80"
+										fill="#5DBE3F"
 										radius={[3, 3, 0, 0]}
 									/>
 									<Bar
 										dataKey="cancelados"
 										name="Cancelados"
-										fill="#f87171"
+										fill="#FF0000"
 										radius={[3, 3, 0, 0]}
 									/>
 								</>
