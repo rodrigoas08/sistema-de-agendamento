@@ -105,9 +105,7 @@ export function DataTable<TData, TValue>({
 									className={`
 										border-b border-gray-100 text-sm hover:bg-gray-50 bg-white group transition-colors
 										${getRowClassName ? getRowClassName(row.original) : ""}
-									`
-										.replace(/\s+/g, " ")
-										.trim()}
+									`}
 								>
 									{row.getVisibleCells().map((cell) => (
 										<td key={cell.id} className="py-4 px-5 align-middle">
