@@ -245,6 +245,7 @@ export default function NotificacoesPage() {
 								px-3 py-1.5
 								font-['Barlow_Condensed'] text-xs font-bold tracking-wider uppercase
 								rounded border
+								cursor-pointer
 								transition-all
 								${
 								filter === f.id
@@ -268,6 +269,7 @@ export default function NotificacoesPage() {
 						rounded border-2 border-[#e0e0e0]
 						hover:border-[#0a0a0a] hover:bg-white
 						transition-all bg-white
+						cursor-pointer
 						disabled:opacity-50 disabled:cursor-not-allowed
 					"
 				>

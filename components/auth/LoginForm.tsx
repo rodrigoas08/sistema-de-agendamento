@@ -131,7 +131,7 @@ export default function LoginForm() {
 							</svg>
 							Continuar com Google
 						</button>
-						<div className="flex items-center gap-3 w-full my-6 text-sm text-gray-400 font-semibold before:h-px before:flex-1 before:bg-gray-200 after:h-px after:flex-1 after:bg-gray-200 uppercase">
+						<div className="flex items-center gap-3 w-full mt-6 text-sm text-gray-400 font-semibold before:h-px before:flex-1 before:bg-gray-200 after:h-px after:flex-1 after:bg-gray-200 uppercase">
 							Ou entre usando senha
 						</div>
 					</div>
@@ -143,7 +143,7 @@ export default function LoginForm() {
 								type="text"
 								{...register("usuario")}
 								className={cn(
-									"w-full pl-4 pr-10 py-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black",
+									"w-full pl-4 pr-10 py-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black placeholder:text-sm",
 									errors.usuario && "border-red-500",
 								)}
 								placeholder="seu@email.com"
@@ -172,7 +172,7 @@ export default function LoginForm() {
 								type={showPassword ? "text" : "password"}
 								{...register("senha")}
 								className={cn(
-									"w-full pl-4 pr-10 py-3 rounded border border-gray-300 text-black focus:outline-none focus:ring-2 focus:ring-red-500",
+									"w-full pl-4 pr-10 py-3 rounded border border-gray-300 text-black placeholder:text-sm focus:outline-none focus:ring-2 focus:ring-red-500",
 									errors.senha && "border-red-500",
 								)}
 								placeholder="Sua senha"
@@ -209,7 +209,7 @@ export default function LoginForm() {
 									<Loader2 className="animate-spin" /> ENTRANDO...
 								</span>
 							) : (
-								"ENTRAR NA ÁREA ADMINISTRATIVA"
+								<p className="text-xs md:text-sm">ENTRAR NA ÁREA ADMINISTRATIVA</p>
 							)}
 						</button>
 					</div>
