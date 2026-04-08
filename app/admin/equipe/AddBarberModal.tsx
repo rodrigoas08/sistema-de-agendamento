@@ -16,7 +16,12 @@ interface AddBarberModalProps {
 /**
  * AddBarberModal - Modal form to add a new team member
  */
-export default function AddBarberModal({ isOpen, onClose, onSuccess, isLoading }: AddBarberModalProps) {
+export default function AddBarberModal({
+	isOpen,
+	onClose,
+	onSuccess,
+	isLoading,
+}: AddBarberModalProps) {
 	const {
 		register,
 		handleSubmit,
@@ -28,6 +33,8 @@ export default function AddBarberModal({ isOpen, onClose, onSuccess, isLoading }
 			active: true,
 			tags: [],
 			color: "#0a0a0a",
+			rating: 0,
+			total_cuts: 0,
 		},
 	});
 
@@ -35,13 +42,7 @@ export default function AddBarberModal({ isOpen, onClose, onSuccess, isLoading }
 
 	const onSubmit = async (data: Barber) => {
 		try {
-			await onSuccess({
-				name: data.name,
-				role: data.role,
-				active: data.active ?? true,
-				color: data.color ?? "#0a0a0a",
-				tags: data.tags ?? [],
-			});
+			await onSuccess(data);
 			reset();
 			onClose();
 		} catch (error) {
@@ -53,8 +54,10 @@ export default function AddBarberModal({ isOpen, onClose, onSuccess, isLoading }
 		<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
 			<div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
 				<div className="flex items-center justify-between p-6 border-b border-gray-100">
-					<h3 className="font-['Bebas_Neue'] text-2xl tracking-wider">ADICIONAR MEMBRO</h3>
-					<button 
+					<h3 className="font-['Bebas_Neue'] text-2xl tracking-wider">
+						ADICIONAR MEMBRO
+					</h3>
+					<button
 						onClick={onClose}
 						className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
 					>
@@ -71,7 +74,7 @@ export default function AddBarberModal({ isOpen, onClose, onSuccess, isLoading }
 							{...register("name")}
 							className={cn(
 								"w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all text-sm",
-								errors.name && "border-red-500"
+								errors.name && "border-red-500",
 							)}
 							placeholder="Ex: Diego Moura"
 						/>
@@ -88,7 +91,7 @@ export default function AddBarberModal({ isOpen, onClose, onSuccess, isLoading }
 							{...register("role")}
 							className={cn(
 								"w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all text-sm",
-								errors.role && "border-red-500"
+								errors.role && "border-red-500",
 							)}
 							placeholder="Ex: Especialista em Degradê"
 						/>

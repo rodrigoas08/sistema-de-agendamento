@@ -10,8 +10,8 @@ export const barberSchema = z.object({
 	color: z.string().optional(),
 	active: z.boolean().optional(),
 	tags: z.array(z.string()).optional(),
-	rating: z.number().optional().default(5),
-	total_cuts: z.number().optional().default(0),
+	rating: z.number(),
+	total_cuts: z.number(),
 	badge: z.string().optional(),
 });
 
