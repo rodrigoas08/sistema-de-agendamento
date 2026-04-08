@@ -6,8 +6,15 @@ import { formatPhone, formatBRLCurrency } from "@/utils/format";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import { DataTable } from "@/components/ui/DataTable";
 import { createColumnHelper, ColumnDef } from "@tanstack/react-table";
-import { Search, MessageCircleMore, Check, CheckCheck, X } from "lucide-react";
 import ActionButton from "@/components/admin/ActionButton";
+import {
+	Search,
+	MessageCircleMore,
+	Check,
+	CheckCheck,
+	X,
+	Loader2,
+} from "lucide-react";
 
 // ─── TYPES ───────────────────────────────────────────────
 type Appointment = {
@@ -444,7 +451,10 @@ export default function AgendamentosPage() {
 				{/* ── MOBILE CARD VIEW (< lg) ── */}
 				<div className="divide-y divide-gray-200 lg:hidden block">
 					{loading ? (
-						<p className="py-10 text-center text-sm text-gray-400">Carregando...</p>
+						<p className="py-10 flex items-center justify-center gap-2 text-sm text-gray-400">
+							<Loader2 className="animate-spin" />
+							Carregando agendamentos...
+						</p>
 					) : filtered.length === 0 ? (
 						<p className="py-10 text-center text-sm font-semibold text-gray-400">
 							Nenhum agendamento encontrado.

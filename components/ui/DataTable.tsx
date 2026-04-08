@@ -94,7 +94,7 @@ export function DataTable<TData, TValue>({
 							<tr>
 								<td colSpan={columns.length} className="py-10">
 									<p className="flex items-center justify-center gap-2 text-sm text-gray-400">
-										<Loader2 /> Carregando dados...
+										<Loader2 className="animate-spin" /> Carregando dados...
 									</p>
 								</td>
 							</tr>
