@@ -1,3 +1,15 @@
+# [1.2.0](https://github.com/rodrigoas08/sistema-de-agendamento/compare/v1.1.1...v1.2.0) (2026-04-08)
+
+
+### Bug Fixes
+
+* remove optional of rating and total_cuts values and aupdate default values in resolver of zodResolver ([a7b4a60](https://github.com/rodrigoas08/sistema-de-agendamento/commit/a7b4a6075cc408059ca86d91f0136fd9d585a917))
+
+
+### Features
+
+* implement team management module with barber CRUD, real-time synchronization, and UI components ([7595b05](https://github.com/rodrigoas08/sistema-de-agendamento/commit/7595b05ec9d1281fb674fe8483243ced340e8b65))
+
 ## [1.1.1](https://github.com/rodrigoas08/sistema-de-agendamento/compare/v1.1.0...v1.1.1) (2026-04-08)
 
 
