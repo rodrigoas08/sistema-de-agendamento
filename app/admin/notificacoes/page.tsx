@@ -2,10 +2,10 @@
 
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { createClient } from "@/utils/supabase/client";
-import { Check, CheckCheck, Trash2 } from "lucide-react";
 import ActionButton from "@/components/admin/ActionButton";
 import { DataTable } from "@/components/ui/DataTable";
 import { createColumnHelper, ColumnDef } from "@tanstack/react-table";
+import { Check, CheckCheck, Trash2, Loader2 } from "lucide-react";
 
 type Notification = {
 	id: Filter;
@@ -281,7 +281,8 @@ export default function NotificacoesPage() {
 				{/* ── MOBILE CARD VIEW (< lg) ── */}
 				<div className="divide-y divide-gray-100 flex flex-col lg:hidden">
 					{loading ? (
-						<div className="p-10 text-center text-gray-400 font-semibold text-sm animate-pulse">
+						<div className="p-10 flex items-center justify-center gap-2 text-sm text-gray-400">
+							<Loader2 className="animate-spin" />
 							Carregando suas notificações...
 						</div>
 					) : filteredNotifications.length === 0 ? (
