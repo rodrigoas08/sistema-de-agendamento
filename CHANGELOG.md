@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/rodrigoas08/sistema-de-agendamento/compare/v1.1.0...v1.1.1) (2026-04-08)
+
+
+### Bug Fixes
+
+* display loading message with icon ([cfed6fe](https://github.com/rodrigoas08/sistema-de-agendamento/commit/cfed6fe94766d580160cd2150bbc1082cea5228c))
+
 # [1.1.0](https://github.com/rodrigoas08/sistema-de-agendamento/compare/v1.0.1...v1.1.0) (2026-04-08)
 
 
