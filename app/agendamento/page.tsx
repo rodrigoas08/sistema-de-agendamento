@@ -13,32 +13,18 @@ import Footer from "@/components/Footer";
 import { formatBRLCurrency } from "@/utils/format";
 import { useRouter } from "next/navigation";
 
-type Barber = {
-	id: string;
-	name: string;
-	role: string;
-	rating: number;
-	total_cuts: number;
-	badge?: string;
-	color?: string;
-	tags?: string[];
-};
-type Service = {
-	id: string;
-	name: string;
-	price: number;
-	duration: string;
-	icon?: string;
-};
+import { useBarbers } from "@/hooks/useBarbers";
+import { useServices } from "@/hooks/useServices";
+import { Barber } from "@/schemas/barberSchema";
+import { Service } from "@/schemas/serviceSchema";
 
 export default function Agendamento() {
 	const supabase = createClient();
+	const { activeBarbers, isLoading: isBarbersLoading } = useBarbers();
+	const { activeServices, isLoading: isServicesLoading } = useServices();
 	const [step, setStep] = useState(1);
 
-	const [barbers, setBarbers] = useState<Barber[]>([]);
-	const [services, setServices] = useState<Service[]>([]);
 	const [busySlots, setBusySlots] = useState<string[]>([]);
-
 	const [selectedBarber, setSelectedBarber] = useState<Barber | null>(null);
 	const [selectedServices, setSelectedServices] = useState<Service[]>([]);
 	const [selectedDate, setSelectedDate] = useState("");
@@ -53,18 +39,6 @@ export default function Agendamento() {
 	// Calendar state
 	const [calYear, setCalYear] = useState(new Date().getFullYear());
 	const [calMonth, setCalMonth] = useState(new Date().getMonth());
-
-	useEffect(() => {
-		const loadInitialData = async () => {
-			const [{ data: bData }, { data: sData }] = await Promise.all([
-				supabase.from("barbers").select("*"),
-				supabase.from("services").select("*"),
-			]);
-			if (bData) setBarbers(bData);
-			if (sData) setServices(sData);
-		};
-		loadInitialData();
-	}, [supabase]);
 
 	const loadBusySlots = useCallback(
 		async (barberId: string, date: string) => {
@@ -118,7 +92,7 @@ export default function Agendamento() {
 		}
 		// Sempre que entrar no step de horários, recarrega os slots ocupados
 		// para garantir que changes feitas no admin (confirmações, etc.) sejam refletidas.
-		if (nextStep === 3 && selectedBarber && selectedDate) {
+		if (nextStep === 3 && selectedBarber?.id && selectedDate) {
 			loadBusySlots(selectedBarber.id, selectedDate);
 		}
 	};
@@ -294,10 +268,17 @@ export default function Agendamento() {
 								</p>
 							</div>
 							<div className="flex flex-col lg:flex-row lg:flex-wrap max-w-[700px] mx-auto gap-3 px-5 lg:px-0">
-								{barbers.length === 0 ? (
-									<div className="w-[247px] h-[146px] mx-auto rounded-xl mb-3.5 bg-[linear-gradient(90deg,#f2f2f2_25%,#e0e0e0_50%,#f2f2f2_75%)] bg-size-[200%_100%] animate-pulse"></div>
+								{isBarbersLoading ? (
+									<div className="w-full flex items-center justify-center py-10 gap-2 text-gray-400">
+										<Loader2 className="animate-spin" />
+										<p className="font-semibold">Buscando profissionais...</p>
+									</div>
+								) : activeBarbers.length === 0 ? (
+									<div className="w-full text-center py-10 text-gray-400 italic">
+										Nenhum barbeiro disponível no momento.
+									</div>
 								) : (
-									barbers.map((barber) => (
+									activeBarbers.map((barber) => (
 										<div
 											key={barber.id}
 											onClick={() => setSelectedBarber(barber)}
@@ -330,9 +311,9 @@ export default function Agendamento() {
 													)}
 													style={{ background: barber.color || "#0a0a0a" }}
 												>
-													{barber.name
+													{barber.name!
 														.split(" ")
-														.map((w) => w[0])
+														.map((w: string) => w[0])
 														.join("")
 														.slice(0, 2)}
 												</div>
@@ -385,9 +366,19 @@ export default function Agendamento() {
 							</div>
 
 							<div className="flex flex-col lg:flex-row lg:flex-wrap max-w-[700px] mx-auto gap-3">
-								{services.map((s) => {
-									const isSec = selectedServices.some((svc) => svc.id === s.id);
-									return (
+								{isServicesLoading ? (
+									<div className="w-full flex items-center justify-center py-10 gap-2 text-gray-400">
+										<Loader2 className="animate-spin" />
+										<p className="font-semibold">Buscando serviços...</p>
+									</div>
+								) : activeServices.length === 0 ? (
+									<div className="w-full text-center py-10 text-gray-400 italic">
+										Nenhum serviço disponível no momento.
+									</div>
+								) : (
+									activeServices.map((s: Service) => {
+										const isSec = selectedServices.some((svc) => svc.id === s.id);
+										return (
 										<div
 											key={s.id}
 											onClick={() => toggleService(s)}
@@ -419,8 +410,9 @@ export default function Agendamento() {
 												{formatBRLCurrency(Number(s.price))}
 											</div>
 										</div>
-									);
-								})}
+										);
+									})
+								)}
 							</div>
 
 							<div className="max-w-[700px] mx-auto mt-4 font-['Barlow_Condensed'] text-[14px] text-[#888] font-semibold tracking-[1px]">

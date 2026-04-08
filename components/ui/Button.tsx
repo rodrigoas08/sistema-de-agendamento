@@ -7,9 +7,16 @@ interface ButtonProps {
 	onClick?: () => void;
 	className?: string;
 	type?: "button" | "submit" | "reset";
+	isLogin?: boolean;
 }
 
-const Button = ({ text, onClick, className, type = "button" }: ButtonProps) => {
+const Button = ({
+	text,
+	onClick,
+	className,
+	type = "button",
+	isLogin = false,
+}: ButtonProps) => {
 	return (
 		<button
 			type={type}
@@ -19,7 +26,7 @@ const Button = ({ text, onClick, className, type = "button" }: ButtonProps) => {
 				className,
 			)}
 		>
-			<LogIn size={16} /> <p className="text-base">{text}</p>
+			{isLogin && <LogIn size={16} />} <p className="text-base">{text}</p>
 		</button>
 	);
 };

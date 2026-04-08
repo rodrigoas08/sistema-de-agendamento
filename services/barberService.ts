@@ -1,0 +1,71 @@
+import { createClient } from "@/utils/supabase/client";
+import { Barber } from "@/schemas/barberSchema";
+
+const supabase = createClient();
+
+/**
+ * Barber Service - Handles all database interactions for barbers
+ */
+export const barberService = {
+	/**
+	 * Fetches all barbers from the database
+	 * 
+	 * @returns {Promise<Barber[]>} List of barbers
+	 */
+	async getAll(): Promise<Barber[]> {
+		const { data, error } = await supabase
+			.from("barbers")
+			.select("*")
+			.order("name", { ascending: true });
+
+		if (error) throw new Error(error.message);
+		return data as Barber[];
+	},
+
+	/**
+	 * Adds a new barber to the database
+	 * 
+	 * @param {Omit<Barber, "id">} barber - Barber data to insert
+	 * @returns {Promise<Barber>} The inserted barber
+	 */
+	async create(barber: Omit<Barber, "id">): Promise<Barber> {
+		const { data, error } = await supabase
+			.from("barbers")
+			.insert(barber)
+			.select()
+			.single();
+
+		if (error) throw new Error(error.message);
+		return data as Barber;
+	},
+
+	/**
+	 * Updates an existing barber
+	 * 
+	 * @param {string} id - Barber ID
+	 * @param {Partial<Barber>} barber - Data to update
+	 * @returns {Promise<Barber>} The updated barber
+	 */
+	async update(id: string, barber: Partial<Barber>): Promise<Barber> {
+		const { data, error } = await supabase
+			.from("barbers")
+			.update(barber)
+			.eq("id", id)
+			.select()
+			.single();
+
+		if (error) throw new Error(error.message);
+		return data as Barber;
+	},
+
+	/**
+	 * Toggles the active status of a barber
+	 * 
+	 * @param {string} id - Barber ID
+	 * @param {boolean} active - New active status
+	 * @returns {Promise<Barber>} The updated barber
+	 */
+	async toggleStatus(id: string, active: boolean): Promise<Barber> {
+		return this.update(id, { active });
+	},
+};
