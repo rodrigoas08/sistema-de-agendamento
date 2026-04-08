@@ -78,6 +78,8 @@ export const viewport: Viewport = {
 	viewportFit: "cover",
 };
 
+import QueryProvider from "@/providers/QueryProvider";
+
 export default function RootLayout({
 	children,
 }: Readonly<{
@@ -88,7 +90,9 @@ export default function RootLayout({
 			lang="pt-BR"
 			className={`${geistSans.variable} ${barlowCondensed.variable} ${barlow.variable} ${bebasNeue.variable} h-full antialiased`}
 		>
-			<body className="min-h-full flex flex-col">{children}</body>
+			<body className="min-h-full flex flex-col">
+				<QueryProvider>{children}</QueryProvider>
+			</body>
 		</html>
 	);
 }

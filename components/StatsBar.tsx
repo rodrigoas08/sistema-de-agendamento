@@ -1,8 +1,7 @@
-import { createClient } from "@/utils/supabase/client";
-import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
+import { useBarbers } from "@/hooks/useBarbers";
 
 interface StatsBarProps {
 	statsCountColor?: string;
@@ -16,36 +15,31 @@ function LoaderSpinner() {
 	);
 }
 
+import { useServices } from "@/hooks/useServices";
+
 export function StatsBar({
 	statsCountColor = "text-[#d4a017]",
 }: StatsBarProps) {
-	const supabase = createClient();
-	const [barbersCount, setBarbersCount] = useState(0);
-	const [servicesCount, setServicesCount] = useState(0);
+	const { activeBarbers, isLoading: isBarbersLoading } = useBarbers();
+	const { activeServices, isLoading: isServicesLoading } = useServices();
 
-	useEffect(() => {
-		const loadInitialData = async () => {
-			const [{ count: bCount }, { count: sCount }] = await Promise.all([
-				supabase.from("barbers").select("*", { count: "exact", head: true }),
-				supabase.from("services").select("*", { count: "exact", head: true }),
-			]);
-			if (bCount !== null) setBarbersCount(bCount);
-			if (sCount !== null) setServicesCount(sCount);
-		};
-		loadInitialData();
-	}, [supabase]);
+	if (isBarbersLoading || isServicesLoading) return <LoaderSpinner />;
 
 	return (
 		<Suspense fallback={<LoaderSpinner />}>
 			<div className="relative z-10 grid grid-cols-4 mt-auto py-8 md:px-18 lg:px-55 text-3xl">
 				<div className="text-center px-0 border-r border-white/10">
-					<b className={cn(statsCountColor, "block leading-none")}>{barbersCount}</b>
+					<b className={cn(statsCountColor, "block leading-none")}>
+						{activeBarbers.length}
+					</b>
 					<span className="text-[11px] text-[#888] uppercase tracking-[2px] font-semibold">
 						Barbeiros
 					</span>
 				</div>
 				<div className="text-center border-r border-white/10">
-					<b className={cn(statsCountColor, "block leading-none")}>{servicesCount}</b>
+					<b className={cn(statsCountColor, "block leading-none")}>
+						{activeServices.length}
+					</b>
 					<span className="text-[11px] text-[#888] uppercase tracking-[2px] font-semibold">
 						Serviços
 					</span>
