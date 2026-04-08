@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/rodrigoas08/sistema-de-agendamento/compare/v1.0.1...v1.1.0) (2026-04-08)
+
+
+### Features
+
+* add login page ([149e621](https://github.com/rodrigoas08/sistema-de-agendamento/commit/149e621b8339c8194aac134d449206a5f9fdba6b))
+
 ## [1.0.1](https://github.com/rodrigoas08/sistema-de-agendamento/compare/v1.0.0...v1.0.1) (2026-04-07)
 
 
