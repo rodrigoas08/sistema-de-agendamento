@@ -68,4 +68,18 @@ export const barberService = {
 	async toggleStatus(id: string, active: boolean): Promise<Barber> {
 		return this.update(id, { active });
 	},
+
+	/**
+	 * Removes a barber from the database
+	 *
+	 * @param {string} id - Barber ID to delete
+	 */
+	async remove(id: string): Promise<void> {
+		const { error } = await supabase
+			.from("barbers")
+			.delete()
+			.eq("id", id);
+
+		if (error) throw new Error(error.message);
+	},
 };

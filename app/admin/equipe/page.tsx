@@ -2,9 +2,18 @@
 
 import { useState } from "react";
 import { useBarbers } from "@/hooks/useBarbers";
-import { Plus, User, Loader2 } from "lucide-react";
+import {
+	Plus,
+	User,
+	Loader2,
+	Pencil,
+	CheckCircle2,
+	Trash2,
+} from "lucide-react";
 import AddBarberModal from "./AddBarberModal";
-import Switch from "@/components/ui/Switch";
+import EditBarberModal from "./EditBarberModal";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
+import ActionButton from "@/components/admin/ActionButton";
 import { cn } from "@/lib/utils";
 import { Barber } from "@/schemas/barberSchema";
 
@@ -14,15 +23,35 @@ import { Barber } from "@/schemas/barberSchema";
  * Objectives:
  * 1. List all team members
  * 2. Add new members
- * 3. Toggle active/inactive status
+ * 3. Edit existing members
+ * 4. Toggle active/inactive status
+ * 5. Remove members
  */
 export default function EquipePage() {
-	const { barbers, isLoading, createBarber, toggleStatus, isCreating } =
-		useBarbers();
-	const [isModalOpen, setIsModalOpen] = useState(false);
+	const {
+		barbers,
+		isLoading,
+		createBarber,
+		updateBarber,
+		toggleStatus,
+		deleteBarber,
+		isCreating,
+		isUpdating,
+		isDeleting,
+	} = useBarbers();
+	const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+	const [barberToEdit, setBarberToEdit] = useState<Barber | null>(null);
+	const [barberToDelete, setBarberToDelete] = useState<Barber | null>(null);
 
 	const handleAddBarber = async (data: Omit<Barber, "id">) => {
 		await createBarber(data);
+	};
+
+	const handleEditBarber = async (payload: {
+		id: string;
+		data: Partial<Barber>;
+	}) => {
+		await updateBarber(payload);
 	};
 
 	const handleToggle = async (id: string, currentStatus: boolean) => {
@@ -30,6 +59,16 @@ export default function EquipePage() {
 			await toggleStatus({ id, active: !currentStatus });
 		} catch (error) {
 			console.error("Erro ao alterar status:", error);
+		}
+	};
+
+	const handleConfirmDelete = async () => {
+		if (!barberToDelete?.id) return;
+		try {
+			await deleteBarber(barberToDelete.id);
+			setBarberToDelete(null);
+		} catch (error) {
+			console.error("Erro ao remover barbeiro:", error);
 		}
 	};
 
@@ -43,7 +82,7 @@ export default function EquipePage() {
 						EQUIPE DE BARBEIROS
 					</h2>
 					<button
-						onClick={() => setIsModalOpen(true)}
+						onClick={() => setIsAddModalOpen(true)}
 						className="
 						flex flex-row items-center gap-2
 						px-4 py-2
@@ -74,58 +113,125 @@ export default function EquipePage() {
 						barbers.map((barber) => (
 							<div
 								key={barber.id}
-								className="flex items-center justify-between p-5 hover:bg-gray-50/50 transition-colors"
+								className="flex flex-col gap-3 p-5 hover:bg-gray-50/50 transition-colors"
 							>
-								{/* Left side: Avatar and Info */}
-								<div className="flex items-center gap-4">
-									<div
-										className="flex shrink-0 items-center justify-center w-10 h-10 rounded-full text-white font-['Bebas_Neue'] text-lg shadow-sm"
-										style={{ backgroundColor: barber.color || "#0a0a0a" }}
-									>
-										{barber.name ? (
-											barber.name
-												.split(" ")
-												.map((w) => w[0])
-												.join("")
-												.slice(0, 2)
-												.toUpperCase()
-										) : (
-											<User size={20} />
-										)}
+								{/* Top row: Avatar + Info + Badge */}
+								<div className="flex items-center justify-between">
+									<div className="flex items-center gap-4">
+										<div
+											className="flex shrink-0 items-center justify-center w-10 h-10 rounded-full text-white font-['Bebas_Neue'] text-lg shadow-sm"
+											style={{ backgroundColor: barber.color || "#0a0a0a" }}
+										>
+											{barber.name ? (
+												barber.name
+													.split(" ")
+													.map((word) => word[0])
+													.join("")
+													.slice(0, 2)
+													.toUpperCase()
+											) : (
+												<User size={20} />
+											)}
+										</div>
+										<div>
+											<div className="flex items-center gap-2">
+												<h4 className="font-bold text-[#0a0a0a] leading-tight text-sm">
+													{barber.name}
+												</h4>
+												{/* Status badge */}
+												<span
+													className={cn(
+														"inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider",
+														barber.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500",
+													)}
+												>
+													<span
+														className={cn(
+															"w-1.5 h-1.5 rounded-full",
+															barber.active ? "bg-green-500" : "bg-gray-400",
+														)}
+													/>
+													{barber.active ? "Ativo" : "Inativo"}
+												</span>
+											</div>
+											<p className="text-gray-400 text-xs font-medium uppercase tracking-wider mt-0.5">
+												{barber.role}
+											</p>
+											{barber.tags && barber.tags.length > 0 && (
+												<div className="flex flex-wrap gap-1 mt-1.5">
+													{barber.tags.map((tag) => (
+														<span
+															key={tag}
+															className="inline-block px-2 py-0.5 rounded-full bg-gray-100 text-[10px] font-semibold text-gray-500 capitalize"
+														>
+															{tag}
+														</span>
+													))}
+												</div>
+											)}
+										</div>
 									</div>
-									<div>
-										<h4 className="font-bold text-[#0a0a0a] leading-tight text-sm">
-											{barber.name}
-										</h4>
-										<p className="text-gray-400 text-xs font-medium uppercase tracking-wider mt-0.5">
-											{barber.role}
-										</p>
+
+									{/* Desktop actions (hidden on mobile) */}
+									<div className="hidden md:flex items-center gap-2">
+										<ActionButton
+											onClick={() => setBarberToEdit(barber)}
+											title="Editar"
+											icon={<Pencil size={16} />}
+											className="hover:border-gray-500 hover:bg-gray-500 hover:text-white"
+										/>
+										<ActionButton
+											onClick={() => handleToggle(barber.id!, !!barber.active)}
+											title={barber.active ? "Inativar" : "Ativar"}
+											icon={<CheckCircle2 size={16} />}
+											className={
+												barber.active
+													? "text-red-500 hover:border-red-500 hover:bg-red-500 hover:text-white"
+													: "text-green-500 hover:border-green-500 hover:bg-green-500 hover:text-white"
+											}
+										/>
+										<ActionButton
+											onClick={() => setBarberToDelete(barber)}
+											title="Remover"
+											icon={<Trash2 size={16} />}
+											className="text-red-500 hover:border-red-500 hover:bg-red-500 hover:text-white"
+										/>
 									</div>
 								</div>
 
-								{/* Right side: Status and Toggle */}
-								<div className="flex items-center gap-4">
-									<div className="flex items-center gap-2 mr-2">
-										<div
-											className={cn(
-												"w-2 h-2 rounded-full",
-												barber.active ? "bg-[#5DBE3F]" : "bg-gray-300",
-											)}
-										/>
-										<span
-											className={cn(
-												"text-xs font-bold font-['Barlow'] tracking-wide",
-												barber.active ? "text-[#5DBE3F]" : "text-gray-400",
-											)}
-										>
-											{barber.active ? "Ativo" : "Inativo"}
-										</span>
-									</div>
-									<Switch
-										checked={!!barber.active}
-										onChange={() => handleToggle(barber.id!, !!barber.active)}
-										className="scale-90"
-									/>
+								{/* Mobile actions (hidden on desktop) */}
+								<div className="flex md:hidden justify-between gap-2">
+									<ActionButton
+										onClick={() => setBarberToEdit(barber)}
+										title="Editar"
+										icon={<Pencil size={16} />}
+										mobileActionBtn
+										className="hover:border-gray-500 hover:bg-gray-500 hover:text-white"
+									>
+										Editar
+									</ActionButton>
+									<ActionButton
+										onClick={() => handleToggle(barber.id!, !!barber.active)}
+										title={barber.active ? "Inativar" : "Ativar"}
+										icon={<CheckCircle2 size={16} />}
+										mobileActionBtn
+										className={
+											barber.active
+												? "text-red-500 hover:border-red-500 hover:bg-red-500 hover:text-white"
+												: "text-green-500 hover:border-green-500 hover:bg-green-500 hover:text-white"
+										}
+									>
+										{barber.active ? "Inativar" : "Ativar"}
+									</ActionButton>
+									<ActionButton
+										onClick={() => setBarberToDelete(barber)}
+										title="Remover"
+										icon={<Trash2 size={16} />}
+										mobileActionBtn
+										className="text-red-500 hover:border-red-500 hover:bg-red-500 hover:text-white"
+									>
+										Remover
+									</ActionButton>
 								</div>
 							</div>
 						))
@@ -134,10 +240,30 @@ export default function EquipePage() {
 			</div>
 
 			<AddBarberModal
-				isOpen={isModalOpen}
-				onClose={() => setIsModalOpen(false)}
+				isOpen={isAddModalOpen}
+				onClose={() => setIsAddModalOpen(false)}
 				onSuccess={handleAddBarber}
 				isLoading={isCreating}
+			/>
+
+			{barberToEdit && (
+				<EditBarberModal
+					isOpen={!!barberToEdit}
+					onClose={() => setBarberToEdit(null)}
+					onSuccess={handleEditBarber}
+					isLoading={isUpdating}
+					barber={barberToEdit}
+				/>
+			)}
+
+			<ConfirmationModal
+				isOpen={!!barberToDelete}
+				onClose={() => setBarberToDelete(null)}
+				onConfirm={handleConfirmDelete}
+				loading={isDeleting}
+				title={`Remover ${barberToDelete?.name ?? "membro"}`}
+				subtitle="Tem certeza que deseja remover este membro? Esta ação não pode ser desfeita."
+				confirmText="Remover"
 			/>
 		</>
 	);
