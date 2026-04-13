@@ -68,6 +68,13 @@ export function useBarbers() {
 		},
 	});
 
+	const deleteBarberMutation = useMutation({
+		mutationFn: (id: string) => barberService.remove(id),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["barbers"] });
+		},
+	});
+
 	return {
 		barbers: barbersQuery.data ?? [],
 		activeBarbers: (barbersQuery.data ?? []).filter((b) => b.active),
@@ -76,6 +83,9 @@ export function useBarbers() {
 		createBarber: createBarberMutation.mutateAsync,
 		isCreating: createBarberMutation.isPending,
 		updateBarber: updateBarberMutation.mutateAsync,
+		isUpdating: updateBarberMutation.isPending,
 		toggleStatus: toggleStatusMutation.mutateAsync,
+		deleteBarber: deleteBarberMutation.mutateAsync,
+		isDeleting: deleteBarberMutation.isPending,
 	};
 }
