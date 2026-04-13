@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/rodrigoas08/sistema-de-agendamento/compare/v1.2.0...v1.3.0) (2026-04-13)
+
+
+### Features
+
+* implement team management dashboard with CRUD operations and real-time synchronization ([5eb0536](https://github.com/rodrigoas08/sistema-de-agendamento/commit/5eb05366b6f852c81a1fc7068161ea414db01b4a))
+
 # [1.2.0](https://github.com/rodrigoas08/sistema-de-agendamento/compare/v1.1.1...v1.2.0) (2026-04-08)
 
 
