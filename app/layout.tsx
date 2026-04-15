@@ -1,7 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Barlow_Condensed, Barlow, Bebas_Neue, Geist } from "next/font/google";
-import { Toaster } from "sonner";
-import { PWAUpdater } from "@/components/ui/pwa-updater";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -31,7 +29,6 @@ const BASE_URL = "https://sistema-de-agendamento-ras.vercel.app";
 
 export const metadata: Metadata = {
 	metadataBase: new URL(BASE_URL),
-	applicationName: "Seu Negócio",
 	title:
 		"Barbearia [Nome da Barbearia] | Corte na Régua e Agendamento Online em [Sua Cidade]",
 	description:
@@ -46,15 +43,6 @@ export const metadata: Metadata = {
 	robots: {
 		index: true,
 		follow: true,
-	},
-	// Metadados específicos para PWA no iOS/Safari
-	appleWebApp: {
-		capable: true,
-		statusBarStyle: "black-translucent",
-		title: "Seu Negócio",
-	},
-	formatDetection: {
-		telephone: false,
 	},
 	openGraph: {
 		type: "website",
@@ -88,8 +76,6 @@ export const viewport: Viewport = {
 	maximumScale: 1,
 	userScalable: false,
 	viewportFit: "cover",
-	// Cor da barra de endereços do navegador no mobile (Android/Chrome)
-	themeColor: "#EF4444",
 };
 
 import QueryProvider from "@/providers/QueryProvider";
@@ -106,10 +92,6 @@ export default function RootLayout({
 		>
 			<body className="min-h-full flex flex-col">
 				<QueryProvider>{children}</QueryProvider>
-				{/* Notificador de atualização do PWA */}
-				<PWAUpdater />
-				{/* Toaster global para notificações via sonner */}
-				<Toaster richColors position="bottom-center" />
 			</body>
 		</html>
 	);
