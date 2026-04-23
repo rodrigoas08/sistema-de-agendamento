@@ -1,0 +1,10 @@
+# Compress Skill
+
+Sempre que eu pedir para comprimir um código ou usar o comando /compress:
+1. Remova todos os comentários (// ou /* */).
+2. Remova linhas em branco e espaços excessivos.
+3. Mantenha apenas a lógica bruta.
+4. O objetivo é reduzir o número de tokens para que o código caiba em janelas de contexto pequenas.
+
+Exemplo de saída:
+`function sum(a,b){return a+b}` em vez de versões longas.
