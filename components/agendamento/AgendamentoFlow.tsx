@@ -17,11 +17,13 @@ import { useBarbers } from "@/hooks/useBarbers";
 import { useServices } from "@/hooks/useServices";
 import { Barber } from "@/schemas/barberSchema";
 import { Service } from "@/schemas/serviceSchema";
+import { useBarbershopContext } from "@/providers/BarbershopProvider";
 
 export default function Agendamento() {
 	const supabase = createClient();
-	const { activeBarbers, isLoading: isBarbersLoading } = useBarbers();
-	const { activeServices, isLoading: isServicesLoading } = useServices();
+	const { barbershopId, barbershop } = useBarbershopContext();
+	const { activeBarbers, isLoading: isBarbersLoading } = useBarbers(barbershopId);
+	const { activeServices, isLoading: isServicesLoading } = useServices(barbershopId);
 	const [step, setStep] = useState(1);
 
 	const [busySlots, setBusySlots] = useState<string[]>([]);
@@ -193,13 +195,13 @@ export default function Agendamento() {
 	return (
 		<>
 			<div className="min-h-[calc(100dvh-80px)] font-['Barlow'] bg-white text-[#0a0a0a] overflow-x-hidden">
-				<header className="flex items-center justify-between h-16 px-4 md:px-18 lg:px-58 bg-[#0a0a0a] border-b-2 border-b-[#e63946] shrink-0 sticky top-0 z-50">
+				<header className="flex items-center justify-between h-16 px-4 md:px-18 lg:px-58 bg-[#0a0a0a] border-b-2 border-b-primary shrink-0 sticky top-0 z-50">
 					<Link
-						href="/"
+						href={`/${barbershop.slug}`}
 						className="font-['Bebas_Neue'] text-[26px] text-white tracking-[3px] flex items-center gap-2.5 no-underline"
 					>
-						<span className="w-2.5 h-2.5 bg-[#e63946] rounded-full inline-block"></span>
-						Seu<em className="text-[#e63946] italic">Negócio</em>
+						<span className="w-2.5 h-2.5 bg-primary rounded-full inline-block"></span>
+						{barbershop.name}
 					</Link>
 					<nav className="flex gap-2 items-center">
 						<LoginButton />
@@ -233,7 +235,7 @@ export default function Agendamento() {
 										<span
 											className={cn(
 												"font-['Bebas_Neue'] text-2xl leading-none transition-colors",
-												step === s ? "text-[#e63946]" : "text-[#c4c4c4]",
+												step === s ? "text-primary" : "text-[#c4c4c4]",
 											)}
 										>
 											0{s}
@@ -247,7 +249,7 @@ export default function Agendamento() {
 											{["Barbeiro", "Serviço", "Horário", "Dados", "Confirmar"][idx]}
 										</span>
 										{step > s && (
-											<span className="absolute top-2 right-2 w-4 h-4 bg-[#e63946] rounded-full text-[9px] text-white flex items-center justify-center font-bold">
+											<span className="absolute top-2 right-2 w-4 h-4 bg-primary rounded-full text-[9px] text-white flex items-center justify-center font-bold">
 												✓
 											</span>
 										)}
@@ -285,7 +287,7 @@ export default function Agendamento() {
 											className={cn(
 												"relative flex-1 p-5 border border-t-4 rounded-xl cursor-pointer transition-all bg-white group hover:-translate-y-0.5",
 												selectedBarber?.id === barber.id
-													? "border-[#e63946] rounded-t-lg"
+													? "border-primary rounded-t-lg"
 													: "border-[#e0e0e0] hover:border-[#0a0a0a] rounded-t-lg",
 											)}
 										>
@@ -293,7 +295,7 @@ export default function Agendamento() {
 												className={cn(
 													"absolute top-0 left-0 right-0 h-[3px] transition-colors",
 													selectedBarber?.id === barber.id
-														? "bg-[#e63946]"
+														? "bg-primary"
 														: "bg-[#e0e0e0] group-hover:bg-[#0a0a0a]",
 												)}
 											></div>
@@ -307,7 +309,7 @@ export default function Agendamento() {
 												<div
 													className={cn(
 														"w-[60px] h-[60px] rounded-full flex items-center justify-center font-['Bebas_Neue'] text-[22px] text-white shrink-0 border-[2.5px] transition-colors",
-														selectedBarber?.id === barber.id ? "border-[#e63946]" : "border-[#e0e0e0]",
+														selectedBarber?.id === barber.id ? "border-primary" : "border-[#e0e0e0]",
 													)}
 													style={{ background: barber.color || "#0a0a0a" }}
 												>
@@ -332,7 +334,7 @@ export default function Agendamento() {
 														className={cn(
 															"text-[11px] font-semibold font-['Barlow_Condensed'] tracking-[0.5px] px-2.5 py-[3px] rounded-full",
 															selectedBarber?.id === barber.id
-																? "bg-[#ffe5e7] text-[#e63946]"
+																? "bg-[#ffe5e7] text-primary"
 																: "bg-[#f2f2f2] text-[#444]",
 														)}
 													>
@@ -385,14 +387,14 @@ export default function Agendamento() {
 											className={cn(
 												"flex-1 shrink-0 gap-3.5 border-[1.5px] rounded-xl px-4 py-4 cursor-pointer transition-all",
 												isSec
-													? "border-[#e63946] bg-[#fff7f7]"
+													? "border-primary bg-[#fff7f7]"
 													: "border-[#e0e0e0] bg-white hover:border-[#0a0a0a]",
 											)}
 										>
 											<div
 												className={cn(
 													"w-[46px] h-[46px] rounded-md flex items-center justify-center text-[22px] shrink-0 transition-colors",
-													isSec ? "bg-[#e63946] text-white" : "bg-[#f2f2f2] text-[#0a0a0a]",
+													isSec ? "bg-primary text-white" : "bg-[#f2f2f2] text-[#0a0a0a]",
 												)}
 											>
 												{s.icon || "✂"}
@@ -404,7 +406,7 @@ export default function Agendamento() {
 											<div
 												className={cn(
 													"font-['Bebas_Neue'] text-[24px] shrink-0 transition-colors",
-													isSec ? "text-[#e63946]" : "text-[#0a0a0a]",
+													isSec ? "text-primary" : "text-[#0a0a0a]",
 												)}
 											>
 												{formatBRLCurrency(Number(s.price))}
@@ -417,7 +419,7 @@ export default function Agendamento() {
 
 							<div className="max-w-[700px] mx-auto mt-4 font-['Barlow_Condensed'] text-[14px] text-[#888] font-semibold tracking-[1px]">
 								{selectedServices.length > 0 && (
-									<span className="text-[#e63946] text-[18px] font-['Bebas_Neue'] tracking-[1px]">
+									<span className="text-primary text-[18px] font-['Bebas_Neue'] tracking-[1px]">
 										Total: {formatBRLCurrency(totalServiceCost)}
 									</span>
 								)}
@@ -498,9 +500,9 @@ export default function Agendamento() {
 														isPast
 															? "text-[#c4c4c4] cursor-not-allowed"
 															: "hover:bg-[#f2f2f2] hover:border-[#c4c4c4]",
-														isToday && !isSelected ? "border-[#e63946] text-[#e63946] font-bold" : "",
+														isToday && !isSelected ? "border-primary text-primary font-bold" : "",
 														isSelected ? "bg-[#0a0a0a] text-white border-[#0a0a0a]" : "",
-														isToday && isSelected ? "bg-[#e63946] border-[#e63946]" : "",
+														isToday && isSelected ? "bg-primary border-primary" : "",
 													)}
 													onClick={() => {
 														if (!isPast) {
@@ -710,7 +712,7 @@ export default function Agendamento() {
 								)}
 								<div className="flex justify-between items-center py-2.5 border-b-0 text-[14px] mt-3.5">
 									<span className="text-[#888] font-medium">Total</span>
-									<span className="font-['Bebas_Neue'] text-[30px] text-[#e63946]">
+									<span className="font-['Bebas_Neue'] text-[30px] text-primary">
 										{formatBRLCurrency(totalServiceCost)}
 									</span>
 								</div>
@@ -732,15 +734,15 @@ export default function Agendamento() {
 					)}
 
 					{step === 6 && (
-						<div className="animate-in zoom-in-95 duration-500 bg-white border-2 border-[#e63946] rounded-xl p-10 text-center max-w-[400px] mx-auto mt-12 mb-12 shadow-[0_20px_40px_rgba(230,57,70,0.15)] relative overflow-hidden">
-							<div className="absolute top-0 left-0 right-0 h-1.5 bg-[#e63946]"></div>
-							<div className="w-[80px] h-[80px] bg-[#e63946] text-white rounded-full flex items-center justify-center text-[36px] mx-auto mb-6 shadow-[0_10px_20px_rgba(230,57,70,0.3)] rotate-0 hover:rotate-180 transition-transform duration-500">
+						<div className="animate-in zoom-in-95 duration-500 bg-white border-2 border-primary rounded-xl p-10 text-center max-w-[400px] mx-auto mt-12 mb-12 shadow-[0_20px_40px_rgba(230,57,70,0.15)] relative overflow-hidden">
+							<div className="absolute top-0 left-0 right-0 h-1.5 bg-primary"></div>
+							<div className="w-[80px] h-[80px] bg-primary text-white rounded-full flex items-center justify-center text-[36px] mx-auto mb-6 shadow-[0_10px_20px_rgba(230,57,70,0.3)] rotate-0 hover:rotate-180 transition-transform duration-500">
 								✂
 							</div>
 							<div className="font-['Bebas_Neue'] text-[42px] leading-none text-[#0a0a0a] mb-4 tracking-[1.5px]">
 								AGENDADO!
 								<br />
-								<em className="text-[#e63946] not-italic">SEU HORÁRIO</em>
+								<em className="text-primary not-italic">SEU HORÁRIO</em>
 								<br />
 								TÁ GARANTIDO
 							</div>
@@ -750,7 +752,7 @@ export default function Agendamento() {
 							</p>
 
 							<Button
-								handleNext={() => router.push("/")}
+								handleNext={() => router.push(`/${barbershop.slug}`)}
 								text="Voltar para a página inicial"
 								className="shrink-0 flex-1 py-1 px-2 lg:px-5 lg:text-sm font-bold bg-transparent font-['Bebas_Neue'] text-[#888] border border-[#888] cursor-pointer transition-all hover:border-[#0a0a0a] hover:text-[#0a0a0a] hover:bg-white"
 							/>

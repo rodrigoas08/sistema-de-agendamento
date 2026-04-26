@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useBarbers } from "@/hooks/useBarbers";
+import { useBarbershopContext } from "@/providers/BarbershopProvider";
 import {
 	Plus,
 	User,
@@ -28,6 +29,7 @@ import { Barber } from "@/schemas/barberSchema";
  * 5. Remove members
  */
 export default function EquipePage() {
+	const { barbershopId } = useBarbershopContext();
 	const {
 		barbers,
 		isLoading,
@@ -38,13 +40,13 @@ export default function EquipePage() {
 		isCreating,
 		isUpdating,
 		isDeleting,
-	} = useBarbers();
+	} = useBarbers(barbershopId);
 	const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 	const [barberToEdit, setBarberToEdit] = useState<Barber | null>(null);
 	const [barberToDelete, setBarberToDelete] = useState<Barber | null>(null);
 
 	const handleAddBarber = async (data: Omit<Barber, "id">) => {
-		await createBarber(data);
+		await createBarber({ ...data, barbershop_id: barbershopId });
 	};
 
 	const handleEditBarber = async (payload: {

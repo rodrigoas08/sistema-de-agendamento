@@ -5,6 +5,7 @@ import * as z from "zod";
  */
 export const barberSchema = z.object({
 	id: z.string().uuid().optional(),
+	barbershop_id: z.string().uuid(),
 	name: z.string().min(3, "O nome deve ter pelo menos 3 caracteres"),
 	role: z.string().min(3, "O cargo deve ter pelo menos 3 caracteres"),
 	color: z.string().optional(),

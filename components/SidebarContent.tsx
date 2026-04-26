@@ -4,6 +4,7 @@ import LogoutButton from "@/components/ui/LogoutButton";
 import Link from "next/link";
 import { X } from "lucide-react";
 import { NAV } from "@/app/admin/AdminLayoutClient";
+import { useBarbershopContext } from "@/providers/BarbershopProvider";
 
 interface SidebarProps {
 	userName: string;
@@ -18,11 +19,21 @@ export default function SidebarContent({
 	setIsMobileMenuOpen,
 	isActive,
 }: SidebarProps) {
+	const { barbershop } = useBarbershopContext();
+
 	return (
 		<>
 			<div className="flex items-center justify-between px-7 h-[60px] border-b border-white/10 shrink-0">
 				<span className="font-['Bebas_Neue'] text-2xl tracking-[3px]">
-					Seu<em className="text-red-500 not-italic">Negócio</em>
+					{barbershop.name.split(" ").map((word, index) => (
+						<span key={index}>
+							{index === 0 ? (
+								word
+							) : (
+								<em className="text-red-500 not-italic"> {word}</em>
+							)}
+						</span>
+					))}
 				</span>
 				<button
 					onClick={setIsMobileMenuOpen}
@@ -67,7 +78,7 @@ export default function SidebarContent({
 
 			<div className="p-4 border-t border-white/10 flex flex-col gap-3 shrink-0">
 				<Link
-					href="/"
+					href={`/${barbershop.slug}`}
 					onClick={setIsMobileMenuOpen}
 					className="text-xs text-gray-500 hover:text-white transition-colors"
 				>

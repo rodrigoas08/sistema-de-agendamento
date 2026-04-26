@@ -5,48 +5,49 @@ import { createClient } from "@/utils/supabase/client";
 
 /**
  * Hook to manage services state using TanStack Query with Realtime support
- * 
+ * Filtrado por barbershop_id para isolamento multi-tenant
+ *
+ * @param {string} barbershopId - UUID do estabelecimento ativo
  * @returns {Object} Query state
  */
-export function useServices() {
+export function useServices(barbershopId: string) {
 	const queryClient = useQueryClient();
 	const supabase = createClient();
 
 	const servicesQuery = useQuery({
-		queryKey: ["services"],
-		queryFn: () => serviceService.getAll(),
+		queryKey: ["services", barbershopId],
+		queryFn: () => serviceService.getAll(barbershopId),
+		enabled: !!barbershopId,
 	});
 
 	// Realtime subscription
 	useEffect(() => {
-		console.log("Subscribing to services realtime...");
+		if (!barbershopId) return;
+
 		const channel = supabase
-			.channel("services-realtime-channel")
+			.channel(`services-realtime-${barbershopId}`)
 			.on(
 				"postgres_changes",
-				{ 
-					event: "*", 
-					schema: "public", 
-					table: "services" 
+				{
+					event: "*",
+					schema: "public",
+					table: "services",
+					filter: `barbershop_id=eq.${barbershopId}`,
 				},
-				(payload) => {
-					console.log("Services change detected:", payload);
-					queryClient.invalidateQueries({ queryKey: ["services"] });
-				}
+				() => {
+					queryClient.invalidateQueries({ queryKey: ["services", barbershopId] });
+				},
 			)
-			.subscribe((status) => {
-				console.log("Services subscription status:", status);
-			});
+			.subscribe();
 
 		return () => {
-			console.log("Unsubscribing from services realtime...");
 			supabase.removeChannel(channel);
 		};
-	}, [supabase, queryClient]);
+	}, [supabase, queryClient, barbershopId]);
 
 	return {
 		services: servicesQuery.data ?? [],
-		activeServices: (servicesQuery.data ?? []).filter(s => s.active),
+		activeServices: (servicesQuery.data ?? []).filter((s) => s.active),
 		isLoading: servicesQuery.isLoading,
 		isError: servicesQuery.isError,
 	};

@@ -5,17 +5,20 @@ const supabase = createClient();
 
 /**
  * Barber Service - Handles all database interactions for barbers
+ * Filtrado por barbershop_id para isolamento multi-tenant
  */
 export const barberService = {
 	/**
-	 * Fetches all barbers from the database
-	 * 
+	 * Fetches all barbers from a specific barbershop
+	 *
+	 * @param {string} barbershopId - UUID do estabelecimento
 	 * @returns {Promise<Barber[]>} List of barbers
 	 */
-	async getAll(): Promise<Barber[]> {
+	async getAll(barbershopId: string): Promise<Barber[]> {
 		const { data, error } = await supabase
 			.from("barbers")
 			.select("*")
+			.eq("barbershop_id", barbershopId)
 			.order("name", { ascending: true });
 
 		if (error) throw new Error(error.message);
@@ -24,7 +27,7 @@ export const barberService = {
 
 	/**
 	 * Adds a new barber to the database
-	 * 
+	 *
 	 * @param {Omit<Barber, "id">} barber - Barber data to insert
 	 * @returns {Promise<Barber>} The inserted barber
 	 */
@@ -41,7 +44,7 @@ export const barberService = {
 
 	/**
 	 * Updates an existing barber
-	 * 
+	 *
 	 * @param {string} id - Barber ID
 	 * @param {Partial<Barber>} barber - Data to update
 	 * @returns {Promise<Barber>} The updated barber
@@ -60,7 +63,7 @@ export const barberService = {
 
 	/**
 	 * Toggles the active status of a barber
-	 * 
+	 *
 	 * @param {string} id - Barber ID
 	 * @param {boolean} active - New active status
 	 * @returns {Promise<Barber>} The updated barber

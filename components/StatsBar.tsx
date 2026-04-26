@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
 import { useBarbers } from "@/hooks/useBarbers";
+import { useBarbershopContext } from "@/providers/BarbershopProvider";
 
 interface StatsBarProps {
 	statsCountColor?: string;
@@ -20,8 +21,9 @@ import { useServices } from "@/hooks/useServices";
 export function StatsBar({
 	statsCountColor = "text-[#d4a017]",
 }: StatsBarProps) {
-	const { activeBarbers, isLoading: isBarbersLoading } = useBarbers();
-	const { activeServices, isLoading: isServicesLoading } = useServices();
+	const { barbershopId } = useBarbershopContext();
+	const { activeBarbers, isLoading: isBarbersLoading } = useBarbers(barbershopId);
+	const { activeServices, isLoading: isServicesLoading } = useServices(barbershopId);
 
 	if (isBarbersLoading || isServicesLoading) return <LoaderSpinner />;
 

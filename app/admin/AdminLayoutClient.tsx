@@ -3,9 +3,11 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu } from "lucide-react";
+import { Menu, Building2 } from "lucide-react";
 import SidebarContent from "@/components/SidebarContent";
 import { createClient } from "@/utils/supabase/client";
+import { useAllBarbershops } from "@/hooks/useBarbershop";
+import { useBarbershopContext } from "@/providers/BarbershopProvider";
 import {
 	ChartColumnIncreasing,
 	CalendarDays,
@@ -51,10 +53,12 @@ export default function AdminLayoutClient({
 	children,
 	userName,
 	unreadCount: initialUnreadCount,
+	isSuperAdmin = false,
 }: {
 	children: React.ReactNode;
 	userName: string;
 	unreadCount: number;
+	isSuperAdmin?: boolean;
 }) {
 	const pathname = usePathname();
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -66,6 +70,10 @@ export default function AdminLayoutClient({
 		item.exact ? pathname === item.href : pathname.startsWith(item.href);
 
 	const title = PAGE_TITLES[pathname] ?? "PAINEL";
+
+	// Super Admin: seletor de inquilinos
+	const { barbershops } = useAllBarbershops();
+	const { barbershop } = useBarbershopContext();
 
 	// Busca a contagem atualizada
 	const refreshUnreadCount = useCallback(async () => {
@@ -157,6 +165,32 @@ export default function AdminLayoutClient({
 					</div>
 
 					<div className="flex items-center gap-2 md:gap-3 shrink-0">
+						{/* Super Admin: Seletor de Inquilinos */}
+						{isSuperAdmin && barbershops.length > 0 && (
+							<div className="flex items-center gap-1.5">
+								<Building2 size={14} className="text-gray-400" />
+								<select
+									className="text-[10px] md:text-xs bg-transparent border border-gray-200 rounded px-2 py-1 font-semibold text-gray-600 focus:outline-none focus:border-gray-400 cursor-pointer"
+									value={barbershop?.id ?? ""}
+									onChange={(event) => {
+										// Recarrega a página com o barbershop selecionado
+										// (em produção, usaremos query param ou cookie)
+										const selectedSlug = barbershops.find(
+											(shop) => shop.id === event.target.value,
+										)?.slug;
+										if (selectedSlug) {
+											window.location.href = `/admin/dashboard?tenant=${selectedSlug}`;
+										}
+									}}
+								>
+									{barbershops.map((shop) => (
+										<option key={shop.id} value={shop.id}>
+											{shop.name}
+										</option>
+									))}
+								</select>
+							</div>
+						)}
 						<span className="text-[10px] md:text-xs text-gray-400 flex items-center gap-1.5 uppercase font-medium">
 							<span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-green-500 rounded-full inline-block animate-pulse" />
 							Ao vivo

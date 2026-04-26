@@ -5,6 +5,7 @@ import * as z from "zod";
  */
 export const serviceSchema = z.object({
 	id: z.string().uuid().optional(),
+	barbershop_id: z.string().uuid(),
 	name: z.string().min(3, "O nome do serviço deve ter pelo menos 3 caracteres"),
 	description: z.string().optional(),
 	price: z.number().min(0, "O preço não pode ser negativo"),

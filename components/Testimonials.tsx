@@ -74,7 +74,7 @@ function Stars({ count }: { count: number }) {
 /* ─── Card ─── */
 function ReviewCard({ name, date, text, rating }: (typeof REVIEWS)[0]) {
 	return (
-		<article className="group relative flex flex-col gap-4 shrink-0 w-[300px] sm:w-[340px] lg:w-auto bg-[#111] border border-white/8 rounded-xl p-6 transition-all duration-300 hover:border-[#e63946]/40 hover:shadow-[0_0_28px_rgba(230,57,70,0.12)] cursor-default select-none">
+		<article className="group relative flex flex-col gap-4 shrink-0 w-[300px] sm:w-[340px] lg:w-auto bg-[#111] border border-white/8 rounded-xl p-6 transition-all duration-300 hover:border-primary/40 hover:shadow-[0_0_28px_rgba(230,57,70,0.12)] cursor-default select-none">
 			{/* Google badge */}
 			<div className="absolute top-5 right-5 opacity-70 group-hover:opacity-100 transition-opacity">
 				<GoogleIcon className="w-5 h-5" />
@@ -90,8 +90,8 @@ function ReviewCard({ name, date, text, rating }: (typeof REVIEWS)[0]) {
 
 			{/* Author */}
 			<footer className="flex items-center gap-3 pt-3 border-t border-white/6">
-				<div className="w-9 h-9 rounded-full bg-[#e63946]/20 border border-[#e63946]/30 flex items-center justify-center shrink-0">
-					<span className="font-['Bebas_Neue'] text-[#e63946] text-base leading-none">
+				<div className="w-9 h-9 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0">
+					<span className="font-['Bebas_Neue'] text-primary text-base leading-none">
 						{name[0]}
 					</span>
 				</div>
@@ -139,22 +139,22 @@ export default function Testimonials() {
 			className="bg-[#0a0a0a] py-20 px-4 md:px-18 lg:px-58 border-t border-white/5 relative overflow-hidden"
 		>
 			{/* Decorative blurs */}
-			<div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#e63946]/4 blur-[130px] -z-10 pointer-events-none" />
+			<div className="absolute top-0 right-0 w-[400px] h-[400px] bg-primary/4 blur-[130px] -z-10 pointer-events-none" />
 			<div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-[#d4a017]/4 blur-[100px] -z-10 pointer-events-none" />
 
 			{/* Header */}
 			<div className="mb-10">
 				<div className="flex items-center gap-4 mb-3">
-					<span className="h-[2px] w-12 bg-[#e63946]" />
-					<span className="font-['Barlow_Condensed'] text-xs font-bold tracking-[4px] uppercase text-[#e63946]">
+					<span className="h-[2px] w-12 bg-primary" />
+					<span className="font-['Barlow_Condensed'] text-xs font-bold tracking-[4px] uppercase text-primary">
 						Depoimentos
 					</span>
 				</div>
 				<h2 className="font-['Bebas_Neue'] text-[clamp(28px,6vw,52px)] leading-tight tracking-[2px] text-white">
 					Quem já passou pela cadeira,{" "}
-					<em className="text-[#e63946] not-italic">recomenda.</em>
+					<em className="text-primary not-italic">recomenda.</em>
 				</h2>
-				<div className="h-[2px] w-20 bg-linear-to-r from-[#e63946] to-transparent mt-4" />
+				<div className="h-[2px] w-20 bg-linear-to-r from-primary to-transparent mt-4" />
 			</div>
 
 			{/* Reviews — scrollable on mobile, grid on desktop */}
@@ -166,7 +166,7 @@ export default function Testimonials() {
 							onClick={() => scroll("left")}
 							disabled={!canScrollLeft}
 							aria-label="Ver anterior"
-							className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 z-10 w-9 h-9 rounded-full bg-[#1a1a1a] border border-white/10 flex items-center justify-center text-white disabled:opacity-20 hover:border-[#e63946]/50 transition-all"
+							className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 z-10 w-9 h-9 rounded-full bg-[#1a1a1a] border border-white/10 flex items-center justify-center text-white disabled:opacity-20 hover:border-primary/50 transition-all"
 						>
 							<ChevronLeft className="w-4 h-4" />
 						</button>
@@ -174,7 +174,7 @@ export default function Testimonials() {
 							onClick={() => scroll("right")}
 							disabled={!canScrollRight}
 							aria-label="Ver próximo"
-							className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 z-10 w-9 h-9 rounded-full bg-[#1a1a1a] border border-white/10 flex items-center justify-center text-white disabled:opacity-20 hover:border-[#e63946]/50 transition-all"
+							className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 z-10 w-9 h-9 rounded-full bg-[#1a1a1a] border border-white/10 flex items-center justify-center text-white disabled:opacity-20 hover:border-primary/50 transition-all"
 						>
 							<ChevronRight className="w-4 h-4" />
 						</button>
@@ -199,14 +199,14 @@ export default function Testimonials() {
 					href="https://maps.google.com/?q=[Endereço+Completo]"
 					target="_blank"
 					rel="noopener noreferrer"
-					className="group inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-white/10 hover:border-[#e63946]/40 bg-white/3 hover:bg-[#e63946]/5 transition-all duration-300"
+					className="group inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-white/10 hover:border-primary/40 bg-white/3 hover:bg-primary/5 transition-all duration-300"
 					aria-label="Ver todas as avaliações no Google Maps"
 				>
 					<GoogleIcon className="w-4 h-4" />
 					<span className="font-['Barlow'] text-sm text-[#c4c4c4] group-hover:text-white transition-colors">
 						Ver todas as avaliações no Google Maps
 					</span>
-					<ExternalLink className="w-3.5 h-3.5 text-[#e63946]/50 group-hover:text-[#e63946] transition-colors" />
+					<ExternalLink className="w-3.5 h-3.5 text-primary/50 group-hover:text-primary transition-colors" />
 				</a>
 			</div>
 		</section>

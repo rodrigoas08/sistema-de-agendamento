@@ -15,13 +15,13 @@ export default function LocalSEOSection() {
 			className="bg-[#0a0a0a] py-20 px-4 md:px-18 lg:px-58 border-t border-white/5 relative overflow-hidden"
 		>
 			{/* Decorative blurs */}
-			<div className="absolute top-0 left-0 w-[350px] h-[350px] bg-[#e63946]/5 blur-[120px] -z-10 pointer-events-none" />
+			<div className="absolute top-0 left-0 w-[350px] h-[350px] bg-primary/5 blur-[120px] -z-10 pointer-events-none" />
 			<div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-[#d4a017]/4 blur-[100px] -z-10 pointer-events-none" />
 
 			{/* Section label */}
 			<div className="flex items-center gap-4 mb-10">
-				<span className="h-[2px] w-12 bg-[#e63946]" />
-				<span className="font-['Barlow_Condensed'] text-xs font-bold tracking-[4px] uppercase text-[#e63946]">
+				<span className="h-[2px] w-12 bg-primary" />
+				<span className="font-['Barlow_Condensed'] text-xs font-bold tracking-[4px] uppercase text-primary">
 					Como nos encontrar
 				</span>
 			</div>
@@ -55,11 +55,11 @@ export default function LocalSEOSection() {
 					<div>
 						<h2 className="font-['Bebas_Neue'] text-[clamp(28px,5vw,48px)] leading-tight tracking-[2px] text-white">
 							A melhor experiência em barbearia{" "}
-							<em className="text-[#e63946] not-italic">
+							<em className="text-primary not-italic">
 								no coração de [Nome da Cidade/Bairro]
 							</em>
 						</h2>
-						<div className="h-[2px] w-20 bg-linear-to-r from-[#e63946] to-transparent mt-4" />
+						<div className="h-[2px] w-20 bg-linear-to-r from-primary to-transparent mt-4" />
 					</div>
 
 					{/* Description */}
@@ -76,27 +76,27 @@ export default function LocalSEOSection() {
 						href="https://maps.google.com/?q=[Endereço+Completo]"
 						target="_blank"
 						rel="noopener noreferrer"
-						className="group inline-flex items-start gap-3 p-4 rounded-lg bg-white/3 border border-white/8 hover:border-[#e63946]/50 hover:bg-[#e63946]/5 transition-all duration-300"
+						className="group inline-flex items-start gap-3 p-4 rounded-lg bg-white/3 border border-white/8 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300"
 						aria-label="Ver endereço no Google Maps"
 					>
 						<MapPin
-							className="w-5 h-5 text-[#e63946] shrink-0 mt-0.5 group-hover:scale-110 transition-transform"
+							className="w-5 h-5 text-primary shrink-0 mt-0.5 group-hover:scale-110 transition-transform"
 							strokeWidth={1.5}
 						/>
 						<span className="font-['Barlow'] text-[#c4c4c4] text-sm group-hover:text-white transition-colors leading-relaxed">
 							[Endereço Completo], [Bairro] — [Cidade], [Estado], CEP [00000-000]
 						</span>
-						<ExternalLink className="w-4 h-4 text-[#e63946]/50 group-hover:text-[#e63946] shrink-0 mt-0.5 transition-colors" />
+						<ExternalLink className="w-4 h-4 text-primary/50 group-hover:text-primary shrink-0 mt-0.5 transition-colors" />
 					</a>
 
 					{/* Phone */}
 					<a
 						href="tel:+5511900000000"
-						className="group inline-flex items-center gap-3 p-4 rounded-lg bg-white/3 border border-white/8 hover:border-[#e63946]/50 hover:bg-[#e63946]/5 transition-all duration-300 w-fit"
+						className="group inline-flex items-center gap-3 p-4 rounded-lg bg-white/3 border border-white/8 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 w-fit"
 						aria-label="Ligar para a barbearia"
 					>
 						<Phone
-							className="w-5 h-5 text-[#e63946] shrink-0 group-hover:scale-110 transition-transform"
+							className="w-5 h-5 text-primary shrink-0 group-hover:scale-110 transition-transform"
 							strokeWidth={1.5}
 						/>
 						<span className="font-['Barlow'] text-[#c4c4c4] text-sm group-hover:text-white transition-colors">
@@ -110,8 +110,8 @@ export default function LocalSEOSection() {
 						aria-label="Horário de funcionamento"
 					>
 						<div className="flex items-center gap-2 mb-3">
-							<Clock className="w-4 h-4 text-[#e63946]" strokeWidth={1.5} />
-							<span className="font-['Barlow_Condensed'] text-xs font-bold tracking-[3px] uppercase text-[#e63946]">
+							<Clock className="w-4 h-4 text-primary" strokeWidth={1.5} />
+							<span className="font-['Barlow_Condensed'] text-xs font-bold tracking-[3px] uppercase text-primary">
 								Horário de funcionamento
 							</span>
 						</div>
@@ -121,7 +121,7 @@ export default function LocalSEOSection() {
 									<span className="font-['Barlow'] text-[#888] text-sm">{day}</span>
 									<span
 										className={`font-['Barlow'] text-sm font-semibold ${
-											time === "Fechado" ? "text-[#e63946]/70" : "text-[#d4a017]"
+											time === "Fechado" ? "text-primary/70" : "text-[#d4a017]"
 										}`}
 									>
 										{time}

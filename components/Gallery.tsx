@@ -18,27 +18,27 @@ export default function Gallery() {
 	return (
 		<section className="relative py-20 px-4 md:px-18 lg:px-58 bg-[#0a0a0a] overflow-hidden">
 			{/* Decorative background elements */}
-			<div className="absolute top-0 right-0 w-[300px] h-[300px] bg-[#e63946]/5 blur-[100px] -z-10"></div>
+			<div className="absolute top-0 right-0 w-[300px] h-[300px] bg-primary/5 blur-[100px] -z-10"></div>
 			<div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#d4a017]/5 blur-[120px] -z-10"></div>
 
 			<div className="mb-12 relative">
 				<div className="flex items-center gap-4 mb-3">
-					<span className="h-[2px] w-12 bg-[#e63946]"></span>
-					<span className="font-['Barlow_Condensed'] text-xs font-bold tracking-[4px] uppercase text-[#e63946]">
+					<span className="h-[2px] w-12 bg-primary"></span>
+					<span className="font-['Barlow_Condensed'] text-xs font-bold tracking-[4px] uppercase text-primary">
 						Portfolio visual
 					</span>
 				</div>
 				<h2 className="font-['Bebas_Neue'] text-[48px] md:text-[64px] text-white leading-none tracking-[2px]">
-					NOSSA <em className="text-[#e63946] not-italic">GALERIA</em>
+					NOSSA <em className="text-primary not-italic">GALERIA</em>
 				</h2>
-				<div className="h-1 w-24 bg-linear-to-r from-[#e63946] to-transparent mt-4"></div>
+				<div className="h-1 w-24 bg-linear-to-r from-primary to-transparent mt-4"></div>
 			</div>
 
 			<div className="columns-2 lg:columns-4">
 				{IMAGES.map((src, idx) => (
 					<div
 						key={idx}
-						className="break-inside-avoid group mb-5 relative overflow-hidden border border-white/10 transition-all duration-500 hover:border-[#e63946]/50"
+						className="break-inside-avoid group mb-5 relative overflow-hidden border border-white/10 transition-all duration-500 hover:border-primary/50"
 					>
 						<Image
 							loading="eager"
@@ -55,7 +55,7 @@ export default function Gallery() {
 								<p className="font-['Bebas_Neue'] text-center lg:text-left text-lg lg:text-xl text-white lg:tracking-[1px]">
 									TRABALHO REALIZADO
 								</p>
-								<p className="font-['Barlow'] text-center lg:text-left text-[10px] text-[#e63946] font-bold tracking-[2px] uppercase">
+								<p className="font-['Barlow'] text-center lg:text-left text-[10px] text-primary font-bold tracking-[2px] uppercase">
 									Estilo Profissional
 								</p>
 							</div>

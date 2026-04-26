@@ -22,7 +22,7 @@ const Button = ({
 			type={type}
 			onClick={onClick}
 			className={cn(
-				"flex items-center justify-center w-fit h-fit gap-2 px-2 py-1 bg-red-500 text-[#fafafa] font-bold rounded-md",
+				"flex items-center justify-center w-fit h-fit gap-2 px-2 py-1 bg-primary text-[#fafafa] font-bold rounded-md",
 				className,
 			)}
 		>

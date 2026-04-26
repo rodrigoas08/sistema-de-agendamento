@@ -6,49 +6,50 @@ import { createClient } from "@/utils/supabase/client";
 
 /**
  * Hook to manage barbers state using TanStack Query
+ * Filtrado por barbershop_id para isolamento multi-tenant
  *
+ * @param {string} barbershopId - UUID do estabelecimento ativo
  * @returns {Object} Query and mutation methods
  */
-export function useBarbers() {
+export function useBarbers(barbershopId: string) {
 	const queryClient = useQueryClient();
 	const supabase = createClient();
 
 	const barbersQuery = useQuery({
-		queryKey: ["barbers"],
-		queryFn: () => barberService.getAll(),
+		queryKey: ["barbers", barbershopId],
+		queryFn: () => barberService.getAll(barbershopId),
+		enabled: !!barbershopId,
 	});
 
 	// Realtime subscription to keep data in sync across all components
 	useEffect(() => {
-		console.log("Subscribing to barbers realtime...");
+		if (!barbershopId) return;
+
 		const channel = supabase
-			.channel("barbers-realtime-channel")
+			.channel(`barbers-realtime-${barbershopId}`)
 			.on(
 				"postgres_changes",
 				{
 					event: "*",
 					schema: "public",
 					table: "barbers",
+					filter: `barbershop_id=eq.${barbershopId}`,
 				},
-				(payload) => {
-					console.log("Barbers change detected:", payload);
-					queryClient.invalidateQueries({ queryKey: ["barbers"] });
+				() => {
+					queryClient.invalidateQueries({ queryKey: ["barbers", barbershopId] });
 				},
 			)
-			.subscribe((status) => {
-				console.log("Barbers subscription status:", status);
-			});
+			.subscribe();
 
 		return () => {
-			console.log("Unsubscribing from barbers realtime...");
 			supabase.removeChannel(channel);
 		};
-	}, [supabase, queryClient]);
+	}, [supabase, queryClient, barbershopId]);
 
 	const createBarberMutation = useMutation({
 		mutationFn: (newBarber: Omit<Barber, "id">) => barberService.create(newBarber),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["barbers"] });
+			queryClient.invalidateQueries({ queryKey: ["barbers", barbershopId] });
 		},
 	});
 
@@ -56,7 +57,7 @@ export function useBarbers() {
 		mutationFn: ({ id, data }: { id: string; data: Partial<Barber> }) =>
 			barberService.update(id, data),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["barbers"] });
+			queryClient.invalidateQueries({ queryKey: ["barbers", barbershopId] });
 		},
 	});
 
@@ -64,14 +65,14 @@ export function useBarbers() {
 		mutationFn: ({ id, active }: { id: string; active: boolean }) =>
 			barberService.toggleStatus(id, active),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["barbers"] });
+			queryClient.invalidateQueries({ queryKey: ["barbers", barbershopId] });
 		},
 	});
 
 	const deleteBarberMutation = useMutation({
 		mutationFn: (id: string) => barberService.remove(id),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["barbers"] });
+			queryClient.invalidateQueries({ queryKey: ["barbers", barbershopId] });
 		},
 	});
 
