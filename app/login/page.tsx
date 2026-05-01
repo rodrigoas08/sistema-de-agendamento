@@ -11,7 +11,13 @@ export const metadata: Metadata = {
  * 
  * @returns {JSX.Element} The rendered login page
  */
-export default function LoginPage() {
+export default async function LoginPage({
+	searchParams,
+}: {
+	searchParams: Promise<{ tenant?: string }>;
+}) {
+	const { tenant } = await searchParams;
+
 	return (
 		<main className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4 selection:bg-red-500 selection:text-white">
 			{/* Decorative background elements */}
@@ -19,9 +25,9 @@ export default function LoginPage() {
 				<div className="absolute -top-24 -left-24 w-96 h-96 bg-red-600/10 rounded-full blur-[120px]" />
 				<div className="absolute -bottom-24 -right-24 w-96 h-96 bg-red-600/10 rounded-full blur-[120px]" />
 			</div>
-			
+
 			<div className="relative z-10 w-full flex justify-center">
-				<LoginForm />
+				<LoginForm tenant={tenant} />
 			</div>
 		</main>
 	);

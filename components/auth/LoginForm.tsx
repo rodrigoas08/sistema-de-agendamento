@@ -28,7 +28,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
  *
  * @returns {JSX.Element} The rendered login form
  */
-export default function LoginForm() {
+export default function LoginForm({ tenant }: { tenant?: string }) {
 	const [loginError, setLoginError] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
@@ -68,15 +68,22 @@ export default function LoginForm() {
 			return;
 		}
 		setIsLoading(false);
-		router.push("/admin/dashboard");
+		router.push(tenant ? `/admin/dashboard?tenant=${tenant}` : "/admin/dashboard");
 	};
 
 	const handleGoogleLogin = async () => {
 		const supabase = createClient();
+		const callbackUrl = new URL(`${location.origin}/auth/callback`);
+		
+		// Se vier de um tenant, passa para o callback
+		if (tenant) {
+			callbackUrl.searchParams.set("next", `/admin/dashboard?tenant=${tenant}`);
+		}
+
 		await supabase.auth.signInWithOAuth({
 			provider: "google",
 			options: {
-				redirectTo: `${location.origin}/auth/callback`,
+				redirectTo: callbackUrl.toString(),
 			},
 		});
 	};

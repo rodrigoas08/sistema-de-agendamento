@@ -9,6 +9,10 @@ export async function GET(request: Request) {
 	// se não tiver "next" na URL, redireciona para o dashboard
 	const next = searchParams.get("next") ?? "/admin/dashboard";
 
+	// Tenta extrair o tenant do next (ex: /admin/dashboard?tenant=slug)
+	const nextUrl = new URL(next, origin);
+	const tenant = nextUrl.searchParams.get("tenant");
+
 	if (code) {
 		const cookieStore = await cookies();
 		const supabase = createServerClient(
@@ -35,6 +39,9 @@ export async function GET(request: Request) {
 		const { error } = await supabase.auth.exchangeCodeForSession(code);
 
 		if (!error) {
+			if (tenant) {
+				cookieStore.set("admin_tenant", tenant, { path: "/" });
+			}
 			return NextResponse.redirect(`${origin}${next}`);
 		} else {
 			console.error("Supabase Auth Error no Callback:", error.message);

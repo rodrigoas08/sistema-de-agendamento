@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import AdminLayoutClient from "./AdminLayoutClient";
 import { BarbershopProvider } from "@/providers/BarbershopProvider";
@@ -36,26 +37,50 @@ export default async function AdminLayout({
 
 	// Busca o barbershop do admin logado
 	let barbershop: Barbershop | null = null;
+	const cookieStore = await cookies();
+	const tenantCookie = cookieStore.get("admin_tenant")?.value;
 
 	if (isSuperAdmin) {
-		// Super Admin: pega o primeiro barbershop (seletor será no client)
-		const { data } = await supabase
-			.from("barbershops")
-			.select("*")
-			.order("name", { ascending: true })
-			.limit(1)
-			.single();
+		// Super Admin: tenta o cookie, senão pega o primeiro
+		if (tenantCookie) {
+			const { data } = await supabase
+				.from("barbershops")
+				.select("*")
+				.eq("slug", tenantCookie)
+				.maybeSingle();
+			barbershop = data as Barbershop | null;
+		}
 
-		barbershop = data as Barbershop | null;
+		if (!barbershop) {
+			const { data } = await supabase
+				.from("barbershops")
+				.select("*")
+				.order("name", { ascending: true })
+				.limit(1)
+				.maybeSingle();
+			barbershop = data as Barbershop | null;
+		}
 	} else {
-		// Owner: pega o barbershop vinculado
-		const { data } = await supabase
-			.from("barbershops")
-			.select("*")
-			.eq("owner_id", user.id)
-			.single();
+		// Owner: tenta o cookie se ele possuir o owner_id correto, senão pega o primeiro que ele for dono
+		if (tenantCookie) {
+			const { data } = await supabase
+				.from("barbershops")
+				.select("*")
+				.eq("slug", tenantCookie)
+				.eq("owner_id", user.id)
+				.maybeSingle();
+			barbershop = data as Barbershop | null;
+		}
 
-		barbershop = data as Barbershop | null;
+		if (!barbershop) {
+			const { data } = await supabase
+				.from("barbershops")
+				.select("*")
+				.eq("owner_id", user.id)
+				.limit(1)
+				.maybeSingle();
+			barbershop = data as Barbershop | null;
+		}
 	}
 
 	if (!barbershop) redirect("/?error=no_barbershop");
