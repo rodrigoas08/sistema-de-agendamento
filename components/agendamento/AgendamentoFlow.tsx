@@ -132,7 +132,8 @@ export default function Agendamento() {
 			.eq("client_name", clientName)
 			.eq("client_phone", clientPhone)
 			.eq("total", totalServiceCost)
-			.eq("status", "pending");
+			.eq("status", "pending")
+			.eq("barbershop_id", barbershopId);
 
 		console.log("appointmentID", data.data?.[0]?.id);
 
@@ -142,6 +143,7 @@ export default function Agendamento() {
 			read: false,
 			type: "appointment",
 			appointment_id: data?.data?.[0]?.id,
+			barbershop_id: barbershopId,
 			created_at: new Date().toISOString(),
 		});
 		if (notifError) {
@@ -174,6 +176,7 @@ export default function Agendamento() {
 			total: totalServiceCost,
 			notified_wa: true,
 			status: "pending",
+			barbershop_id: barbershopId,
 		});
 
 		setIsSubmitting(false);

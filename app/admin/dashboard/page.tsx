@@ -18,6 +18,7 @@ import {
 	CheckCheck,
 	Loader2,
 } from "lucide-react";
+import { useBarbershopContext } from "@/providers/BarbershopProvider";
 
 // ─── TYPES ───────────────────────────────────────────────
 type Appointment = {
@@ -79,6 +80,7 @@ const columnHelper = createColumnHelper<Appointment>();
 
 // ─── COMPONENT ───────────────────────────────────────────
 export default function DashboardPage() {
+	const { barbershopId } = useBarbershopContext();
 	const [appointments, setAppointments] = useState<Appointment[]>([]);
 	const [notifications, setNotifications] = useState<Notification[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -101,15 +103,19 @@ export default function DashboardPage() {
 		const today = new Date().toISOString().split("T")[0];
 
 		const fetchData = async () => {
+			if (!barbershopId) return;
+
 			const [{ data: appts }, { data: notifs }] = await Promise.all([
 				supabase
 					.from("appointments")
 					.select("*")
+					.eq("barbershop_id", barbershopId)
 					.eq("date", today)
 					.order("time", { ascending: true }),
 				supabase
 					.from("notifications")
 					.select("*")
+					.eq("barbershop_id", barbershopId)
 					.order("created_at", { ascending: false })
 					.limit(20),
 			]);
@@ -124,7 +130,12 @@ export default function DashboardPage() {
 			.channel("dashboard-live")
 			.on(
 				"postgres_changes",
-				{ event: "INSERT", schema: "public", table: "appointments" },
+				{
+					event: "INSERT",
+					schema: "public",
+					table: "appointments",
+					filter: `barbershop_id=eq.${barbershopId}`,
+				},
 				(payload) => {
 					const a = payload.new as Appointment;
 					if (a.date === today) {
@@ -137,7 +148,12 @@ export default function DashboardPage() {
 			)
 			.on(
 				"postgres_changes",
-				{ event: "UPDATE", schema: "public", table: "appointments" },
+				{
+					event: "UPDATE",
+					schema: "public",
+					table: "appointments",
+					filter: `barbershop_id=eq.${barbershopId}`,
+				},
 				(payload) => {
 					const a = payload.new as Appointment;
 					setAppointments((prev) => prev.map((x) => (x.id === a.id ? a : x)));
@@ -145,7 +161,12 @@ export default function DashboardPage() {
 			)
 			.on(
 				"postgres_changes",
-				{ event: "INSERT", schema: "public", table: "notifications" },
+				{
+					event: "INSERT",
+					schema: "public",
+					table: "notifications",
+					filter: `barbershop_id=eq.${barbershopId}`,
+				},
 				(payload) => {
 					setNotifications((prev) => [payload.new as Notification, ...prev]);
 				},

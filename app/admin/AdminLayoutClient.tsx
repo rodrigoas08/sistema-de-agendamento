@@ -77,12 +77,14 @@ export default function AdminLayoutClient({
 
 	// Busca a contagem atualizada
 	const refreshUnreadCount = useCallback(async () => {
+		if (!barbershop?.id) return;
 		const { count } = await supabase
 			.from("notifications")
 			.select("*", { count: "exact", head: true })
-			.eq("read", false);
+			.eq("read", false)
+			.eq("barbershop_id", barbershop.id);
 		if (count !== null) setUnreadCount(count);
-	}, [supabase]);
+	}, [supabase, barbershop?.id]);
 
 	useEffect(() => {
 		// Listener para mudanças nas notificações
@@ -90,7 +92,12 @@ export default function AdminLayoutClient({
 			.channel("notifications-badge")
 			.on(
 				"postgres_changes",
-				{ event: "*", schema: "public", table: "notifications" },
+				{
+					event: "*",
+					schema: "public",
+					table: "notifications",
+					filter: `barbershop_id=eq.${barbershop?.id}`,
+				},
 				() => {
 					refreshUnreadCount();
 				},
@@ -173,12 +180,12 @@ export default function AdminLayoutClient({
 									className="text-[10px] md:text-xs bg-transparent border border-gray-200 rounded px-2 py-1 font-semibold text-gray-600 focus:outline-none focus:border-gray-400 cursor-pointer"
 									value={barbershop?.id ?? ""}
 									onChange={(event) => {
-										// Recarrega a página com o barbershop selecionado
-										// (em produção, usaremos query param ou cookie)
 										const selectedSlug = barbershops.find(
 											(shop) => shop.id === event.target.value,
 										)?.slug;
 										if (selectedSlug) {
+											// Define o cookie para o servidor reconhecer o tenant
+											document.cookie = `admin_tenant=${selectedSlug}; path=/; max-age=31536000`;
 											window.location.href = `/admin/dashboard?tenant=${selectedSlug}`;
 										}
 									}}

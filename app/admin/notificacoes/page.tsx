@@ -6,6 +6,7 @@ import ActionButton from "@/components/admin/ActionButton";
 import { DataTable } from "@/components/ui/DataTable";
 import { createColumnHelper, ColumnDef } from "@tanstack/react-table";
 import { Check, CheckCheck, Trash2, Loader2 } from "lucide-react";
+import { useBarbershopContext } from "@/providers/BarbershopProvider";
 
 type Notification = {
 	id: Filter;
@@ -20,17 +21,17 @@ type Filter = "all" | "unread" | "read";
 const columnHelper = createColumnHelper<Notification>();
 
 export default function NotificacoesPage() {
+	const { barbershopId } = useBarbershopContext();
 	const [notifications, setNotifications] = useState<Notification[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [filter, setFilter] = useState<Filter>("all");
-
 	const supabase = createClient();
 
 	useEffect(() => {
 		const fetchData = async () => {
 			const { data, error } = await supabase
-				.from("notifications")
 				.select("*")
+				.eq("barbershop_id", barbershopId)
 				.order("created_at", { ascending: false });
 
 			if (!error && data) {
@@ -45,7 +46,12 @@ export default function NotificacoesPage() {
 			.channel("notifications-live")
 			.on(
 				"postgres_changes",
-				{ event: "INSERT", schema: "public", table: "notifications" },
+				{
+					event: "INSERT",
+					schema: "public",
+					table: "notifications",
+					filter: `barbershop_id=eq.${barbershopId}`,
+				},
 				(payload) => {
 					const newNotification = payload.new as Notification;
 					setNotifications((prev) => [newNotification, ...prev]);
@@ -53,7 +59,12 @@ export default function NotificacoesPage() {
 			)
 			.on(
 				"postgres_changes",
-				{ event: "UPDATE", schema: "public", table: "notifications" },
+				{
+					event: "UPDATE",
+					schema: "public",
+					table: "notifications",
+					filter: `barbershop_id=eq.${barbershopId}`,
+				},
 				(payload) => {
 					const updated = payload.new as Notification;
 					setNotifications((prev) =>
@@ -65,7 +76,12 @@ export default function NotificacoesPage() {
 			)
 			.on(
 				"postgres_changes",
-				{ event: "DELETE", schema: "public", table: "notifications" },
+				{
+					event: "DELETE",
+					schema: "public",
+					table: "notifications",
+					filter: `barbershop_id=eq.${barbershopId}`,
+				},
 				(payload) => {
 					const deleted = payload.old as { id: string };
 					setNotifications((prev) =>

@@ -14,6 +14,7 @@ import {
 import { createClient } from "@/utils/supabase/client";
 import { Loader2 } from "lucide-react";
 import { useMediaQuery } from "react-responsive";
+import { useBarbershopContext } from "@/providers/BarbershopProvider";
 
 // ─── TYPES ───────────────────────────────────────────────
 type RawRow = {
@@ -108,6 +109,7 @@ const filterBtn = (active: boolean) => `
 
 // ─── COMPONENT ───────────────────────────────────────────
 export default function AppointmentsChart() {
+	const { barbershopId } = useBarbershopContext();
 	const [rows, setRows] = useState<RawRow[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [mode, setMode] = useState<ViewMode>("appointments");
@@ -140,6 +142,7 @@ export default function AppointmentsChart() {
 			let query = supabase
 				.from("appointments")
 				.select("date, status, total")
+				.eq("barbershop_id", barbershopId)
 				.gte("date", startDate)
 				.in("status", ["confirmed", "done", "cancelled"]);
 

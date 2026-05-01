@@ -15,6 +15,7 @@ import {
 	X,
 	Loader2,
 } from "lucide-react";
+import { useBarbershopContext } from "@/providers/BarbershopProvider";
 
 // ─── TYPES ───────────────────────────────────────────────
 type Appointment = {
@@ -69,12 +70,11 @@ const columnHelper = createColumnHelper<Appointment>();
 
 // ─── COMPONENT ───────────────────────────────────────────
 export default function AgendamentosPage() {
+	const { barbershopId } = useBarbershopContext();
 	const [appointments, setAppointments] = useState<Appointment[]>([]);
 	const [loading, setLoading] = useState(true);
-
 	const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 	const [searchQuery, setSearchQuery] = useState("");
-
 	const [toast, setToast] = useState<{ msg: string; error?: boolean } | null>(
 		null,
 	);
@@ -82,7 +82,6 @@ export default function AgendamentosPage() {
 	const [selectedAppointment, setSelectedAppointment] =
 		useState<Appointment | null>(null);
 	const [cancelling, setCancelling] = useState(false);
-
 	const supabase = createClient();
 
 	const showToast = useCallback((msg: string, error = false) => {
@@ -93,8 +92,8 @@ export default function AgendamentosPage() {
 	useEffect(() => {
 		const fetchData = async () => {
 			const { data: appts } = await supabase
-				.from("appointments")
 				.select("*")
+				.eq("barbershop_id", barbershopId)
 				.order("date", { ascending: false })
 				.order("time", { ascending: false });
 
@@ -108,7 +107,12 @@ export default function AgendamentosPage() {
 			.channel("agendamentos-live")
 			.on(
 				"postgres_changes",
-				{ event: "INSERT", schema: "public", table: "appointments" },
+				{
+					event: "INSERT",
+					schema: "public",
+					table: "appointments",
+					filter: `barbershop_id=eq.${barbershopId}`,
+				},
 				(payload) => {
 					const a = payload.new as Appointment;
 					setAppointments((prev) => [a, ...prev]);
@@ -117,7 +121,12 @@ export default function AgendamentosPage() {
 			)
 			.on(
 				"postgres_changes",
-				{ event: "UPDATE", schema: "public", table: "appointments" },
+				{
+					event: "UPDATE",
+					schema: "public",
+					table: "appointments",
+					filter: `barbershop_id=eq.${barbershopId}`,
+				},
 				(payload) => {
 					const a = payload.new as Appointment;
 					setAppointments((prev) => prev.map((x) => (x.id === a.id ? a : x)));
